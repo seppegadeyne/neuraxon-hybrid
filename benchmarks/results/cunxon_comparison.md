@@ -1,14 +1,16 @@
 # cuNxon comparison against existing Neuraxon-Hybrid evidence
 
-Verdict: `longer cuNxon sweep still flat/baseline-level`
+Verdict: `cuNxon interface semantics clarified; decision probes remain flat/baseline-level`
 
 ## What changed
 
-The previous cuNxon slice established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, and a three-sphere action adapter. This follow-up adds a longer task-coupled sweep over 108 live RTX 5090 samples: modes `infer`, `train`, and `train_rewarded`; horizons `32`, `512`, `4096`, and `32768`; seed offsets `79`, `80`, and `81`; and the same execute/retry/query action contract.
+The previous cuNxon slices established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, a three-sphere action adapter, and a longer task-coupled sweep over 108 live RTX 5090 samples. This follow-up adds a focused interface semantics probe for same-sphere readout ports and source-to-downstream relay ports.
 
 The longer sweep remains baseline-level. Every mode × horizon accuracy is `0.333333`, exactly equal to the constant-action baselines on the balanced toy set. Shorter frozen infer samples show a little readout diversity, but by `4096`/`32768` steps infer also collapses to `query=9`; both `train` and `train_rewarded` are flat `query=9` at every tested horizon.
 
-The earlier snapshot/pattern and multi-sphere findings still stand: snapshot APIs expose hidden-state changes and pattern APIs are callable, but recall stayed flat zero; the three-sphere adapter ran but decoded all train/holdout cases to `query`, showed baseline-level holdout accuracy, and matched trivial baselines.
+The new interface probe supports the absolute-neuron-index interpretation used by the C++ path: same-sphere readouts match their full-sphere snapshot slices for both relative input ports `[0..3]` and absolute output ports `[8..11]` in a 4/4/4 sphere. Relay behavior also differs by source port class: relaying input-neuron ports activates the downstream input readout, while relaying output-neuron ports stayed neutral in this setup. This clarifies interface semantics, but it is not a task-learning result.
+
+The earlier snapshot/pattern, multi-sphere and long-sweep findings still stand: snapshot APIs expose hidden-state changes and pattern APIs are callable, but recall stayed flat zero; the three-sphere adapter ran but decoded all train/holdout cases to `query`, showed baseline-level holdout accuracy, and matched trivial baselines; longer one-sphere action sweeps remained baseline-level.
 
 ## Comparison lanes
 
@@ -21,6 +23,7 @@ The earlier snapshot/pattern and multi-sphere findings still stand: snapshot API
 | cuNxon infer-vs-train sensitivity probe | readout/action diversity | infer unique=3; train unique=1; train-mode flat/query=9 | `benchmarks/results/cunxon_sensitivity_probe.json` |
 | cuNxon snapshot/pattern probe | hidden-state and recall signal | snapshots active=0,8,2; patterns=2→0; recall hamming=0 | `benchmarks/results/cunxon_snapshot_pattern_probe.json` |
 | cuNxon multi-sphere/action adapter | holdout success_rate vs trivial baselines | holdout=0.333333; overall=0.333333; flat query motor readouts | `benchmarks/results/cunxon_multisphere_action_probe.json` |
+| cuNxon interface semantics probe | readout/relay port mapping | same-sphere readouts match snapshot slices; input-port relay activates downstream; output-port relay stays neutral in this setup | `benchmarks/results/cunxon_interface_semantics_probe.json` |
 | raw_network | success_rate | 0.145833 | `holdout_noisy_generalization anti-oracle temporal mode` |
 | random | success_rate | 0.104167 | `holdout_noisy_generalization anti-oracle temporal baseline` |
 | always_execute | success_rate | 0.166667 | `holdout_noisy_generalization anti-oracle temporal baseline` |
@@ -29,10 +32,10 @@ The earlier snapshot/pattern and multi-sphere findings still stand: snapshot API
 
 ## Interpretation
 
-cuNxon remains interesting as a GPU runtime and diagnostics surface, but the new longer sweep strengthens the negative decision-quality conclusion for the current Hybrid adapter path. Longer training horizons and simple neuromodulator/reward injection did not turn the one-sphere action readout into a policy signal; they mostly collapsed to the same neutral `query` output.
+cuNxon remains interesting as a GPU runtime and diagnostics surface, and the interface semantics probe removes one ambiguity from the next adapter design: readout/relay ports should be treated as absolute neuron indices when targeting output neurons. However, this does not rescue the current decision-quality evidence. Longer training horizons and simple neuromodulator/reward injection did not turn the one-sphere action readout into a policy signal; they mostly collapsed to the same neutral `query` output.
 
-The next useful direction is no longer “just run longer”. Either inspect/readjust cuNxon interface semantics and output-port/CTSN readout mapping at the C/CUDA level, or design an adapter with an explicit supervised motor-target mechanism and stronger holdout temporal baselines before claiming integration value.
+The next useful direction is no longer “just run longer”. A plausible next slice is an explicit supervised motor-target adapter that uses absolute output-neuron indices and tests train/holdout cases against constant-action baselines. If that remains flat, the research should move to lower-level CTSN/readout or plasticity semantics rather than adding horizon length.
 
 ## Evidence boundary
 
-This comparison deliberately separates runtime viability from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, and reward injection prove useful diagnostic surfaces, but flat recall and baseline-level action accuracy do not prove intelligence, generalization, or useful learning.
+This comparison deliberately separates runtime viability and interface semantics from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, reward injection, and absolute-neuron-index port mapping prove useful diagnostic surfaces, but flat recall and baseline-level action accuracy do not prove intelligence, generalization, or useful learning.

@@ -11,6 +11,9 @@ from neuraxon_agent.cli import main
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonInterfaceReadoutSample,
+    CunxonInterfaceRelaySample,
+    CunxonInterfaceSemanticsProbeResult,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
     CunxonLongSweepProbeResult,
@@ -488,6 +491,73 @@ def test_cli_cunxon_multisphere_action_probe_writes_json_and_markdown(
         encoding="utf-8"
     )
     assert "multi-sphere/action adapter" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_interface_semantics_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonInterfaceSemanticsProbeResult:
+        return CunxonInterfaceSemanticsProbeResult(
+            status="interface semantics probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            steps=3,
+            readout_samples=[
+                CunxonInterfaceReadoutSample(
+                    mapping="relative-input-readout",
+                    port_ids=[0, 1, 2],
+                    neuron_class="input",
+                    readout=[1, -1, 1],
+                    snapshot_slice=[1, -1, 1],
+                    matches_snapshot_slice=True,
+                    active_state_count=3,
+                    signed_sum=1,
+                )
+            ],
+            relay_samples=[
+                CunxonInterfaceRelaySample(
+                    mapping="input-neuron-relay",
+                    source_port_ids=[0, 1, 2, 3],
+                    source_neuron_class="input",
+                    source_relay_readout=[1, -1, 0, 1],
+                    downstream_input_readout=[0, -1, 0, 0],
+                    downstream_active_state_count=1,
+                    downstream_energy=4.0,
+                )
+            ],
+            notes=["fake interface semantics"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_interface_semantics_probe", fake_probe)
+    json_path = tmp_path / "interface.json"
+    markdown_path = tmp_path / "interface.md"
+
+    rc = main(
+        [
+            "cunxon-interface-semantics-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "interface semantics probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "absolute neuron indices" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:

@@ -349,6 +349,64 @@ class CunxonMultisphereActionProbeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonInterfaceReadoutSample:
+    """One same-sphere readout-port mapping sample."""
+
+    mapping: str
+    port_ids: list[int]
+    neuron_class: str
+    readout: list[int]
+    snapshot_slice: list[int]
+    matches_snapshot_slice: bool
+    active_state_count: int
+    signed_sum: int
+
+
+@dataclass(frozen=True)
+class CunxonInterfaceRelaySample:
+    """One source-port relay mapping sample into a downstream sphere."""
+
+    mapping: str
+    source_port_ids: list[int]
+    source_neuron_class: str
+    source_relay_readout: list[int]
+    downstream_input_readout: list[int]
+    downstream_active_state_count: int
+    downstream_energy: float
+
+
+@dataclass(frozen=True)
+class CunxonInterfaceSemanticsProbeResult:
+    """Probe result for cuNxon absolute-vs-relative interface/readout semantics."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    steps: int
+    readout_samples: list[CunxonInterfaceReadoutSample]
+    relay_samples: list[CunxonInterfaceRelaySample]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of interface samples checked."""
+        return len(self.readout_samples) + len(self.relay_samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -958,6 +1016,193 @@ def write_multisphere_action_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_multisphere_action_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
+
+
+def render_interface_semantics_markdown_report(
+    result: CunxonInterfaceSemanticsProbeResult,
+) -> str:
+    """Render a cuNxon interface/readout-port semantics report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    readout_rows = [
+        (
+            "| Mapping | Port IDs | Neuron class | Readout | Snapshot slice | "
+            "Matches snapshot | Active | Signed sum |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | ---: | ---: |",
+    ]
+    for sample in result.readout_samples:
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        snapshot = ", ".join(_format_trinary(value) for value in sample.snapshot_slice)
+        readout_rows.append(
+            "| "
+            f"{sample.mapping} | {sample.port_ids} | {sample.neuron_class} | "
+            f"[{readout}] | [{snapshot}] | {sample.matches_snapshot_slice} | "
+            f"{sample.active_state_count} | {sample.signed_sum} |"
+        )
+    relay_rows = [
+        (
+            "| Mapping | Source port IDs | Source class | Source readout | "
+            "Downstream input readout | Downstream active | Downstream energy |"
+        ),
+        "| --- | --- | --- | --- | --- | ---: | ---: |",
+    ]
+    for sample in result.relay_samples:
+        source = ", ".join(_format_trinary(value) for value in sample.source_relay_readout)
+        downstream = ", ".join(
+            _format_trinary(value) for value in sample.downstream_input_readout
+        )
+        relay_rows.append(
+            "| "
+            f"{sample.mapping} | {sample.source_port_ids} | {sample.source_neuron_class} | "
+            f"[{source}] | [{downstream}] | {sample.downstream_active_state_count} | "
+            f"{sample.downstream_energy:.6g} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon interface semantics probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Steps: {result.steps}",
+            f"- Samples: {result.sample_count}",
+            "",
+            "## Why this probe exists",
+            "",
+            "previous multi-sphere probes stayed flat, so this slice checks whether cuNxon "
+            "interfaces use absolute neuron indices rather than relative output-block "
+            "indices before building another supervised motor-target adapter.",
+            "",
+            "## Same-sphere readout-port samples",
+            "",
+            *readout_rows,
+            "",
+            "## Relay samples",
+            "",
+            *relay_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This probe only checks cuNxon C API interface/readout-port semantics. It does "
+            "not prove intelligence, task learning, action quality, or generalization. A "
+            "supervised motor-target adapter would still need holdout cases and trivial "
+            "baselines before any usefulness claim.",
+            "",
+        ]
+    )
+
+
+def write_interface_semantics_artifacts(
+    result: CunxonInterfaceSemanticsProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown interface semantics artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_interface_semantics_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def run_ctypes_interface_semantics_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    steps: int = 3,
+    device_id: int = 0,
+) -> CunxonInterfaceSemanticsProbeResult:
+    """Check cuNxon interface/readout port mapping with absolute neuron indices."""
+    if steps <= 0:
+        raise ValueError("steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        readout_samples = [
+            _run_interface_readout_sample(
+                lib=lib,
+                ctx=ctx,
+                mapping="relative-input-readout",
+                port_ids=[0, 1, 2, 3],
+                neuron_class="input",
+                steps=steps,
+            ),
+            _run_interface_readout_sample(
+                lib=lib,
+                ctx=ctx,
+                mapping="absolute-output-readout",
+                port_ids=[8, 9, 10, 11],
+                neuron_class="output",
+                steps=steps,
+            ),
+        ]
+        relay_samples = [
+            _run_interface_relay_sample(
+                lib=lib,
+                ctx=ctx,
+                mapping="input-neuron-relay",
+                source_port_ids=[0, 1, 2, 3],
+                source_neuron_class="input",
+                steps=steps,
+            ),
+            _run_interface_relay_sample(
+                lib=lib,
+                ctx=ctx,
+                mapping="output-neuron-relay",
+                source_port_ids=[8, 9, 10, 11],
+                source_neuron_class="output",
+                steps=steps,
+            ),
+        ]
+        return CunxonInterfaceSemanticsProbeResult(
+            status="interface semantics probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            steps=steps,
+            readout_samples=readout_samples,
+            relay_samples=relay_samples,
+            notes=[
+                "same-sphere readouts were compared against full-sphere snapshot slices",
+                (
+                    "relay samples use identical source inputs but alternate "
+                    "input-vs-output source ports"
+                ),
+                (
+                    "absolute output ports are input_count + hidden_count + output offset "
+                    "for this 4/4/4 probe"
+                ),
+            ],
+        )
+    finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
 
 
 def run_ctypes_smoke(
@@ -2290,6 +2535,187 @@ def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float],
         ("retry-negative-drive", (-1.0, -0.25, 0.0), "retry"),
         ("query-neutral-drive", (0.0, 0.0, 0.0), "query"),
     ]
+
+
+def _run_interface_readout_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mapping: str,
+    port_ids: Sequence[int],
+    neuron_class: str,
+    steps: int,
+) -> CunxonInterfaceReadoutSample:
+    net = C.c_void_p()
+    try:
+        name = f"neuraxon_hybrid_cunxon_interface_{mapping}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        sphere_id = _add_interface_probe_sphere(
+            lib, net, sphere_name=b"IFACE", readout_ids=port_ids
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+        input_buffer = (C.c_float * 4)(1.0, -1.0, 0.25, 0.75)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        for _ in range(steps):
+            _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+        _check(lib, lib.cunxonContextSync(ctx))
+        readout = _capture_readout(lib, net, sphere_id)
+        states = _capture_snapshot_states(lib, net, sphere_id)
+        snapshot_slice = [states[index] for index in port_ids]
+        return CunxonInterfaceReadoutSample(
+            mapping=mapping,
+            port_ids=list(port_ids),
+            neuron_class=neuron_class,
+            readout=readout,
+            snapshot_slice=snapshot_slice,
+            matches_snapshot_slice=readout == snapshot_slice,
+            active_state_count=sum(1 for value in readout if value != 0),
+            signed_sum=sum(readout),
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+
+
+def _run_interface_relay_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mapping: str,
+    source_port_ids: Sequence[int],
+    source_neuron_class: str,
+    steps: int,
+) -> CunxonInterfaceRelaySample:
+    net = C.c_void_p()
+    try:
+        name = f"neuraxon_hybrid_cunxon_interface_relay_{mapping}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        source_id = _add_interface_probe_sphere(
+            lib,
+            net,
+            sphere_name=b"SRC",
+            readout_ids=source_port_ids,
+            relay_output_ids=source_port_ids,
+        )
+        downstream_id = _add_interface_probe_sphere(
+            lib,
+            net,
+            sphere_name=b"DST",
+            sphere_type=CUNXON_SPHERE_ASSOCIATION,
+            readout_ids=[0, 1, 2, 3],
+            sensory_ids=None,
+            relay_input_ids=[0, 1, 2, 3],
+            seed_offset=80,
+        )
+        link_params = _default_link_params()
+        link_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddLink(
+                net, source_id, downstream_id, C.byref(link_params), C.byref(link_id)
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+        source_input = (C.c_float * 4)(1.0, -1.0, 0.25, 0.75)
+        source_pointer = C.cast(source_input, C.POINTER(C.c_float))
+        null_pointer = C.POINTER(C.c_float)()
+        ext_inputs = (C.POINTER(C.c_float) * 2)(source_pointer, null_pointer)
+        for _ in range(steps):
+            _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+        _check(lib, lib.cunxonContextSync(ctx))
+        source_readout = _capture_readout(lib, net, source_id)
+        downstream_readout = _capture_readout(lib, net, downstream_id)
+        return CunxonInterfaceRelaySample(
+            mapping=mapping,
+            source_port_ids=list(source_port_ids),
+            source_neuron_class=source_neuron_class,
+            source_relay_readout=source_readout,
+            downstream_input_readout=downstream_readout,
+            downstream_active_state_count=sum(1 for value in downstream_readout if value != 0),
+            downstream_energy=_capture_energy(lib, net),
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+
+
+def _add_interface_probe_sphere(
+    lib: C.CDLL,
+    net: C.c_void_p,
+    *,
+    sphere_name: bytes,
+    readout_ids: Sequence[int],
+    seed_offset: int = 79,
+    sphere_type: int = CUNXON_SPHERE_SENSORY,
+    sensory_ids: Sequence[int] | None = (0, 1, 2, 3),
+    relay_input_ids: Sequence[int] | None = None,
+    relay_output_ids: Sequence[int] | None = None,
+) -> int:
+    params = _NetworkParameters()
+    _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+    params.num_input_neurons = 4
+    params.num_hidden_neurons = 4
+    params.num_output_neurons = 4
+    params.random_seed_offset = seed_offset
+    params.synapse_death_prob = 0.0
+    params.synapse_formation_prob = 0.0
+    sphere_id = C.c_int(-1)
+    _check(
+        lib,
+        lib.cunxonNetworkAddSphere(
+            net, sphere_name, sphere_type, C.byref(params), C.byref(sphere_id)
+        ),
+    )
+    sensory_ids_array = _optional_int_array(sensory_ids)
+    relay_input_ids_array = _optional_int_array(relay_input_ids)
+    relay_output_ids_array = _optional_int_array(relay_output_ids)
+    readout_ids_array = (C.c_int * len(readout_ids))(*readout_ids)
+    _check(
+        lib,
+        lib.cunxonNetworkSetSphereInterface(
+            net,
+            sphere_id.value,
+            sensory_ids_array,
+            len(sensory_ids) if sensory_ids is not None else 0,
+            relay_input_ids_array,
+            len(relay_input_ids) if relay_input_ids is not None else 0,
+            relay_output_ids_array,
+            len(relay_output_ids) if relay_output_ids is not None else 0,
+            readout_ids_array,
+            len(readout_ids),
+        ),
+    )
+    return sphere_id.value
+
+
+def _optional_int_array(values: Sequence[int] | None) -> Any:
+    if values is None:
+        return None
+    return (C.c_int * len(values))(*values)
+
+
+def _capture_snapshot_states(lib: C.CDLL, net: C.c_void_p, sphere_id: int) -> list[int]:
+    n_neurons = C.c_int(0)
+    _check(
+        lib,
+        lib.cunxonSphereSnapshot(
+            net, sphere_id, None, None, None, None, None, None, C.byref(n_neurons)
+        ),
+    )
+    if n_neurons.value <= 0:
+        raise CunxonError("cuNxon snapshot returned an empty neuron count")
+    size = n_neurons.value
+    states = (C.c_int8 * size)()
+    _check(
+        lib,
+        lib.cunxonSphereSnapshot(
+            net, sphere_id, None, None, None, states, None, None, C.byref(n_neurons)
+        ),
+    )
+    state_values = [int(states[index]) for index in range(size)]
+    validate_trinary_readout(state_values)
+    return state_values
 
 
 def _capture_readout(lib: C.CDLL, net: C.c_void_p, sphere_id: int) -> list[int]:

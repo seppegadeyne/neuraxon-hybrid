@@ -11,6 +11,7 @@ from typing import Any, Callable, cast
 
 from neuraxon_agent.cunxon_smoke import (
     run_ctypes_action_probe,
+    run_ctypes_interface_semantics_probe,
     run_ctypes_long_horizon_probe,
     run_ctypes_long_sweep_probe,
     run_ctypes_multisphere_action_probe,
@@ -18,6 +19,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_smoke,
     run_ctypes_snapshot_pattern_probe,
     write_action_probe_artifacts,
+    write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
     write_long_sweep_artifacts,
     write_multisphere_action_artifacts,
@@ -395,6 +397,34 @@ def cmd_cunxon_multisphere_action_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_interface_semantics_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_interface_semantics_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            steps=args.steps,
+            device_id=args.device,
+        )
+        write_interface_semantics_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon interface semantics probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed interface semantics probe does not support any "
+            "GPU-backed learning, action-quality, or interface-semantics claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -683,6 +713,40 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_multi.set_defaults(func=cmd_cunxon_multisphere_action_probe)
+
+    p_cunxon_interface = sub.add_parser(
+        "cunxon-interface-semantics-probe",
+        help="Probe cuNxon readout and relay port mapping semantics",
+        description=(
+            "Run focused cuNxon same-sphere readout and source-to-downstream relay checks "
+            "to validate absolute-vs-relative neuron index semantics before another adapter."
+        ),
+    )
+    p_cunxon_interface.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_interface.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_interface.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_interface.add_argument(
+        "--steps",
+        type=int,
+        default=3,
+        help="Inference steps for each interface sample",
+    )
+    p_cunxon_interface.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_interface.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_interface_semantics_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_interface.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_interface_semantics_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_interface.set_defaults(func=cmd_cunxon_interface_semantics_probe)
 
     try:
         args = parser.parse_args(argv)

@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere APIs from Python, but the richer and longer task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, and a 108-sample long sweep through 32..32768 steps matches constant-action baselines at 0.333333 accuracy.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, and a 108-sample long sweep through 32..32768 steps matches constant-action baselines at 0.333333 accuracy. The interface semantics probe supports absolute neuron-index readout/relay mapping but is not a decision-quality result.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -44,6 +44,12 @@
       "value": "holdout=0.333333; overall=0.333333; flat query motor readouts"
     },
     {
+      "evidence": "benchmarks/results/cunxon_interface_semantics_probe.json",
+      "lane": "cuNxon interface semantics probe",
+      "metric": "readout/relay port mapping",
+      "value": "same-sphere readouts match snapshot slices; input-port relay activates downstream; output-port relay stays neutral in this setup"
+    },
+    {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
       "lane": "raw_network",
       "metric": "success_rate",
@@ -82,6 +88,92 @@
     "trial_count": 3,
     "trial_steps": 32,
     "verdict": "task-coupled but not above baselines"
+  },
+  "cunxon_interface_semantics_probe": {
+    "decision_quality_measured": false,
+    "readout_mappings": {
+      "absolute-output-readout": {
+        "matches_snapshot_slice": true,
+        "neuron_class": "output",
+        "port_ids": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "readout": [
+          -1,
+          0,
+          1,
+          0
+        ]
+      },
+      "relative-input-readout": {
+        "matches_snapshot_slice": true,
+        "neuron_class": "input",
+        "port_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "readout": [
+          1,
+          -1,
+          1,
+          1
+        ]
+      }
+    },
+    "relay_mappings": {
+      "input-neuron-relay": {
+        "downstream_active_state_count": 4,
+        "downstream_input_readout": [
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "source_neuron_class": "input",
+        "source_port_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "source_relay_readout": [
+          1,
+          -1,
+          1,
+          1
+        ]
+      },
+      "output-neuron-relay": {
+        "downstream_active_state_count": 0,
+        "downstream_input_readout": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "source_neuron_class": "output",
+        "source_port_ids": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "source_relay_readout": [
+          -1,
+          0,
+          1,
+          0
+        ]
+      }
+    },
+    "sample_count": 4,
+    "status": "interface semantics probe viable",
+    "verdict": "absolute neuron-index readout semantics confirmed; relay behavior differs by source port class, not a learning result"
   },
   "cunxon_long_horizon": {
     "decision_quality_measured": false,
@@ -337,8 +429,9 @@
     "benchmarks/results/cunxon_sensitivity_probe.json",
     "benchmarks/results/cunxon_snapshot_pattern_probe.json",
     "benchmarks/results/cunxon_multisphere_action_probe.json",
+    "benchmarks/results/cunxon_interface_semantics_probe.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "longer cuNxon sweep still flat/baseline-level"
+  "verdict": "cuNxon interface semantics clarified; decision probes remain flat/baseline-level"
 }

@@ -9,6 +9,9 @@ import pytest
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonInterfaceReadoutSample,
+    CunxonInterfaceRelaySample,
+    CunxonInterfaceSemanticsProbeResult,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
     CunxonLongSweepProbeResult,
@@ -23,6 +26,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonSnapshotPatternProbeResult,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_interface_semantics_markdown_report,
     render_long_horizon_markdown_report,
     render_long_sweep_markdown_report,
     render_markdown_report,
@@ -31,6 +35,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_snapshot_pattern_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
+    write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
     write_long_sweep_artifacts,
     write_multisphere_action_artifacts,
@@ -472,6 +477,77 @@ def test_multisphere_action_report_compares_holdout_against_trivial_baselines(
 
     assert '"sphere_count": 3' in json_path.read_text(encoding="utf-8")
     assert "trivial baselines" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_interface_semantics_report_records_absolute_port_mapping(tmp_path: Path) -> None:
+    result = CunxonInterfaceSemanticsProbeResult(
+        status="interface semantics probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        steps=3,
+        readout_samples=[
+            CunxonInterfaceReadoutSample(
+                mapping="relative-input-readout",
+                port_ids=[0, 1, 2],
+                neuron_class="input",
+                readout=[1, -1, 1],
+                snapshot_slice=[1, -1, 1],
+                matches_snapshot_slice=True,
+                active_state_count=3,
+                signed_sum=1,
+            ),
+            CunxonInterfaceReadoutSample(
+                mapping="absolute-output-readout",
+                port_ids=[8, 9, 10],
+                neuron_class="output",
+                readout=[0, 0, 0],
+                snapshot_slice=[0, 0, 0],
+                matches_snapshot_slice=True,
+                active_state_count=0,
+                signed_sum=0,
+            ),
+        ],
+        relay_samples=[
+            CunxonInterfaceRelaySample(
+                mapping="input-neuron-relay",
+                source_port_ids=[0, 1, 2, 3],
+                source_neuron_class="input",
+                source_relay_readout=[1, -1, 0, 1],
+                downstream_input_readout=[0, -1, 0, 0],
+                downstream_active_state_count=1,
+                downstream_energy=4.0,
+            ),
+            CunxonInterfaceRelaySample(
+                mapping="output-neuron-relay",
+                source_port_ids=[16, 17, 18, 19],
+                source_neuron_class="output",
+                source_relay_readout=[0, 0, 0, 0],
+                downstream_input_readout=[0, 0, 0, 0],
+                downstream_active_state_count=0,
+                downstream_energy=1.0,
+            ),
+        ],
+        notes=["fake interface semantics probe"],
+    )
+
+    markdown = render_interface_semantics_markdown_report(result)
+    assert "absolute neuron indices" in markdown
+    assert "relative-input-readout" in markdown
+    assert "input-neuron-relay" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "previous multi-sphere probes" in markdown
+
+    json_path = tmp_path / "interface.json"
+    markdown_path = tmp_path / "interface.md"
+    write_interface_semantics_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "interface semantics probe viable"' in data
+    assert '"matches_snapshot_slice": true' in data
+    assert "absolute neuron indices" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_tracked_cunxon_investigation_report_preserves_live_smoke_and_boundary() -> None:
