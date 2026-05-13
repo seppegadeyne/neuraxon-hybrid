@@ -7,15 +7,19 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, cast
 
+from neuraxon_agent.cunxon_smoke import run_ctypes_smoke, write_smoke_artifacts
 from neuraxon_agent.evolution import AgentEvolution, EvolutionConfig
 from neuraxon_agent.tissue import AgentTissue, TissueState
 from neuraxon_agent.vendor.neuraxon2 import NetworkParameters
 
 
 def _load_json(path: str) -> dict[str, Any]:
-    return json.loads(Path(path).read_text())
+    data = json.loads(Path(path).read_text())
+    if not isinstance(data, dict):
+        raise ValueError(f"Expected JSON object in {path}")
+    return data
 
 
 def _save_json(path: str, data: dict[str, Any]) -> None:
@@ -149,6 +153,34 @@ def cmd_load(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_smoke(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_smoke(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            steps=args.steps,
+            device_id=args.device,
+        )
+        write_smoke_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon GPU smoke report\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "No broad Neuraxon intelligence claim: failed smoke tests do not support "
+            "any GPU-backed decision-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -182,6 +214,24 @@ def main(argv: list[str] | None = None) -> int:
     p_load.add_argument("--output", "-o", required=True, help="Result JSON file")
     p_load.set_defaults(func=cmd_load)
 
+    p_cunxon = sub.add_parser("cunxon-smoke", help="Run optional cuNxon CUDA ctypes smoke")
+    p_cunxon.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon.add_argument("--upstream-commit", required=True, help="Upstream Neuraxon commit")
+    p_cunxon.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon.add_argument("--steps", type=int, default=16, help="Smoke simulation steps")
+    p_cunxon.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_smoke.json",
+        help="JSON artifact path",
+    )
+    p_cunxon.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_smoke.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon.set_defaults(func=cmd_cunxon_smoke)
+
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -189,7 +239,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command is None:
         parser.print_help()
         return 2
-    return args.func(args)
+    func = getattr(args, "func")
+    if not callable(func):
+        return 2
+    handler = cast(Callable[[argparse.Namespace], int], func)
+    return handler(args)
 
 
 if __name__ == "__main__":

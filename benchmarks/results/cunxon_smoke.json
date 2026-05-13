@@ -1,0 +1,56 @@
+{
+  "aorus_environment": {
+    "cmake": "4.3.2",
+    "cuda_arch": "120",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "driver": "595.71.05",
+    "nvcc": "13.2.78"
+  },
+  "build": {
+    "build_ok": true,
+    "configure_ok": true,
+    "ctest_ok": true,
+    "ctest_summary": "1/1 Test #1: cunxon_smoke passed in 0.20 sec",
+    "examples_built": [
+      "example_4sphere",
+      "example_aigarth"
+    ],
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so"
+  },
+  "evidence_boundary": "Build, upstream CTest and C++ examples prove local CUDA viability only; GPU execution does not prove intelligence, generalization or Neuraxon-Hybrid decision quality.",
+  "examples": {
+    "aigarth_demo": {
+      "baseline_margin": 0.875,
+      "final_margin": 1.5,
+      "improvement": 0.625,
+      "status": "ran"
+    },
+    "four_sphere_demo": {
+      "asc_trinary_distribution": {
+        "negative": 31,
+        "neutral": 27,
+        "positive": 40,
+        "total": 98
+      },
+      "overall_accuracy": 0.5,
+      "status": "ran"
+    }
+  },
+  "hybrid_ctypes_smoke": {
+    "implemented": true,
+    "runtime_status": "not_run_blocked",
+    "runtime_status_detail": "Attempting to run neuraxon_agent.cunxon_smoke.run_ctypes_smoke against the built libcunxon.so was blocked by the local execution safety layer with: BLOCKED: User denied. Do NOT retry. The command was not retried.",
+    "validates": "minimal one-sphere C API load/context/step/readout path with {-1, 0, +1} validation"
+  },
+  "python_binding_demo": {
+    "status": "failed",
+    "failure": "RuntimeError: cunxonNetworkAddLink: INVALID_ARGUMENT ()",
+    "likely_cause": "The upstream Python demo appears to pass relay/readout output indices relative to the output block; the C++ demo uses absolute neuron indices and runs. This affects the demo wrapper, not the C++ build/ctest result."
+  },
+  "readout": [],
+  "status": "build-only",
+  "upstream": {
+    "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+    "repo_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+  }
+}
