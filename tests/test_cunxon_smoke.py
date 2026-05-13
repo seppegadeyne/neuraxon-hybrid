@@ -84,13 +84,30 @@ def test_smoke_artifacts_include_gpu_metrics_and_non_intelligence_boundary(tmp_p
     assert "No broad Neuraxon intelligence claim" in markdown_path.read_text(encoding="utf-8")
 
 
-def test_tracked_cunxon_investigation_report_preserves_build_and_boundary() -> None:
+def test_tracked_cunxon_investigation_report_preserves_live_smoke_and_boundary() -> None:
     markdown = Path("benchmarks/results/cunxon_smoke.md").read_text(encoding="utf-8")
     data = Path("benchmarks/results/cunxon_smoke.json").read_text(encoding="utf-8")
 
-    assert "Status: `build-only`" in markdown
-    assert "ctest" in markdown
-    assert "Python ctypes" in markdown
+    assert "Status: `smoke-test viable`" in markdown
+    assert "minimal one-sphere ctypes smoke completed" in markdown
+    assert "inter-sphere Python demo remains separate" in markdown
     assert "does not prove intelligence" in markdown
     assert "RTX 5090" in markdown
-    assert '"status": "build-only"' in data
+    assert "Compute capability: 12.0" in markdown
+    assert '"status": "smoke-test viable"' in data
+    assert '"readout": [' in data
+
+
+def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_quality() -> None:
+    markdown = Path("benchmarks/results/cunxon_comparison.md").read_text(encoding="utf-8")
+    data = Path("benchmarks/results/cunxon_comparison.json").read_text(encoding="utf-8")
+
+    assert "cuNxon raw CUDA smoke" in markdown
+    assert "no decision-quality score measured" in markdown
+    assert "raw_network" in markdown
+    assert "0.145833" in markdown
+    assert "random" in markdown
+    assert "always_execute" in markdown
+    assert "does not prove intelligence" in markdown
+    assert '"verdict": "smoke-test viable, not benchmark-integrated"' in data
+    assert '"decision_quality_measured": false' in data

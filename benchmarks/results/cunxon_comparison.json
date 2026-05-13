@@ -1,0 +1,57 @@
+{
+  "claim_boundary": "cuNxon GPU execution proves only that the CUDA runtime can load and emit a valid trinary readout; it does not prove intelligence, generalization, or decision quality.",
+  "cunxon_smoke": {
+    "decision_quality_measured": false,
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "readout": [
+      0,
+      0,
+      0
+    ],
+    "status": "smoke-test viable"
+  },
+  "comparison_lanes": [
+    {
+      "evidence": "ctypes one-sphere GPU smoke only",
+      "lane": "cuNxon raw CUDA smoke",
+      "metric": "decision-quality score",
+      "value": "no decision-quality score measured"
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
+      "lane": "raw_network",
+      "metric": "success_rate",
+      "value": 0.145833
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal baseline",
+      "lane": "random",
+      "metric": "success_rate",
+      "value": 0.104167
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal baseline",
+      "lane": "always_execute",
+      "metric": "success_rate",
+      "value": 0.166667
+    },
+    {
+      "evidence": "holdout_noisy_generalization semantic bridge mode",
+      "lane": "semantic_bridge",
+      "metric": "success_rate",
+      "value": 1.0
+    },
+    {
+      "evidence": "holdout_noisy_generalization temporal adapter mode",
+      "lane": "temporal_context_adapter",
+      "metric": "success_rate",
+      "value": 1.0
+    }
+  ],
+  "sources": [
+    "benchmarks/results/cunxon_smoke.json",
+    "benchmarks/results/holdout_noisy_generalization.json",
+    "benchmarks/results/analysis/benchmark_summary.csv"
+  ],
+  "verdict": "smoke-test viable, not benchmark-integrated"
+}

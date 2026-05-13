@@ -1,6 +1,7 @@
 {
   "aorus_environment": {
     "cmake": "4.3.2",
+    "compute_capability": "12.0",
     "cuda_arch": "120",
     "device_name": "NVIDIA GeForce RTX 5090",
     "driver": "595.71.05",
@@ -15,9 +16,9 @@
       "example_4sphere",
       "example_aigarth"
     ],
-    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so"
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0"
   },
-  "evidence_boundary": "Build, upstream CTest and C++ examples prove local CUDA viability only; GPU execution does not prove intelligence, generalization or Neuraxon-Hybrid decision quality.",
+  "evidence_boundary": "Build, upstream CTest, C++ examples and Hybrid ctypes smoke prove local CUDA runtime viability only; GPU execution does not prove intelligence, generalization or Neuraxon-Hybrid decision quality.",
   "examples": {
     "aigarth_demo": {
       "baseline_margin": 0.875,
@@ -37,18 +38,36 @@
     }
   },
   "hybrid_ctypes_smoke": {
+    "compute_capability": "12.0",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "elapsed_ms": 99.98643602011725,
+    "energy": 339.2394766807556,
     "implemented": true,
-    "runtime_status": "not_run_blocked",
-    "runtime_status_detail": "Attempting to run neuraxon_agent.cunxon_smoke.run_ctypes_smoke against the built libcunxon.so was blocked by the local execution safety layer with: BLOCKED: User denied. Do NOT retry. The command was not retried.",
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+    "notes": [
+      "minimal one-sphere ctypes smoke completed",
+      "inter-sphere Python demo remains separate from this smoke path"
+    ],
+    "readout": [
+      0,
+      0,
+      0
+    ],
+    "runtime_status": "passed",
+    "steps": 16,
     "validates": "minimal one-sphere C API load/context/step/readout path with {-1, 0, +1} validation"
   },
   "python_binding_demo": {
-    "status": "failed",
     "failure": "RuntimeError: cunxonNetworkAddLink: INVALID_ARGUMENT ()",
-    "likely_cause": "The upstream Python demo appears to pass relay/readout output indices relative to the output block; the C++ demo uses absolute neuron indices and runs. This affects the demo wrapper, not the C++ build/ctest result."
+    "likely_cause": "The upstream Python demo appears to pass relay/readout output indices relative to the output block; the C++ demo uses absolute neuron indices and runs. This affects the demo wrapper, not the C++ build/ctest or Hybrid one-sphere ctypes smoke result.",
+    "status": "failed"
   },
-  "readout": [],
-  "status": "build-only",
+  "readout": [
+    0,
+    0,
+    0
+  ],
+  "status": "smoke-test viable",
   "upstream": {
     "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
     "repo_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"

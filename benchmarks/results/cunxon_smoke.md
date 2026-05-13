@@ -1,13 +1,13 @@
 # cuNxon GPU smoke report
 
-Status: `build-only`
+Status: `smoke-test viable`
 
 ## Source
 
 - Upstream repo commit: `bd2242fabad08cb73dab2c4170d11fa941030e8c`
 - cuNxon commit: `b4f6db85f7aff04ddb4e1078d523d514a278521b`
 - Local upstream checkout: `/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon`
-- Built library: `/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so`
+- Built library: `/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0`
 
 ## Aorus GPU/runtime
 
@@ -15,6 +15,7 @@ Status: `build-only`
 - Driver: 595.71.05
 - CUDA/nvcc: 13.2.78
 - CMake: 4.3.2
+- Compute capability: 12.0
 - Build arch: `-DCUNXON_CUDA_ARCH=120`
 
 ## Upstream build and test result
@@ -54,22 +55,24 @@ Added a guarded Neuraxon-Hybrid-side smoke module and CLI surface:
 
 The module validates that cuNxon emits a non-empty trinary readout in `{-1, 0, +1}` and writes JSON/Markdown artifacts.
 
-Runtime note: the first attempt to run this new Neuraxon-Hybrid ctypes smoke command against the built `libcunxon.so` was blocked by the local execution safety layer with `BLOCKED: User denied. Do NOT retry.` The command was not retried. Therefore the current tracked status remains `build-only`, not `smoke-test viable`.
+Live Hybrid smoke result:
+
+- Command: `uv run neuraxon-agent cunxon-smoke --library /home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0 --upstream-commit bd2242fabad08cb73dab2c4170d11fa941030e8c --cunxon-commit b4f6db85f7aff04ddb4e1078d523d514a278521b --steps 16`
+- Status: passed.
+- Device: NVIDIA GeForce RTX 5090.
+- Compute capability: 12.0.
+- Steps: 16.
+- Elapsed: 99.986 ms.
+- Energy accumulator: 339.239.
+- Trinary readout ({-1, 0, +1}): [0, 0, 0].
+- Notes:
+  - minimal one-sphere ctypes smoke completed
+  - inter-sphere Python demo remains separate from this smoke path
 
 ## Evidence boundary
 
-No broad Neuraxon intelligence claim: this report only proves that upstream cuNxon can configure, compile, pass its upstream `ctest`, and run its C++ demos on Aorus/RTX 5090. GPU execution does not prove intelligence, generalization, useful policy learning, or superiority over existing Neuraxon-Hybrid baselines.
+No broad Neuraxon intelligence claim: this report proves that upstream cuNxon can configure, compile, pass its upstream `ctest`, run its C++ demos on Aorus/RTX 5090, and load/step through the guarded Hybrid `ctypes` smoke path with a valid trinary readout. GPU execution does not prove intelligence, generalization, useful policy learning, or superiority over existing Neuraxon-Hybrid baselines.
 
 ## Recommended next step
 
-If/when local execution approval permits, run the guarded Neuraxon-Hybrid smoke command and only then promote the status from `build-only` to `smoke-test viable`:
-
-```bash
-neuraxon-agent cunxon-smoke \
-  --library /home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so \
-  --upstream-commit bd2242fabad08cb73dab2c4170d11fa941030e8c \
-  --cunxon-commit b4f6db85f7aff04ddb4e1078d523d514a278521b \
-  --steps 24 \
-  --json-output benchmarks/results/cunxon_smoke.json \
-  --markdown-output benchmarks/results/cunxon_smoke.md
-```
+The next step is a separate cuNxon-backed decision adapter or raw-dynamics probe that maps GPU readout to the same Neuraxon-Hybrid action contract, then compares it directly against `raw_network`, `random`, and `always_execute` without treating speed as intelligence evidence.
