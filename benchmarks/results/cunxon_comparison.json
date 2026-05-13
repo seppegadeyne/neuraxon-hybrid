@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere APIs from Python, but the richer probes remain diagnostic/negative: pattern recall readouts are flat zero and the multi-sphere action adapter decodes all cases to query, matching trivial constant baselines rather than beating them.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere APIs from Python, but the richer and longer task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, and a 108-sample long sweep through 32..32768 steps matches constant-action baselines at 0.333333 accuracy.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -12,6 +12,12 @@
       "lane": "cuNxon long-horizon raw dynamics",
       "metric": "continuous runtime samples",
       "value": "65536 steps; 1 unique readout(s); 0 readout changes"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_long_sweep.json",
+      "lane": "cuNxon long sweep action diagnostic",
+      "metric": "success_rate vs trivial baselines",
+      "value": "108 samples; all mode/horizon accuracies=0.333333; train/train_rewarded flat query"
     },
     {
       "evidence": "benchmarks/results/cunxon_action_probe.json",
@@ -87,6 +93,114 @@
     "total_steps": 65536,
     "unique_readouts": 1,
     "verdict": "long-horizon runtime viable, not benchmark-integrated"
+  },
+  "cunxon_long_sweep": {
+    "accuracy_by_mode_and_steps": {
+      "infer": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      },
+      "train": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      },
+      "train_rewarded": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      }
+    },
+    "action_distribution_by_mode_and_steps": {
+      "infer": {
+        "32": {
+          "query": 8,
+          "retry": 1
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "execute": 1,
+          "query": 8
+        }
+      },
+      "train": {
+        "32": {
+          "query": 9
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "query": 9
+        }
+      },
+      "train_rewarded": {
+        "32": {
+          "query": 9
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "query": 9
+        }
+      }
+    },
+    "baseline_accuracy": {
+      "always_execute": 0.3333333333333333,
+      "always_query": 0.3333333333333333,
+      "always_retry": 0.3333333333333333
+    },
+    "decision_quality_measured": true,
+    "sample_count": 108,
+    "seed_offsets": [
+      79,
+      80,
+      81
+    ],
+    "status": "long-sweep probe viable",
+    "step_horizons": [
+      32,
+      512,
+      4096,
+      32768
+    ],
+    "unique_readouts_by_mode_and_steps": {
+      "infer": {
+        "32": 3,
+        "32768": 1,
+        "4096": 1,
+        "512": 2
+      },
+      "train": {
+        "32": 1,
+        "32768": 1,
+        "4096": 1,
+        "512": 1
+      },
+      "train_rewarded": {
+        "32": 1,
+        "32768": 1,
+        "4096": 1,
+        "512": 1
+      }
+    },
+    "verdict": "longer action sweep remains baseline-level"
   },
   "cunxon_multisphere_action_probe": {
     "accuracy_by_split": {
@@ -218,6 +332,7 @@
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_long_horizon.json",
+    "benchmarks/results/cunxon_long_sweep.json",
     "benchmarks/results/cunxon_action_probe.json",
     "benchmarks/results/cunxon_sensitivity_probe.json",
     "benchmarks/results/cunxon_snapshot_pattern_probe.json",
@@ -225,5 +340,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "richer cuNxon diagnostics still flat/baseline-level"
+  "verdict": "longer cuNxon sweep still flat/baseline-level"
 }

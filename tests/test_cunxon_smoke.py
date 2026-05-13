@@ -11,6 +11,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
+    CunxonLongSweepProbeResult,
+    CunxonLongSweepSample,
     CunxonMultisphereActionCase,
     CunxonMultisphereActionProbeResult,
     CunxonPatternRecallSample,
@@ -22,6 +24,7 @@ from neuraxon_agent.cunxon_smoke import (
     classify_cunxon_status,
     render_action_probe_markdown_report,
     render_long_horizon_markdown_report,
+    render_long_sweep_markdown_report,
     render_markdown_report,
     render_multisphere_action_markdown_report,
     render_sensitivity_probe_markdown_report,
@@ -29,6 +32,7 @@ from neuraxon_agent.cunxon_smoke import (
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_long_horizon_artifacts,
+    write_long_sweep_artifacts,
     write_multisphere_action_artifacts,
     write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
@@ -142,6 +146,74 @@ def test_long_horizon_report_frames_neuraxon_as_time_dependent_learning_process(
 
     assert '"total_steps": 1024' in json_path.read_text(encoding="utf-8")
     assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_long_sweep_report_scores_longer_modes_horizons_and_baselines(tmp_path: Path) -> None:
+    result = CunxonLongSweepProbeResult(
+        status="long-sweep probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        step_horizons=[32, 2048],
+        seed_offsets=[79],
+        samples=[
+            CunxonLongSweepSample(
+                mode="train_rewarded",
+                steps=2048,
+                seed_offset=79,
+                stimulus="execute-positive-drive",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                readout=[1, 0, 0],
+                decoded_action="PROCEED",
+                normalized_action="execute",
+                confidence=0.3333,
+                outcome="success",
+                energy=42.0,
+                elapsed_ms=12.0,
+            ),
+            CunxonLongSweepSample(
+                mode="train_rewarded",
+                steps=2048,
+                seed_offset=79,
+                stimulus="retry-negative-drive",
+                input_vector=[-1.0, -0.25, 0.0],
+                expected_action="retry",
+                readout=[0, 0, 0],
+                decoded_action="PAUSE",
+                normalized_action="query",
+                confidence=1.0,
+                outcome="failure",
+                energy=43.0,
+                elapsed_ms=13.0,
+            ),
+        ],
+        accuracy_by_mode_and_steps={"train_rewarded": {"2048": 0.5}},
+        unique_readouts_by_mode_and_steps={"train_rewarded": {"2048": 2}},
+        action_distribution_by_mode_and_steps={
+            "train_rewarded": {"2048": {"execute": 1, "query": 1}}
+        },
+        baseline_accuracy={"always_execute": 0.5, "always_query": 0.0, "always_retry": 0.5},
+        notes=["fake long sweep"],
+    )
+
+    markdown = render_long_sweep_markdown_report(result)
+    assert "long sweep" in markdown
+    assert "train_rewarded" in markdown
+    assert "2048" in markdown
+    assert "always_query" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "long_sweep.json"
+    markdown_path = tmp_path / "long_sweep.md"
+    write_long_sweep_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "long-sweep probe viable"' in data
+    assert '"step_horizons": [' in data
+    assert "longer horizons" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_action_probe_report_scores_decoded_readout_against_expected_actions(
@@ -422,6 +494,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
 
     assert "cuNxon raw CUDA smoke" in markdown
     assert "cuNxon long-horizon raw dynamics" in markdown
+    assert "cuNxon long sweep action diagnostic" in markdown
     assert "cuNxon task-coupled action probe" in markdown
     assert "cuNxon infer-vs-train sensitivity probe" in markdown
     assert "cuNxon snapshot/pattern probe" in markdown
@@ -436,6 +509,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "always_execute" in markdown
     assert "do not prove intelligence" in markdown
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
+    assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
     assert '"verdict": "sensitivity diagnostic train-mode flat"' in data
     assert (
@@ -463,6 +537,19 @@ def test_tracked_cunxon_sensitivity_probe_report_records_train_mode_flatness() -
     assert '"status": "sensitivity probe viable"' in data
     assert '"sample_count": 18' in data
     assert '"train": {' in data
+
+def test_tracked_cunxon_long_sweep_report_records_baseline_level_long_horizons() -> None:
+    markdown = Path("benchmarks/results/cunxon_long_sweep.md").read_text(encoding="utf-8")
+    data = Path("benchmarks/results/cunxon_long_sweep.json").read_text(encoding="utf-8")
+
+    assert "long sweep action diagnostic" in markdown
+    assert "Step horizons: 32, 512, 4096, 32768" in markdown
+    assert "Samples: 108" in markdown
+    assert "| train_rewarded | 32768 | 0.333333 | 1 | query=9 |" in markdown
+    assert "does not prove intelligence" in markdown
+    assert '"sample_count": 108' in data
+    assert '"32768": 0.3333333333333333' in data
+
 
 def test_tracked_cunxon_action_probe_report_preserves_flat_readout_caveat() -> None:
     markdown = Path("benchmarks/results/cunxon_action_probe.md").read_text(encoding="utf-8")

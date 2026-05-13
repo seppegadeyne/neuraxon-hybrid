@@ -1,0 +1,2602 @@
+{
+  "accuracy_by_mode_and_steps": {
+    "infer": {
+      "32": 0.3333333333333333,
+      "32768": 0.3333333333333333,
+      "4096": 0.3333333333333333,
+      "512": 0.3333333333333333
+    },
+    "train": {
+      "32": 0.3333333333333333,
+      "32768": 0.3333333333333333,
+      "4096": 0.3333333333333333,
+      "512": 0.3333333333333333
+    },
+    "train_rewarded": {
+      "32": 0.3333333333333333,
+      "32768": 0.3333333333333333,
+      "4096": 0.3333333333333333,
+      "512": 0.3333333333333333
+    }
+  },
+  "action_distribution_by_mode_and_steps": {
+    "infer": {
+      "32": {
+        "query": 8,
+        "retry": 1
+      },
+      "32768": {
+        "query": 9
+      },
+      "4096": {
+        "query": 9
+      },
+      "512": {
+        "execute": 1,
+        "query": 8
+      }
+    },
+    "train": {
+      "32": {
+        "query": 9
+      },
+      "32768": {
+        "query": 9
+      },
+      "4096": {
+        "query": 9
+      },
+      "512": {
+        "query": 9
+      }
+    },
+    "train_rewarded": {
+      "32": {
+        "query": 9
+      },
+      "32768": {
+        "query": 9
+      },
+      "4096": {
+        "query": 9
+      },
+      "512": {
+        "query": 9
+      }
+    }
+  },
+  "baseline_accuracy": {
+    "always_execute": 0.3333333333333333,
+    "always_query": 0.3333333333333333,
+    "always_retry": 0.3333333333333333
+  },
+  "compute_capability": "12.0",
+  "cunxon_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "fresh one-sphere network per mode/steps/seed/stimulus sample",
+    "infer is frozen; train is plastic; train_rewarded adds simple neuromodulator feedback",
+    "longer horizons are diagnostic evidence, not benchmark success by themselves"
+  ],
+  "sample_count": 108,
+  "samples": [
+    {
+      "confidence": 0.3333,
+      "decoded_action": "RETRY",
+      "elapsed_ms": 117.97401600051671,
+      "energy": 708.5816502571106,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "retry",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        -1
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 120.13085099169984,
+      "energy": 719.9179873466492,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 122.54706700332463,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 0.3333,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 124.63972001569346,
+      "energy": 583.8191504478455,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 126.71179097378626,
+      "energy": 631.8581824302673,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 128.79020301625133,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 0.3333,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 130.85677399067208,
+      "energy": 626.7323007583618,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 132.94954597949982,
+      "energy": 635.5942134857178,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 135.043088987004,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 160.86538799572736,
+      "energy": 8702.65562582016,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 0.3333,
+      "decoded_action": "PROCEED",
+      "elapsed_ms": 186.76376098301262,
+      "energy": 8572.68903207779,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "execute",
+      "outcome": "failure",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 212.060906982515,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 236.8929730146192,
+      "energy": 6900.423714160919,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 262.07524398341775,
+      "energy": 8269.752362728119,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 287.3484090087004,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 315.15992601634935,
+      "energy": 8044.682618141174,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 343.3260889723897,
+      "energy": 7521.598874092102,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 368.6697469674982,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 567.9188889916986,
+      "energy": 68634.75815153122,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 769.0741149708629,
+      "energy": 66716.1487736702,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 969.9009360047057,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1188.0376319750212,
+      "energy": 54577.73680925369,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1390.159179980401,
+      "energy": 65367.053629398346,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1589.9497169884853,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1790.5874800053425,
+      "energy": 63315.96577358246,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1987.4835489899851,
+      "energy": 58710.596826553345,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 2189.5557859679684,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 3805.630323011428,
+      "energy": 554399.7300944328,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 5409.367131011095,
+      "energy": 534266.1079249382,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 7041.636923968326,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 8647.447825002018,
+      "energy": 437458.2328953743,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 10286.47681698203,
+      "energy": 498707.299182415,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 11942.884452990256,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 13598.749260010663,
+      "energy": 509390.47061538696,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 15214.87085800618,
+      "energy": 470743.30164051056,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16864.299362991005,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16866.801932977978,
+      "energy": 46.217979311943054,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16869.15331700584,
+      "energy": 47.43915006518364,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16871.408836974297,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16873.706317972392,
+      "energy": 24.56634896993637,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16875.940096972045,
+      "energy": 23.07277376949787,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16878.16774501698,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16880.42936497368,
+      "energy": 29.694859743118286,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16882.70985597046,
+      "energy": 30.162799030542374,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16884.976816014387,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16913.79500797484,
+      "energy": 54.421989481593556,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16945.570892014075,
+      "energy": 55.61720431993902,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 16975.05802399246,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17004.867430019658,
+      "energy": 29.582654126937264,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17036.351809976622,
+      "energy": 27.72217897309967,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17069.21779201366,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17098.50998496404,
+      "energy": 35.05146159548315,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17126.809775014408,
+      "energy": 35.45121390634973,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17158.419150975533,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17389.716495003086,
+      "energy": 54.42198955353458,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17623.22122597834,
+      "energy": 55.61720435668733,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 17850.99770501256,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 18078.722812002525,
+      "energy": 29.58265414081266,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 18307.196591980755,
+      "energy": 27.72217898609877,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 18547.03087301459,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 18781.589001999237,
+      "energy": 35.05146160943856,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 19015.85043797968,
+      "energy": 35.4512139194259,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 19243.899739987683,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 21132.994673971552,
+      "energy": 54.42198955429841,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 23022.906160971615,
+      "energy": 55.61720432735067,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 24903.0625949963,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 26766.093298967462,
+      "energy": 29.58265414081266,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 28644.868856994435,
+      "energy": 27.72217898609877,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 30533.93751598196,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 32396.162965975236,
+      "energy": 35.05146160943856,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 34285.95133300405,
+      "energy": 35.4512139194259,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36148.27801199863,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36150.929009018,
+      "energy": 45.971943795681,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36153.448251017835,
+      "energy": 50.317735105752945,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36156.30469698226,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36159.558450977784,
+      "energy": 24.23768363893032,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36163.0347140017,
+      "energy": 26.326183333992958,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36166.138771979604,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36168.634391971864,
+      "energy": 29.60808375477791,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36171.08928097878,
+      "energy": 33.42530381679535,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36173.48767601652,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36205.40792698739,
+      "energy": 54.14516726373565,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36238.63642598735,
+      "energy": 58.933755392152115,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36271.67319599539,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36303.867338981945,
+      "energy": 29.18333902457426,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36338.5373710189,
+      "energy": 31.36252391615063,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36377.584306988865,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36410.8958899742,
+      "energy": 34.939575632558814,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36444.731484982185,
+      "energy": 39.2070415045939,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36477.216091006994,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 512,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36736.656127963215,
+      "energy": 54.14516728378407,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 36996.787245967425,
+      "energy": 58.9337554335142,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 37264.35270300135,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 37537.986446986906,
+      "energy": 29.18333903835015,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 37804.42298500566,
+      "energy": 31.36252392936025,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 38074.581896013115,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 38330.83477301989,
+      "energy": 34.93957564595842,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 38604.457337991334,
+      "energy": 39.20704421470513,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 38870.03817799268,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 4096,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 41147.35570101766,
+      "energy": 54.145167276333034,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 43563.35567496717,
+      "energy": 58.93375534409905,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 45860.17171101412,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 48256.294819002505,
+      "energy": 29.18333903835015,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 50643.881389987655,
+      "energy": 31.36252392936025,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 52967.50993496971,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 55169.5379599696,
+      "energy": 34.93957564595842,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 57344.462234992534,
+      "energy": 39.20704421470513,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 59658.665512979496,
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train_rewarded",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "steps": 32768,
+      "stimulus": "query-neutral-drive"
+    }
+  ],
+  "seed_offsets": [
+    79,
+    80,
+    81
+  ],
+  "status": "long-sweep probe viable",
+  "step_horizons": [
+    32,
+    512,
+    4096,
+    32768
+  ],
+  "unique_readouts_by_mode_and_steps": {
+    "infer": {
+      "32": 3,
+      "32768": 1,
+      "4096": 1,
+      "512": 2
+    },
+    "train": {
+      "32": 1,
+      "32768": 1,
+      "4096": 1,
+      "512": 1
+    },
+    "train_rewarded": {
+      "32": 1,
+      "32768": 1,
+      "4096": 1,
+      "512": 1
+    }
+  },
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

@@ -12,12 +12,14 @@ from typing import Any, Callable, cast
 from neuraxon_agent.cunxon_smoke import (
     run_ctypes_action_probe,
     run_ctypes_long_horizon_probe,
+    run_ctypes_long_sweep_probe,
     run_ctypes_multisphere_action_probe,
     run_ctypes_sensitivity_probe,
     run_ctypes_smoke,
     run_ctypes_snapshot_pattern_probe,
     write_action_probe_artifacts,
     write_long_horizon_artifacts,
+    write_long_sweep_artifacts,
     write_multisphere_action_artifacts,
     write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
@@ -44,6 +46,22 @@ def _parse_seed_offsets(raw: str) -> list[int]:
     if not offsets:
         raise ValueError("--seed-offsets must contain at least one integer")
     return offsets
+
+
+def _parse_step_horizons(raw: str) -> list[int]:
+    horizons = [int(part.strip()) for part in raw.split(",") if part.strip()]
+    if not horizons:
+        raise ValueError("--step-horizons must contain at least one integer")
+    if any(horizon <= 0 for horizon in horizons):
+        raise ValueError("--step-horizons must contain only positive integers")
+    return horizons
+
+
+def _parse_modes(raw: str) -> list[str]:
+    modes = [part.strip() for part in raw.split(",") if part.strip()]
+    if not modes:
+        raise ValueError("--modes must contain at least one mode")
+    return modes
 
 
 def _encode_state(tissue: AgentTissue) -> str:
@@ -226,6 +244,36 @@ def cmd_cunxon_long_horizon(args: argparse.Namespace) -> int:
             "Long-horizon learning caveat: short smoke tests are insufficient for "
             "judging a brain-like Neuraxon system, but a failed probe also does not "
             "support any GPU-backed learning claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_long_sweep(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_long_sweep_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            step_horizons=_parse_step_horizons(args.step_horizons),
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            modes=_parse_modes(args.modes),
+            device_id=args.device,
+        )
+        write_long_sweep_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon long sweep action diagnostic\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed long-sweep diagnostic does not support any "
+            "GPU-backed learning or decision-quality claim.\n",
             encoding="utf-8",
         )
         return 1
@@ -433,6 +481,49 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_long.set_defaults(func=cmd_cunxon_long_horizon)
+
+    p_cunxon_long_sweep = sub.add_parser(
+        "cunxon-long-sweep",
+        help="Sweep longer cuNxon modes/horizons/seeds against the action contract",
+        description=(
+            "Run fresh cuNxon samples across infer/train/train_rewarded modes, longer step "
+            "horizons, and seed offsets. Scores decoded actions against trivial baselines."
+        ),
+    )
+    p_cunxon_long_sweep.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_long_sweep.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_long_sweep.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_long_sweep.add_argument(
+        "--step-horizons",
+        default="32,512,4096",
+        help="Comma-separated simulation-step horizons per sample",
+    )
+    p_cunxon_long_sweep.add_argument(
+        "--seed-offsets",
+        default="79,80,81",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_long_sweep.add_argument(
+        "--modes",
+        default="infer,train,train_rewarded",
+        help="Comma-separated modes: infer, train, train_rewarded",
+    )
+    p_cunxon_long_sweep.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_long_sweep.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_long_sweep.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_long_sweep.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_long_sweep.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_long_sweep.set_defaults(func=cmd_cunxon_long_sweep)
 
     p_cunxon_action = sub.add_parser(
         "cunxon-action-probe",

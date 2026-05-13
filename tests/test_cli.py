@@ -13,6 +13,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
+    CunxonLongSweepProbeResult,
+    CunxonLongSweepSample,
     CunxonMultisphereActionCase,
     CunxonMultisphereActionProbeResult,
     CunxonPatternRecallSample,
@@ -159,6 +161,72 @@ def test_cli_cunxon_long_horizon_writes_json_and_markdown(
     assert rc == 0
     assert '"status": "long-horizon probe viable"' in json_path.read_text(encoding="utf-8")
     assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_long_sweep_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonLongSweepProbeResult:
+        return CunxonLongSweepProbeResult(
+            status="long-sweep probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            step_horizons=[32, 2048],
+            seed_offsets=[79],
+            samples=[
+                CunxonLongSweepSample(
+                    mode="train_rewarded",
+                    steps=2048,
+                    seed_offset=79,
+                    stimulus="query-neutral-drive",
+                    input_vector=[0.0, 0.0, 0.0],
+                    expected_action="query",
+                    readout=[0, 0, 0],
+                    decoded_action="PAUSE",
+                    normalized_action="query",
+                    confidence=1.0,
+                    outcome="success",
+                    energy=2.0,
+                    elapsed_ms=1.0,
+                )
+            ],
+            accuracy_by_mode_and_steps={"train_rewarded": {"2048": 1.0}},
+            unique_readouts_by_mode_and_steps={"train_rewarded": {"2048": 1}},
+            action_distribution_by_mode_and_steps={"train_rewarded": {"2048": {"query": 1}}},
+            baseline_accuracy={"always_query": 1.0},
+            notes=["fake long sweep"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_long_sweep_probe", fake_probe)
+    json_path = tmp_path / "long_sweep.json"
+    markdown_path = tmp_path / "long_sweep.md"
+
+    rc = main(
+        [
+            "cunxon-long-sweep",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--step-horizons",
+            "32,2048",
+            "--seed-offsets",
+            "79",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "long-sweep probe viable"' in json_path.read_text(encoding="utf-8")
+    assert "longer horizons" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_action_probe_writes_json_and_markdown(

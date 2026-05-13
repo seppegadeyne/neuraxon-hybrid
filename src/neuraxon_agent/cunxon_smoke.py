@@ -91,6 +91,60 @@ class CunxonLongHorizonResult:
 
 
 @dataclass(frozen=True)
+class CunxonLongSweepSample:
+    """One long-horizon/mode/seed/stimulus sample decoded through the action contract."""
+
+    mode: str
+    steps: int
+    seed_offset: int
+    stimulus: str
+    input_vector: list[float]
+    expected_action: str
+    readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    energy: float
+    elapsed_ms: float
+
+
+@dataclass(frozen=True)
+class CunxonLongSweepProbeResult:
+    """Longer cuNxon horizon sweep across modes, seeds, and action stimuli."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    step_horizons: list[int]
+    seed_offsets: list[int]
+    samples: list[CunxonLongSweepSample]
+    accuracy_by_mode_and_steps: dict[str, dict[str, float]]
+    unique_readouts_by_mode_and_steps: dict[str, dict[str, int]]
+    action_distribution_by_mode_and_steps: dict[str, dict[str, dict[str, int]]]
+    baseline_accuracy: dict[str, float]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of scored long-sweep samples."""
+        return len(self.samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonActionProbeTrial:
     """One task-coupled cuNxon readout decoded through the existing action contract."""
 
@@ -442,6 +496,113 @@ def write_long_horizon_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_long_horizon_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_long_sweep_markdown_report(result: CunxonLongSweepProbeResult) -> str:
+    """Render a long-horizon cuNxon action sweep report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    summary_rows = [
+        "| Mode | Steps | Accuracy | Unique readouts | Action distribution |",
+        "| --- | ---: | ---: | ---: | --- |",
+    ]
+    for mode, by_steps in sorted(result.accuracy_by_mode_and_steps.items()):
+        for steps_text, accuracy in sorted(by_steps.items(), key=lambda item: int(item[0])):
+            unique = result.unique_readouts_by_mode_and_steps.get(mode, {}).get(steps_text, 0)
+            distribution = result.action_distribution_by_mode_and_steps.get(mode, {}).get(
+                steps_text, {}
+            )
+            distribution_text = ", ".join(
+                f"{action}={count}" for action, count in sorted(distribution.items())
+            ) or "none"
+            summary_rows.append(
+                f"| {mode} | {steps_text} | {accuracy:.6f} | {unique} | {distribution_text} |"
+            )
+    baseline_rows = ["| Baseline | Accuracy |", "| --- | ---: |"]
+    for baseline, accuracy in sorted(result.baseline_accuracy.items()):
+        baseline_rows.append(f"| {baseline} | {accuracy:.6f} |")
+    sample_rows = [
+        "| Mode | Steps | Seed | Stimulus | Expected | Readout | Decoded | Outcome | Energy |",
+        "| --- | ---: | ---: | --- | --- | --- | --- | --- | ---: |",
+    ]
+    for sample in result.samples:
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        sample_rows.append(
+            "| "
+            f"{sample.mode} | {sample.steps} | {sample.seed_offset} | {sample.stimulus} | "
+            f"{sample.expected_action} | [{readout}] | "
+            f"{sample.decoded_action} ({sample.normalized_action}, {sample.confidence:.4f}) | "
+            f"{sample.outcome} | {sample.energy:.6g} |"
+        )
+    horizons = ", ".join(str(step) for step in result.step_horizons)
+    seeds = ", ".join(str(seed) for seed in result.seed_offsets)
+    return "\n".join(
+        [
+            "# cuNxon long sweep action diagnostic",
+            "",
+            f"Status: `{result.status}`",
+            f"Samples: {result.sample_count}",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Step horizons: {horizons}",
+            f"- Seed offsets: {seeds}",
+            "",
+            "## Why this probe exists",
+            "",
+            "Earlier cuNxon probes showed flat or baseline-level action readouts. This long sweep "
+            "keeps the task-coupled action contract but tests longer horizons, multiple seeds, "
+            "frozen inference, paper-canonical train mode, and train mode with simple "
+            "reward/neuromodulator injection before treating the backend as useful.",
+            "",
+            "## Long sweep summary",
+            "",
+            *summary_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Samples",
+            "",
+            *sample_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "Longer horizons, reward injection, readout diversity, or one successful sample "
+            "does not prove intelligence, generalization, or useful learning. "
+            "This diagnostic becomes positive evidence only if it beats trivial baselines "
+            "across seeds and horizons.",
+            "",
+        ]
+    )
+
+
+def write_long_sweep_artifacts(
+    result: CunxonLongSweepProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown long-sweep artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_long_sweep_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -1017,6 +1178,85 @@ def run_ctypes_long_horizon_probe(
     finally:
         if net.value:
             lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_long_sweep_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    step_horizons: Sequence[int] = (32, 512, 4096),
+    seed_offsets: Sequence[int] = (79, 80, 81),
+    modes: Sequence[str] = ("infer", "train", "train_rewarded"),
+    device_id: int = 0,
+) -> CunxonLongSweepProbeResult:
+    """Sweep longer cuNxon horizons/modes/seeds against the action contract."""
+    if not step_horizons:
+        raise ValueError("step_horizons must not be empty")
+    normalized_horizons = [int(steps) for steps in step_horizons]
+    if any(steps <= 0 for steps in normalized_horizons):
+        raise ValueError("step_horizons must contain positive integers")
+    if not seed_offsets:
+        raise ValueError("seed_offsets must not be empty")
+    normalized_seeds = [int(seed) for seed in seed_offsets]
+    allowed_modes = {"infer", "train", "train_rewarded"}
+    normalized_modes = [str(mode) for mode in modes]
+    invalid_modes = sorted(set(normalized_modes) - allowed_modes)
+    if invalid_modes:
+        raise ValueError(f"unsupported long-sweep modes: {invalid_modes}")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    start = time.perf_counter()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        samples: list[CunxonLongSweepSample] = []
+        for mode in normalized_modes:
+            for steps in normalized_horizons:
+                for seed_offset in normalized_seeds:
+                    for stimulus, input_vector, expected_action in _default_action_probe_specs():
+                        samples.append(
+                            _run_long_sweep_sample(
+                                lib=lib,
+                                ctx=ctx,
+                                mode=mode,
+                                steps=steps,
+                                seed_offset=seed_offset,
+                                stimulus=stimulus,
+                                input_vector=input_vector,
+                                expected_action=expected_action,
+                                decoder=decoder,
+                                start=start,
+                            )
+                        )
+        return CunxonLongSweepProbeResult(
+            status="long-sweep probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            step_horizons=normalized_horizons,
+            seed_offsets=normalized_seeds,
+            samples=samples,
+            accuracy_by_mode_and_steps=_long_sweep_accuracy_by_mode_and_steps(samples),
+            unique_readouts_by_mode_and_steps=_long_sweep_unique_by_mode_and_steps(samples),
+            action_distribution_by_mode_and_steps=_long_sweep_actions_by_mode_and_steps(samples),
+            baseline_accuracy=_long_sweep_baseline_accuracy(samples),
+            notes=[
+                "fresh one-sphere network per mode/steps/seed/stimulus sample",
+                "infer is frozen; train is plastic; train_rewarded adds simple "
+                "neuromodulator feedback",
+                "longer horizons are diagnostic evidence, not benchmark success by themselves",
+            ],
+        )
+    finally:
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
 
@@ -1854,6 +2094,157 @@ def _run_sensitivity_sample(
     finally:
         if net.value:
             lib.cunxonNetworkDestroy(net)
+
+
+def _run_long_sweep_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mode: str,
+    steps: int,
+    seed_offset: int,
+    stimulus: str,
+    input_vector: tuple[float, float, float],
+    expected_action: str,
+    decoder: ActionDecoder,
+    start: float,
+) -> CunxonLongSweepSample:
+    net = C.c_void_p()
+    try:
+        name = f"neuraxon_hybrid_cunxon_long_sweep_{mode}_{steps}_{seed_offset}_{stimulus}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = seed_offset
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"SWEEP", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_base, readout_base + 1, readout_base + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        input_buffer = (C.c_float * 3)(*input_vector)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        for _ in range(steps):
+            if mode == "infer":
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            else:
+                _check(lib, lib.cunxonNetworkStepTrain(net, ext_inputs, C.c_float(1.0)))
+                if mode == "train_rewarded":
+                    _inject_expected_action_modulator(lib, net, expected_action)
+        _check(lib, lib.cunxonContextSync(ctx))
+        readout = _capture_readout(lib, net, sphere_id.value)
+        energy = _capture_energy(lib, net)
+        decoded = decoder.decode(readout)
+        normalized_action = normalize_benchmark_action(decoded.actie_type)
+        return CunxonLongSweepSample(
+            mode=mode,
+            steps=steps,
+            seed_offset=seed_offset,
+            stimulus=stimulus,
+            input_vector=list(input_vector),
+            expected_action=expected_action,
+            readout=readout,
+            decoded_action=decoded.actie_type,
+            normalized_action=normalized_action,
+            confidence=decoded.confidence,
+            outcome="success" if normalized_action == expected_action else "failure",
+            energy=energy,
+            elapsed_ms=(time.perf_counter() - start) * 1000.0,
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+
+
+def _long_sweep_accuracy_by_mode_and_steps(
+    samples: Sequence[CunxonLongSweepSample],
+) -> dict[str, dict[str, float]]:
+    grouped: dict[str, dict[str, list[CunxonLongSweepSample]]] = {}
+    for sample in samples:
+        grouped.setdefault(sample.mode, {}).setdefault(str(sample.steps), []).append(sample)
+    return {
+        mode: {
+            steps: sum(1 for sample in step_samples if sample.outcome == "success")
+            / len(step_samples)
+            for steps, step_samples in sorted(by_steps.items(), key=lambda item: int(item[0]))
+        }
+        for mode, by_steps in sorted(grouped.items())
+    }
+
+
+def _long_sweep_unique_by_mode_and_steps(
+    samples: Sequence[CunxonLongSweepSample],
+) -> dict[str, dict[str, int]]:
+    grouped: dict[str, dict[str, set[tuple[int, ...]]]] = {}
+    for sample in samples:
+        grouped.setdefault(sample.mode, {}).setdefault(str(sample.steps), set()).add(
+            tuple(sample.readout)
+        )
+    return {
+        mode: {
+            steps: len(readouts)
+            for steps, readouts in sorted(by_steps.items(), key=lambda item: int(item[0]))
+        }
+        for mode, by_steps in sorted(grouped.items())
+    }
+
+
+def _long_sweep_actions_by_mode_and_steps(
+    samples: Sequence[CunxonLongSweepSample],
+) -> dict[str, dict[str, dict[str, int]]]:
+    grouped: dict[str, dict[str, dict[str, int]]] = {}
+    for sample in samples:
+        actions = grouped.setdefault(sample.mode, {}).setdefault(str(sample.steps), {})
+        actions[sample.normalized_action] = actions.get(sample.normalized_action, 0) + 1
+    return {
+        mode: {
+            steps: dict(sorted(actions.items()))
+            for steps, actions in sorted(by_steps.items(), key=lambda item: int(item[0]))
+        }
+        for mode, by_steps in sorted(grouped.items())
+    }
+
+
+def _long_sweep_baseline_accuracy(samples: Sequence[CunxonLongSweepSample]) -> dict[str, float]:
+    baselines = {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry",
+    }
+    if not samples:
+        return {name: 0.0 for name in baselines}
+    return {
+        name: sum(1 for sample in samples if action == sample.expected_action) / len(samples)
+        for name, action in sorted(baselines.items())
+    }
 
 
 def _count_unique_readouts_by_mode(

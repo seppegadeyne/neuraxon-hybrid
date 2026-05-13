@@ -1,14 +1,14 @@
 # cuNxon comparison against existing Neuraxon-Hybrid evidence
 
-Verdict: `richer cuNxon diagnostics still flat/baseline-level`
+Verdict: `longer cuNxon sweep still flat/baseline-level`
 
 ## What changed
 
-The previous cuNxon slice established CUDA runtime viability, long-horizon dynamics, a tiny task-coupled action probe, and an infer-vs-train sensitivity diagnostic. This follow-up executed the two next research steps: (1) inspect hidden-state/snapshot and pattern-memory APIs, and (2) build a richer sensory→association→motor multi-sphere/action adapter with holdout cases and trivial baselines.
+The previous cuNxon slice established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, and a three-sphere action adapter. This follow-up adds a longer task-coupled sweep over 108 live RTX 5090 samples: modes `infer`, `train`, and `train_rewarded`; horizons `32`, `512`, `4096`, and `32768`; seed offsets `79`, `80`, and `81`; and the same execute/retry/query action contract.
 
-The snapshot/pattern probe is runtime-viable on the RTX 5090: `cunxonSphereSnapshot` exposes full-neuron channels, pattern store/list/recall/clear calls work, and hidden-state activity changes from [0, 8, 2]. But recall remains flat: both stored patterns recalled `[0, 0, 0, 0, 0, 0, 0, 0]`, with Hamming distance `0`.
+The longer sweep remains baseline-level. Every mode × horizon accuracy is `0.333333`, exactly equal to the constant-action baselines on the balanced toy set. Shorter frozen infer samples show a little readout diversity, but by `4096`/`32768` steps infer also collapses to `query=9`; both `train` and `train_rewarded` are flat `query=9` at every tested horizon.
 
-The multi-sphere/action adapter also runs, but it does not improve decision quality. All six train/holdout cases decode to `query` from motor readout `[0, 0, 0]`. Accuracy is `0.333333` overall and `0.333333` on holdout, equal to the constant-action trivial baselines in this balanced toy set.
+The earlier snapshot/pattern and multi-sphere findings still stand: snapshot APIs expose hidden-state changes and pattern APIs are callable, but recall stayed flat zero; the three-sphere adapter ran but decoded all train/holdout cases to `query`, showed baseline-level holdout accuracy, and matched trivial baselines.
 
 ## Comparison lanes
 
@@ -16,6 +16,7 @@ The multi-sphere/action adapter also runs, but it does not improve decision qual
 | --- | --- | ---: | --- |
 | cuNxon raw CUDA smoke | decision-quality score | no decision-quality score measured | `benchmarks/results/cunxon_smoke.json` |
 | cuNxon long-horizon raw dynamics | continuous runtime samples | 65536 steps; 1 unique readout(s); 0 readout changes | `benchmarks/results/cunxon_long_horizon.json` |
+| cuNxon long sweep action diagnostic | success_rate vs trivial baselines | 108 samples; all mode/horizon accuracies=0.333333; train/train_rewarded flat query | `benchmarks/results/cunxon_long_sweep.json` |
 | cuNxon task-coupled action probe | success_rate | 0.333333 | `benchmarks/results/cunxon_action_probe.json` |
 | cuNxon infer-vs-train sensitivity probe | readout/action diversity | infer unique=3; train unique=1; train-mode flat/query=9 | `benchmarks/results/cunxon_sensitivity_probe.json` |
 | cuNxon snapshot/pattern probe | hidden-state and recall signal | snapshots active=0,8,2; patterns=2→0; recall hamming=0 | `benchmarks/results/cunxon_snapshot_pattern_probe.json` |
@@ -28,10 +29,10 @@ The multi-sphere/action adapter also runs, but it does not improve decision qual
 
 ## Interpretation
 
-cuNxon is still interesting as a GPU runtime/diagnostics surface: we can load it, step it, query hidden state, use host-side pattern memory, and wire a three-sphere topology from Python. That is not the same as useful Neuraxon-Hybrid behavior. The richer probes strengthen the negative conclusion: in these small task-coupled setups, the cuNxon readout remains flat/baseline-level rather than producing task-coupled actions or useful recall.
+cuNxon remains interesting as a GPU runtime and diagnostics surface, but the new longer sweep strengthens the negative decision-quality conclusion for the current Hybrid adapter path. Longer training horizons and simple neuromodulator/reward injection did not turn the one-sphere action readout into a policy signal; they mostly collapsed to the same neutral `query` output.
 
-The next useful direction is not another smoke test. Either inspect/readjust cuNxon interface semantics and output-port mapping at the C/CUDA level, or design a stronger adapter that explicitly drives motor outputs and compares against holdout temporal baselines before claiming integration value.
+The next useful direction is no longer “just run longer”. Either inspect/readjust cuNxon interface semantics and output-port/CTSN readout mapping at the C/CUDA level, or design an adapter with an explicit supervised motor-target mechanism and stronger holdout temporal baselines before claiming integration value.
 
 ## Evidence boundary
 
-This comparison deliberately separates runtime viability from decision quality. Snapshot activity, callable pattern APIs, and inter-sphere topology construction prove useful diagnostic surfaces, but flat recall and baseline-level holdout accuracy do not prove intelligence, generalization, or useful learning.
+This comparison deliberately separates runtime viability from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, and reward injection prove useful diagnostic surfaces, but flat recall and baseline-level action accuracy do not prove intelligence, generalization, or useful learning.
