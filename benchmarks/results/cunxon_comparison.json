@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution now has runtime/dynamics viability, a tiny task-coupled action probe, and an infer-vs-train sensitivity diagnostic. The sensitivity probe shows frozen-infer readout diversity but train-mode collapses to query for this one-sphere setup; this remains diagnostic/negative evidence, not intelligence, generalization, or useful learning.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere APIs from Python, but the richer probes remain diagnostic/negative: pattern recall readouts are flat zero and the multi-sphere action adapter decodes all cases to query, matching trivial constant baselines rather than beating them.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -24,6 +24,18 @@
       "lane": "cuNxon infer-vs-train sensitivity probe",
       "metric": "readout/action diversity",
       "value": "infer unique=3; train unique=1; train-mode flat/query=9"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_snapshot_pattern_probe.json",
+      "lane": "cuNxon snapshot/pattern probe",
+      "metric": "hidden-state and recall signal",
+      "value": "snapshots active=0,8,2; patterns=2\u21920; recall hamming=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_multisphere_action_probe.json",
+      "lane": "cuNxon multi-sphere/action adapter",
+      "metric": "holdout success_rate vs trivial baselines",
+      "value": "holdout=0.333333; overall=0.333333; flat query motor readouts"
     },
     {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
@@ -76,6 +88,66 @@
     "unique_readouts": 1,
     "verdict": "long-horizon runtime viable, not benchmark-integrated"
   },
+  "cunxon_multisphere_action_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "motor_readouts": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "sphere_count": 3,
+    "status": "multi-sphere action probe viable",
+    "verdict": "three-sphere adapter runs but is flat query and does not beat trivial baselines"
+  },
   "cunxon_sensitivity_probe": {
     "action_change_count_by_stimulus": {
       "execute-positive-drive": 1,
@@ -91,10 +163,8 @@
         "query": 9
       }
     },
-    "decision_quality_measured": false,
     "sample_count": 18,
     "status": "sensitivity probe viable",
-    "steps": 32,
     "unique_readouts_by_mode": {
       "infer": 3,
       "train": 1
@@ -111,13 +181,49 @@
     ],
     "status": "smoke-test viable"
   },
+  "cunxon_snapshot_pattern_probe": {
+    "pattern_count_after_clear": 0,
+    "pattern_count_after_store": 2,
+    "recall_hamming_distance": 0,
+    "recall_readouts": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "snapshot_active_state_counts": [
+      0,
+      8,
+      2
+    ],
+    "status": "snapshot-pattern probe viable",
+    "verdict": "snapshot channels viable; pattern recall callable but flat zero in this setup"
+  },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_long_horizon.json",
     "benchmarks/results/cunxon_action_probe.json",
     "benchmarks/results/cunxon_sensitivity_probe.json",
+    "benchmarks/results/cunxon_snapshot_pattern_probe.json",
+    "benchmarks/results/cunxon_multisphere_action_probe.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "sensitivity diagnostic train-mode flat"
+  "verdict": "richer cuNxon diagnostics still flat/baseline-level"
 }

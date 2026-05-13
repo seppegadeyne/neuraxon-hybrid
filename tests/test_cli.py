@@ -13,9 +13,14 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
+    CunxonMultisphereActionCase,
+    CunxonMultisphereActionProbeResult,
+    CunxonPatternRecallSample,
     CunxonSensitivityProbeResult,
     CunxonSensitivityProbeSample,
     CunxonSmokeResult,
+    CunxonSnapshotObservation,
+    CunxonSnapshotPatternProbeResult,
 )
 
 
@@ -275,6 +280,146 @@ def test_cli_cunxon_sensitivity_probe_writes_json_and_markdown(
     assert rc == 0
     assert '"status": "sensitivity probe viable"' in json_path.read_text(encoding="utf-8")
     assert "infer-vs-train sensitivity probe" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_snapshot_pattern_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonSnapshotPatternProbeResult:
+        return CunxonSnapshotPatternProbeResult(
+            status="snapshot-pattern probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            present_steps=4,
+            settle_steps=3,
+            pattern_count_after_store=2,
+            pattern_count_after_clear=0,
+            snapshots=[
+                CunxonSnapshotObservation(
+                    phase="after-finalize",
+                    n_neurons=8,
+                    active_state_count=0,
+                    neutral_state_count=8,
+                    mean_abs_membrane=0.0,
+                    mean_abs_complement=0.0,
+                    mean_abs_stilde=0.0,
+                    mean_firing_rate=0.0,
+                    mean_astrocyte=0.0,
+                    energy=0.0,
+                )
+            ],
+            recalls=[
+                CunxonPatternRecallSample(
+                    pattern_name="alpha",
+                    mask_fraction=0.5,
+                    readout=[1, 0, -1],
+                    active_state_count=2,
+                    signed_sum=0,
+                )
+            ],
+            recall_hamming_distance=0,
+            notes=["fake snapshot pattern"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_snapshot_pattern_probe", fake_probe)
+    json_path = tmp_path / "snapshot_pattern.json"
+    markdown_path = tmp_path / "snapshot_pattern.md"
+
+    rc = main(
+        [
+            "cunxon-snapshot-pattern-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--present-steps",
+            "4",
+            "--settle-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "snapshot-pattern probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "hidden-state/snapshot" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_multisphere_action_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonMultisphereActionProbeResult:
+        return CunxonMultisphereActionProbeResult(
+            status="multi-sphere action probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            train_steps=4,
+            eval_steps=3,
+            sphere_count=3,
+            cases=[
+                CunxonMultisphereActionCase(
+                    name="execute-holdout",
+                    split="holdout",
+                    input_vector=[1.0, 0.2, 0.0, 0.0],
+                    expected_action="execute",
+                    sensory_readout=[1, 0, 0, 0],
+                    association_readout=[0, 1, 0, 0],
+                    motor_readout=[1, 0, 0],
+                    decoded_action="PROCEED",
+                    normalized_action="execute",
+                    confidence=0.3333,
+                    outcome="success",
+                    baseline_actions={"always_execute": "execute"},
+                    energy=2.0,
+                )
+            ],
+            accuracy_by_split={"holdout": 1.0, "overall": 1.0},
+            baseline_accuracy_by_split={"always_execute": {"holdout": 1.0, "overall": 1.0}},
+            notes=["fake multi-sphere action"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_multisphere_action_probe", fake_probe)
+    json_path = tmp_path / "multi.json"
+    markdown_path = tmp_path / "multi.md"
+
+    rc = main(
+        [
+            "cunxon-multisphere-action-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--train-steps",
+            "4",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "multi-sphere action probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "multi-sphere/action adapter" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:

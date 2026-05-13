@@ -11,19 +11,28 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
+    CunxonMultisphereActionCase,
+    CunxonMultisphereActionProbeResult,
+    CunxonPatternRecallSample,
     CunxonSensitivityProbeResult,
     CunxonSensitivityProbeSample,
     CunxonSmokeResult,
+    CunxonSnapshotObservation,
+    CunxonSnapshotPatternProbeResult,
     classify_cunxon_status,
     render_action_probe_markdown_report,
     render_long_horizon_markdown_report,
     render_markdown_report,
+    render_multisphere_action_markdown_report,
     render_sensitivity_probe_markdown_report,
+    render_snapshot_pattern_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_long_horizon_artifacts,
+    write_multisphere_action_artifacts,
     write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
+    write_snapshot_pattern_artifacts,
 )
 
 
@@ -253,6 +262,146 @@ def test_sensitivity_probe_report_compares_infer_and_train_modes(tmp_path: Path)
     assert "infer-vs-train sensitivity probe" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_snapshot_pattern_report_records_hidden_state_and_pattern_memory(tmp_path: Path) -> None:
+    result = CunxonSnapshotPatternProbeResult(
+        status="snapshot-pattern probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        present_steps=30,
+        settle_steps=20,
+        pattern_count_after_store=2,
+        pattern_count_after_clear=0,
+        snapshots=[
+            CunxonSnapshotObservation(
+                phase="after-finalize",
+                n_neurons=48,
+                active_state_count=0,
+                neutral_state_count=48,
+                mean_abs_membrane=0.0,
+                mean_abs_complement=0.0,
+                mean_abs_stilde=0.0,
+                mean_firing_rate=0.0,
+                mean_astrocyte=0.0,
+                energy=0.0,
+            ),
+            CunxonSnapshotObservation(
+                phase="after-pattern-store",
+                n_neurons=48,
+                active_state_count=7,
+                neutral_state_count=41,
+                mean_abs_membrane=0.12,
+                mean_abs_complement=0.04,
+                mean_abs_stilde=0.13,
+                mean_firing_rate=0.02,
+                mean_astrocyte=0.01,
+                energy=8.0,
+            ),
+        ],
+        recalls=[
+            CunxonPatternRecallSample(
+                pattern_name="alpha",
+                mask_fraction=0.5,
+                readout=[1, 0, -1, 0, 0, 1, 0, -1],
+                active_state_count=4,
+                signed_sum=0,
+            ),
+            CunxonPatternRecallSample(
+                pattern_name="beta",
+                mask_fraction=0.5,
+                readout=[0, -1, 0, 1, 1, 0, -1, 0],
+                active_state_count=4,
+                signed_sum=0,
+            ),
+        ],
+        recall_hamming_distance=6,
+        notes=["fake snapshot/pattern probe"],
+    )
+
+    markdown = render_snapshot_pattern_markdown_report(result)
+    assert "hidden-state/snapshot" in markdown
+    assert "pattern store/recall" in markdown
+    assert "Hamming distance: 6" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "snapshot_pattern.json"
+    markdown_path = tmp_path / "snapshot_pattern.md"
+    write_snapshot_pattern_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"pattern_count_after_store": 2' in data
+    assert "pattern store/recall" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_multisphere_action_report_compares_holdout_against_trivial_baselines(
+    tmp_path: Path,
+) -> None:
+    result = CunxonMultisphereActionProbeResult(
+        status="multi-sphere action probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        train_steps=12,
+        eval_steps=8,
+        sphere_count=3,
+        cases=[
+            CunxonMultisphereActionCase(
+                name="execute-train",
+                split="train",
+                input_vector=[1.0, 0.3, 0.1, 0.0],
+                expected_action="execute",
+                sensory_readout=[1, 0, 0, 0],
+                association_readout=[0, 1, 0, 0],
+                motor_readout=[1, 0, 0],
+                decoded_action="PROCEED",
+                normalized_action="execute",
+                confidence=0.3333,
+                outcome="success",
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=2.0,
+            ),
+            CunxonMultisphereActionCase(
+                name="retry-holdout-noisy",
+                split="holdout",
+                input_vector=[-0.8, -0.2, 0.6, 0.1],
+                expected_action="retry",
+                sensory_readout=[0, -1, 0, 0],
+                association_readout=[0, 0, -1, 0],
+                motor_readout=[0, 0, 0],
+                decoded_action="PAUSE",
+                normalized_action="query",
+                confidence=1.0,
+                outcome="failure",
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=3.0,
+            ),
+        ],
+        accuracy_by_split={"train": 1.0, "holdout": 0.0, "overall": 0.5},
+        baseline_accuracy_by_split={
+            "always_execute": {"train": 1.0, "holdout": 0.0, "overall": 0.5},
+            "always_query": {"train": 0.0, "holdout": 0.0, "overall": 0.0},
+        },
+        notes=["fake multi-sphere adapter"],
+    )
+
+    markdown = render_multisphere_action_markdown_report(result)
+    assert "multi-sphere/action adapter" in markdown
+    assert "holdout" in markdown
+    assert "always_execute" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "multi.json"
+    markdown_path = tmp_path / "multi.md"
+    write_multisphere_action_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    assert '"sphere_count": 3' in json_path.read_text(encoding="utf-8")
+    assert "trivial baselines" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_tracked_cunxon_investigation_report_preserves_live_smoke_and_boundary() -> None:
     markdown = Path("benchmarks/results/cunxon_smoke.md").read_text(encoding="utf-8")
     data = Path("benchmarks/results/cunxon_smoke.json").read_text(encoding="utf-8")
@@ -275,18 +424,29 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon long-horizon raw dynamics" in markdown
     assert "cuNxon task-coupled action probe" in markdown
     assert "cuNxon infer-vs-train sensitivity probe" in markdown
-    assert "short smoke tests are insufficient" in markdown
+    assert "cuNxon snapshot/pattern probe" in markdown
+    assert "cuNxon multi-sphere/action adapter" in markdown
     assert "no decision-quality score measured" in markdown
-    assert "decision-quality measured but not useful" in markdown
     assert "train-mode flat" in markdown
+    assert "flat recall" in markdown
+    assert "baseline-level holdout accuracy" in markdown
     assert "raw_network" in markdown
     assert "0.145833" in markdown
     assert "random" in markdown
     assert "always_execute" in markdown
-    assert "does not prove intelligence" in markdown
+    assert "do not prove intelligence" in markdown
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
     assert '"verdict": "sensitivity diagnostic train-mode flat"' in data
+    assert (
+        '"verdict": "snapshot channels viable; pattern recall callable but flat zero in this setup"'
+        in data
+    )
+    assert (
+        '"verdict": "three-sphere adapter runs but is flat query and does not beat '
+        'trivial baselines"'
+        in data
+    )
     assert '"decision_quality_measured": false' in data
     assert '"decision_quality_measured": true' in data
 

@@ -12,7 +12,7 @@ import json
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from neuraxon_agent.action import ActionDecoder
 from neuraxon_agent.action_contract import normalize_benchmark_action
@@ -21,6 +21,11 @@ CUNXON_OK = 0
 CUNXON_PROP_DEVICE_NAME = 1
 CUNXON_PROP_COMPUTE_CAPABILITY = 2
 CUNXON_SPHERE_SENSORY = 0
+CUNXON_SPHERE_ASSOCIATION = 1
+CUNXON_SPHERE_MOTOR = 2
+CUNXON_LINK_FEEDFORWARD = 0
+CUNXON_BAND_GAMMA = 5
+CUNXON_TOPO_DENSE = 0
 
 
 @dataclass(frozen=True)
@@ -175,6 +180,114 @@ class CunxonSensitivityProbeResult:
         """Return a JSON-serializable result dictionary."""
         data = asdict(self)
         data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonSnapshotObservation:
+    """Aggregated hidden-state channels captured via cunxonSphereSnapshot."""
+
+    phase: str
+    n_neurons: int
+    active_state_count: int
+    neutral_state_count: int
+    mean_abs_membrane: float
+    mean_abs_complement: float
+    mean_abs_stilde: float
+    mean_firing_rate: float
+    mean_astrocyte: float
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonPatternRecallSample:
+    """One host-side cuNxon pattern recall sample."""
+
+    pattern_name: str
+    mask_fraction: float
+    readout: list[int]
+    active_state_count: int
+    signed_sum: int
+
+
+@dataclass(frozen=True)
+class CunxonSnapshotPatternProbeResult:
+    """Result of inspecting cuNxon snapshot and pattern-memory APIs."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    present_steps: int
+    settle_steps: int
+    pattern_count_after_store: int
+    pattern_count_after_clear: int
+    snapshots: list[CunxonSnapshotObservation]
+    recalls: list[CunxonPatternRecallSample]
+    recall_hamming_distance: int
+    notes: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        return asdict(self)
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonMultisphereActionCase:
+    """One train/holdout case from a cuNxon multi-sphere action adapter probe."""
+
+    name: str
+    split: str
+    input_vector: list[float]
+    expected_action: str
+    sensory_readout: list[int]
+    association_readout: list[int]
+    motor_readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    baseline_actions: dict[str, str]
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonMultisphereActionProbeResult:
+    """Richer cuNxon sensory→association→motor action probe result."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    train_steps: int
+    eval_steps: int
+    sphere_count: int
+    cases: list[CunxonMultisphereActionCase]
+    accuracy_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of scored train/holdout cases."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["case_count"] = self.case_count
         return data
 
     def to_json(self, *, indent: int | None = 2) -> str:
@@ -498,6 +611,191 @@ def write_sensitivity_probe_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_sensitivity_probe_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_snapshot_pattern_markdown_report(result: CunxonSnapshotPatternProbeResult) -> str:
+    """Render a cuNxon hidden-state snapshot and pattern-memory probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    snapshot_rows = [
+        (
+            "| Phase | Neurons | Active | Neutral | mean abs U | mean abs h | "
+            "mean abs s_tilde | mean firing | mean astro | Energy |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for snapshot in result.snapshots:
+        snapshot_rows.append(
+            "| "
+            f"{snapshot.phase} | {snapshot.n_neurons} | {snapshot.active_state_count} | "
+            f"{snapshot.neutral_state_count} | {snapshot.mean_abs_membrane:.6g} | "
+            f"{snapshot.mean_abs_complement:.6g} | {snapshot.mean_abs_stilde:.6g} | "
+            f"{snapshot.mean_firing_rate:.6g} | {snapshot.mean_astrocyte:.6g} | "
+            f"{snapshot.energy:.6g} |"
+        )
+    recall_rows = [
+        "| Pattern | Mask fraction | Readout | Active | Signed sum |",
+        "| --- | ---: | --- | ---: | ---: |",
+    ]
+    for recall in result.recalls:
+        readout = ", ".join(_format_trinary(value) for value in recall.readout)
+        recall_rows.append(
+            f"| {recall.pattern_name} | {recall.mask_fraction:.3g} | [{readout}] | "
+            f"{recall.active_state_count} | {recall.signed_sum} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon hidden-state/snapshot + pattern store/recall probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Pattern present steps: {result.present_steps}",
+            f"- Recall settle steps: {result.settle_steps}",
+            f"- Pattern count after store: {result.pattern_count_after_store}",
+            f"- Pattern count after clear: {result.pattern_count_after_clear}",
+            f"- Recall Hamming distance: {result.recall_hamming_distance}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The one-sphere action and sensitivity probes mostly exposed flat `query` "
+            "readouts. This diagnostic inspects richer cuNxon surfaces before building "
+            "another policy: full sphere hidden-state/snapshot channels and the host-side "
+            "pattern store/recall API.",
+            "",
+            "## Snapshot observations",
+            "",
+            *snapshot_rows,
+            "",
+            "## Pattern recall samples",
+            "",
+            *recall_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "Snapshot activity or pattern recall shape does not prove intelligence, "
+            "generalization, or useful task learning. It only tells us whether cuNxon "
+            "exposes hidden-state and pattern-memory signals that are worth testing in a "
+            "richer adapter.",
+            "",
+        ]
+    )
+
+
+def write_snapshot_pattern_artifacts(
+    result: CunxonSnapshotPatternProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown snapshot/pattern artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_snapshot_pattern_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_multisphere_action_markdown_report(result: CunxonMultisphereActionProbeResult) -> str:
+    """Render a richer multi-sphere cuNxon action adapter report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    accuracy_rows = ["| Split | cuNxon adapter accuracy |", "| --- | ---: |"]
+    for split, accuracy in sorted(result.accuracy_by_split.items()):
+        accuracy_rows.append(f"| {split} | {accuracy:.6f} |")
+    baseline_rows = ["| Baseline | Split | Accuracy |", "| --- | --- | ---: |"]
+    for baseline, by_split in sorted(result.baseline_accuracy_by_split.items()):
+        for split, accuracy in sorted(by_split.items()):
+            baseline_rows.append(f"| {baseline} | {split} | {accuracy:.6f} |")
+    case_rows = [
+        "| Case | Split | Expected | Motor readout | Decoded | Outcome | Baselines | Energy |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: |",
+    ]
+    for case in result.cases:
+        motor = ", ".join(_format_trinary(value) for value in case.motor_readout)
+        baselines = ", ".join(
+            f"{name}={action}" for name, action in sorted(case.baseline_actions.items())
+        )
+        case_rows.append(
+            "| "
+            f"{case.name} | {case.split} | {case.expected_action} | [{motor}] | "
+            f"{case.decoded_action} ({case.normalized_action}, {case.confidence:.4f}) | "
+            f"{case.outcome} | {baselines} | {case.energy:.6g} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon multi-sphere/action adapter probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Sphere count: {result.sphere_count}",
+            f"- Train steps per training case: {result.train_steps}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Cases: {result.case_count}",
+            "",
+            "## Adapter and holdout results",
+            "",
+            *accuracy_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Cases",
+            "",
+            *case_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This multi-sphere/action adapter is useful only if it beats trivial baselines "
+            "on holdout cases. Runtime viability, inter-sphere routing, or a single positive "
+            "case does not prove intelligence, generalization, or robust learning.",
+            "",
+        ]
+    )
+
+
+def write_multisphere_action_artifacts(
+    result: CunxonMultisphereActionProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown multi-sphere action artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_multisphere_action_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -901,6 +1199,581 @@ def run_ctypes_sensitivity_probe(
             lib.cunxonDestroyContext(ctx)
 
 
+def run_ctypes_snapshot_pattern_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    present_steps: int = 30,
+    settle_steps: int = 20,
+    mask_fraction: float = 0.5,
+    device_id: int = 0,
+) -> CunxonSnapshotPatternProbeResult:
+    """Inspect cuNxon full-sphere snapshot and host-side pattern APIs."""
+    if present_steps <= 0:
+        raise ValueError("present_steps must be positive")
+    if settle_steps <= 0:
+        raise ValueError("settle_steps must be positive")
+    if not 0.0 <= mask_fraction <= 1.0:
+        raise ValueError("mask_fraction must be between 0 and 1")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_snapshot_pattern"),
+        )
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 8
+        params.num_hidden_neurons = 32
+        params.num_output_neurons = 8
+        params.random_seed_offset = 141
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"PATTERN", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 8)(*range(8))
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 8)(*(readout_base + i for i in range(8)))
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                8,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                8,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        snapshots = [_capture_snapshot_observation(lib, net, sphere_id.value, "after-finalize")]
+        patterns = [
+            ("alpha", (0.8, 0.8, 0.8, 0.8, -0.8, -0.8, -0.8, -0.8)),
+            ("beta", (-0.8, -0.8, -0.8, -0.8, 0.8, 0.8, 0.8, 0.8)),
+        ]
+        for pattern_name, pattern_values in patterns:
+            pattern_buffer = (C.c_float * 8)(*pattern_values)
+            _check(
+                lib,
+                lib.cunxonNetworkStorePattern(
+                    net,
+                    sphere_id.value,
+                    pattern_name.encode("utf-8"),
+                    pattern_buffer,
+                    8,
+                    present_steps,
+                    C.c_float(1.0),
+                ),
+            )
+        _check(lib, lib.cunxonContextSync(ctx))
+        pattern_count_after_store = _capture_pattern_count(lib, net)
+        snapshots.append(
+            _capture_snapshot_observation(lib, net, sphere_id.value, "after-pattern-store")
+        )
+
+        recalls = [
+            _recall_pattern(
+                lib,
+                net,
+                sphere_id.value,
+                pattern_name,
+                pattern_len=8,
+                mask_fraction=mask_fraction,
+                settle_steps=settle_steps,
+            )
+            for pattern_name, _pattern_values in patterns
+        ]
+        _check(lib, lib.cunxonContextSync(ctx))
+        snapshots.append(_capture_snapshot_observation(lib, net, sphere_id.value, "after-recall"))
+        recall_distance = (
+            _hamming_distance(recalls[0].readout, recalls[1].readout) if len(recalls) >= 2 else 0
+        )
+        _check(lib, lib.cunxonNetworkClearPatterns(net))
+        pattern_count_after_clear = _capture_pattern_count(lib, net)
+        return CunxonSnapshotPatternProbeResult(
+            status="snapshot-pattern probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            present_steps=present_steps,
+            settle_steps=settle_steps,
+            pattern_count_after_store=pattern_count_after_store,
+            pattern_count_after_clear=pattern_count_after_clear,
+            snapshots=snapshots,
+            recalls=recalls,
+            recall_hamming_distance=recall_distance,
+            notes=[
+                "cunxonSphereSnapshot exposed full-neuron state channels",
+                "pattern store/list/recall/clear APIs are callable from ctypes",
+                "pattern recall shape/signal is diagnostic evidence, not decision-quality evidence",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_multisphere_action_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    train_steps: int = 24,
+    eval_steps: int = 16,
+    device_id: int = 0,
+) -> CunxonMultisphereActionProbeResult:
+    """Run a three-sphere sensory→association→motor action probe against baselines."""
+    if train_steps <= 0:
+        raise ValueError("train_steps must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(
+                ctx,
+                C.byref(net),
+                b"neuraxon_hybrid_cunxon_multisphere_action",
+            ),
+        )
+        sensory_id, association_id, motor_id = _build_multisphere_action_topology(lib, net)
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        specs = _default_multisphere_action_specs()
+        for _name, split, input_vector, expected_action in specs:
+            if split != "train":
+                continue
+            for _ in range(train_steps):
+                ext_inputs = _pack_three_sphere_inputs(input_vector)
+                _check(lib, lib.cunxonNetworkStepTrain(net, ext_inputs, C.c_float(1.0)))
+            _inject_expected_action_modulator(lib, net, expected_action)
+        _check(lib, lib.cunxonContextSync(ctx))
+
+        cases: list[CunxonMultisphereActionCase] = []
+        for case_index, (name, split, input_vector, expected_action) in enumerate(specs):
+            for _ in range(eval_steps):
+                ext_inputs = _pack_three_sphere_inputs(input_vector)
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            _check(lib, lib.cunxonContextSync(ctx))
+            sensory_readout = _capture_readout(lib, net, sensory_id)
+            association_readout = _capture_readout(lib, net, association_id)
+            motor_readout = _capture_readout(lib, net, motor_id)
+            decoded = decoder.decode(motor_readout)
+            normalized_action = normalize_benchmark_action(decoded.actie_type)
+            baseline_actions = _baseline_actions_for_case(case_index)
+            cases.append(
+                CunxonMultisphereActionCase(
+                    name=name,
+                    split=split,
+                    input_vector=list(input_vector),
+                    expected_action=expected_action,
+                    sensory_readout=sensory_readout,
+                    association_readout=association_readout,
+                    motor_readout=motor_readout,
+                    decoded_action=decoded.actie_type,
+                    normalized_action=normalized_action,
+                    confidence=decoded.confidence,
+                    outcome="success" if normalized_action == expected_action else "failure",
+                    baseline_actions=baseline_actions,
+                    energy=_capture_energy(lib, net),
+                )
+            )
+
+        return CunxonMultisphereActionProbeResult(
+            status="multi-sphere action probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            train_steps=train_steps,
+            eval_steps=eval_steps,
+            sphere_count=3,
+            cases=cases,
+            accuracy_by_split=_accuracy_by_split(cases),
+            baseline_accuracy_by_split=_baseline_accuracy_by_split(cases),
+            notes=[
+                "three-sphere sensory-to-association-to-motor topology completed",
+                "motor readout is decoded through the existing ActionDecoder/action contract",
+                "holdout and trivial-baseline comparison is required before any adapter claim",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def _capture_snapshot_observation(
+    lib: C.CDLL,
+    net: C.c_void_p,
+    sphere_id: int,
+    phase: str,
+) -> CunxonSnapshotObservation:
+    n_neurons = C.c_int(0)
+    _check(
+        lib,
+        lib.cunxonSphereSnapshot(
+            net, sphere_id, None, None, None, None, None, None, C.byref(n_neurons)
+        ),
+    )
+    if n_neurons.value <= 0:
+        raise CunxonError("cuNxon snapshot returned an empty neuron count")
+    size = n_neurons.value
+    u = (C.c_float * size)()
+    h = (C.c_float * size)()
+    stilde = (C.c_float * size)()
+    states = (C.c_int8 * size)()
+    firing_rate = (C.c_float * size)()
+    astrocyte = (C.c_float * size)()
+    _check(
+        lib,
+        lib.cunxonSphereSnapshot(
+            net,
+            sphere_id,
+            u,
+            h,
+            stilde,
+            states,
+            firing_rate,
+            astrocyte,
+            C.byref(n_neurons),
+        ),
+    )
+    state_values = [int(states[index]) for index in range(size)]
+    validate_trinary_readout(state_values)
+    return CunxonSnapshotObservation(
+        phase=phase,
+        n_neurons=size,
+        active_state_count=sum(1 for value in state_values if value != 0),
+        neutral_state_count=sum(1 for value in state_values if value == 0),
+        mean_abs_membrane=_mean_abs(u, size),
+        mean_abs_complement=_mean_abs(h, size),
+        mean_abs_stilde=_mean_abs(stilde, size),
+        mean_firing_rate=_mean(firing_rate, size),
+        mean_astrocyte=_mean(astrocyte, size),
+        energy=_capture_energy(lib, net),
+    )
+
+
+def _capture_pattern_count(lib: C.CDLL, net: C.c_void_p) -> int:
+    count = C.c_int(0)
+    _check(lib, lib.cunxonNetworkListPatterns(net, None, 0, C.byref(count)))
+    return int(count.value)
+
+
+def _recall_pattern(
+    lib: C.CDLL,
+    net: C.c_void_p,
+    sphere_id: int,
+    pattern_name: str,
+    *,
+    pattern_len: int,
+    mask_fraction: float,
+    settle_steps: int,
+) -> CunxonPatternRecallSample:
+    n_readout = C.c_int(pattern_len)
+    readout_buffer = (C.c_int8 * pattern_len)()
+    _check(
+        lib,
+        lib.cunxonNetworkRecallPattern(
+            net,
+            sphere_id,
+            pattern_name.encode("utf-8"),
+            pattern_len,
+            C.c_float(mask_fraction),
+            settle_steps,
+            C.c_float(1.0),
+            readout_buffer,
+            C.byref(n_readout),
+        ),
+    )
+    readout = [int(readout_buffer[index]) for index in range(n_readout.value)]
+    validate_trinary_readout(readout)
+    return CunxonPatternRecallSample(
+        pattern_name=pattern_name,
+        mask_fraction=mask_fraction,
+        readout=readout,
+        active_state_count=sum(1 for value in readout if value != 0),
+        signed_sum=sum(readout),
+    )
+
+
+def _hamming_distance(left: Sequence[int], right: Sequence[int]) -> int:
+    return sum(1 for left_value, right_value in zip(left, right) if left_value != right_value)
+
+
+def _mean(values: Any, size: int) -> float:
+    if size <= 0:
+        return 0.0
+    return float(sum(float(values[index]) for index in range(size)) / size)
+
+
+def _mean_abs(values: Any, size: int) -> float:
+    if size <= 0:
+        return 0.0
+    return float(sum(abs(float(values[index])) for index in range(size)) / size)
+
+
+def _build_multisphere_action_topology(lib: C.CDLL, net: C.c_void_p) -> tuple[int, int, int]:
+    sensory_params = _NetworkParameters()
+    association_params = _NetworkParameters()
+    motor_params = _NetworkParameters()
+    sensory_id = _add_sphere(lib, net, b"SENSORY", CUNXON_SPHERE_SENSORY, sensory_params)
+    association_id = _add_sphere(
+        lib, net, b"ASSOCIATION", CUNXON_SPHERE_ASSOCIATION, association_params
+    )
+    motor_id = _add_sphere(lib, net, b"MOTOR", CUNXON_SPHERE_MOTOR, motor_params)
+
+    four_ports = (C.c_int * 4)(0, 1, 2, 3)
+    sensory_readout = _output_ids(sensory_params, 4)
+    association_readout = _output_ids(association_params, 4)
+    motor_readout = _output_ids(motor_params, 3)
+    _check(
+        lib,
+        lib.cunxonNetworkSetSphereInterface(
+            net,
+            sensory_id,
+            four_ports,
+            4,
+            None,
+            0,
+            four_ports,
+            4,
+            sensory_readout,
+            4,
+        ),
+    )
+    _check(
+        lib,
+        lib.cunxonNetworkSetSphereInterface(
+            net,
+            association_id,
+            None,
+            0,
+            four_ports,
+            4,
+            four_ports,
+            4,
+            association_readout,
+            4,
+        ),
+    )
+    motor_relay = (C.c_int * 4)(0, 1, 2, 3)
+    _check(
+        lib,
+        lib.cunxonNetworkSetSphereInterface(
+            net,
+            motor_id,
+            None,
+            0,
+            motor_relay,
+            4,
+            None,
+            0,
+            motor_readout,
+            3,
+        ),
+    )
+    link_params = _default_link_params()
+    link_id = C.c_int(-1)
+    _check(
+        lib,
+        lib.cunxonNetworkAddLink(
+            net, sensory_id, association_id, C.byref(link_params), C.byref(link_id)
+        ),
+    )
+    _check(
+        lib,
+        lib.cunxonNetworkAddLink(
+            net,
+            association_id,
+            motor_id,
+            C.byref(link_params),
+            C.byref(link_id),
+        ),
+    )
+    return sensory_id, association_id, motor_id
+
+
+
+def _add_sphere(
+    lib: C.CDLL,
+    net: C.c_void_p,
+    name: bytes,
+    kind: int,
+    params: _NetworkParameters,
+) -> int:
+    _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+    # Defaults are loaded here so every sphere has a fully initialized parameter struct.
+    if name == b"SENSORY":
+        params.num_input_neurons = 4
+        params.num_hidden_neurons = 12
+        params.num_output_neurons = 4
+        params.random_seed_offset = 210
+    elif name == b"ASSOCIATION":
+        params.num_input_neurons = 4
+        params.num_hidden_neurons = 12
+        params.num_output_neurons = 4
+        params.random_seed_offset = 211
+    else:
+        params.num_input_neurons = 4
+        params.num_hidden_neurons = 10
+        params.num_output_neurons = 3
+        params.random_seed_offset = 212
+    params.synapse_death_prob = 0.0
+    params.synapse_formation_prob = 0.0
+    sphere_id = C.c_int(-1)
+    _check(lib, lib.cunxonNetworkAddSphere(net, name, kind, C.byref(params), C.byref(sphere_id)))
+    return int(sphere_id.value)
+
+
+def _output_ids(params: _NetworkParameters, count: int) -> Any:
+    base = params.num_input_neurons + params.num_hidden_neurons
+    return (C.c_int * count)(*(base + index for index in range(count)))
+
+
+def _default_link_params() -> _LinkParameters:
+    params = _LinkParameters()
+    params.kind = CUNXON_LINK_FEEDFORWARD
+    params.coherence_band = CUNXON_BAND_GAMMA
+    params.gain = 1.0
+    params.delay_steps = 1
+    params.transmission_threshold = 0.0
+    params.coherence_strength = 0.5
+    params.topology = CUNXON_TOPO_DENSE
+    params.sparse_prob = 0.3
+    params.allow_negative_weights = 1
+    params.plasticity_rate = 1e-3
+    params.weight_decay = 1e-5
+    params.weight_clip = 1.0
+    params.normalize_rows = 0
+    params.bias = 0.0
+    return params
+
+
+def _pack_three_sphere_inputs(
+    input_vector: Sequence[float],
+) -> Any:
+    input_buffer = (C.c_float * len(input_vector))(*input_vector)
+    input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+    null_pointer = C.POINTER(C.c_float)()
+    ext_inputs = (C.POINTER(C.c_float) * 3)(input_pointer, null_pointer, null_pointer)
+    ext_inputs._input_buffer = input_buffer  # type: ignore[attr-defined]
+    return ext_inputs
+
+
+def _inject_expected_action_modulator(lib: C.CDLL, net: C.c_void_p, expected_action: str) -> None:
+    if expected_action == "execute":
+        _check(lib, lib.cunxonNetworkInjectNeuromodulator(net, 0, C.c_float(0.5)))
+    elif expected_action == "retry":
+        _check(lib, lib.cunxonNetworkInjectNeuromodulator(net, 3, C.c_float(0.35)))
+    else:
+        _check(lib, lib.cunxonNetworkInjectNeuromodulator(net, 1, C.c_float(0.2)))
+
+
+def _default_multisphere_action_specs() -> list[
+    tuple[str, str, tuple[float, float, float, float], str]
+]:
+    return [
+        ("execute-train", "train", (1.0, 0.25, 0.0, 0.1), "execute"),
+        ("retry-train", "train", (-1.0, -0.25, 0.5, -0.1), "retry"),
+        ("query-train", "train", (0.0, 0.0, 0.0, 0.0), "query"),
+        ("execute-holdout-noisy", "holdout", (0.8, 0.2, 0.1, 0.05), "execute"),
+        ("retry-holdout-noisy", "holdout", (-0.8, -0.2, 0.6, -0.05), "retry"),
+        ("query-holdout-low-drive", "holdout", (0.05, 0.0, -0.05, 0.0), "query"),
+    ]
+
+
+def _baseline_actions_for_case(_case_index: int) -> dict[str, str]:
+    return {
+        "always_execute": "execute",
+        "always_retry": "retry",
+        "always_query": "query",
+    }
+
+
+def _accuracy_by_split(cases: Sequence[CunxonMultisphereActionCase]) -> dict[str, float]:
+    by_split: dict[str, list[CunxonMultisphereActionCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: _case_accuracy(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _baseline_accuracy_by_split(
+    cases: Sequence[CunxonMultisphereActionCase],
+) -> dict[str, dict[str, float]]:
+    baseline_names = sorted({name for case in cases for name in case.baseline_actions})
+    result: dict[str, dict[str, float]] = {}
+    for baseline_name in baseline_names:
+        pseudo_cases = [
+            case
+            for case in cases
+            if baseline_name in case.baseline_actions
+        ]
+        split_scores: dict[str, float] = {}
+        for split in sorted({case.split for case in pseudo_cases} | {"overall"}):
+            if split == "overall":
+                split_cases = pseudo_cases
+            else:
+                split_cases = [case for case in pseudo_cases if case.split == split]
+            if not split_cases:
+                continue
+            successes = sum(
+                1
+                for case in split_cases
+                if case.baseline_actions[baseline_name] == case.expected_action
+            )
+            split_scores[split] = successes / len(split_cases)
+        result[baseline_name] = split_scores
+    return result
+
+
+def _case_accuracy(cases: Sequence[CunxonMultisphereActionCase]) -> float:
+    if not cases:
+        return 0.0
+    successes = sum(1 for case in cases if case.normalized_action == case.expected_action)
+    return successes / len(cases)
+
+
 def _run_sensitivity_sample(
     *,
     lib: C.CDLL,
@@ -1094,12 +1967,22 @@ def _load_library(path: Path) -> C.CDLL:
         C.c_int,
     ]
     lib.cunxonNetworkSetSphereInterface.restype = C.c_int
+    lib.cunxonNetworkAddLink.argtypes = [
+        C.c_void_p,
+        C.c_int,
+        C.c_int,
+        C.POINTER(_LinkParameters),
+        C.POINTER(C.c_int),
+    ]
+    lib.cunxonNetworkAddLink.restype = C.c_int
     lib.cunxonNetworkFinalize.argtypes = [C.c_void_p]
     lib.cunxonNetworkFinalize.restype = C.c_int
     lib.cunxonNetworkStepInfer.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
     lib.cunxonNetworkStepInfer.restype = C.c_int
     lib.cunxonNetworkStepTrain.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
     lib.cunxonNetworkStepTrain.restype = C.c_int
+    lib.cunxonNetworkInjectNeuromodulator.argtypes = [C.c_void_p, C.c_int, C.c_float]
+    lib.cunxonNetworkInjectNeuromodulator.restype = C.c_int
     lib.cunxonSphereGetReadout.argtypes = [
         C.c_void_p,
         C.c_int,
@@ -1107,8 +1990,46 @@ def _load_library(path: Path) -> C.CDLL:
         C.POINTER(C.c_int),
     ]
     lib.cunxonSphereGetReadout.restype = C.c_int
+    lib.cunxonSphereSnapshot.argtypes = [
+        C.c_void_p,
+        C.c_int,
+        C.POINTER(C.c_float),
+        C.POINTER(C.c_float),
+        C.POINTER(C.c_float),
+        C.POINTER(C.c_int8),
+        C.POINTER(C.c_float),
+        C.POINTER(C.c_float),
+        C.POINTER(C.c_int),
+    ]
+    lib.cunxonSphereSnapshot.restype = C.c_int
     lib.cunxonNetworkGetEnergy.argtypes = [C.c_void_p, C.POINTER(C.c_double)]
     lib.cunxonNetworkGetEnergy.restype = C.c_int
+    lib.cunxonNetworkStorePattern.argtypes = [
+        C.c_void_p,
+        C.c_int,
+        C.c_char_p,
+        C.POINTER(C.c_float),
+        C.c_int,
+        C.c_int,
+        C.c_float,
+    ]
+    lib.cunxonNetworkStorePattern.restype = C.c_int
+    lib.cunxonNetworkRecallPattern.argtypes = [
+        C.c_void_p,
+        C.c_int,
+        C.c_char_p,
+        C.c_int,
+        C.c_float,
+        C.c_int,
+        C.c_float,
+        C.POINTER(C.c_int8),
+        C.POINTER(C.c_int),
+    ]
+    lib.cunxonNetworkRecallPattern.restype = C.c_int
+    lib.cunxonNetworkListPatterns.argtypes = [C.c_void_p, C.c_char_p, C.c_int, C.POINTER(C.c_int)]
+    lib.cunxonNetworkListPatterns.restype = C.c_int
+    lib.cunxonNetworkClearPatterns.argtypes = [C.c_void_p]
+    lib.cunxonNetworkClearPatterns.restype = C.c_int
     return lib
 
 
@@ -1141,6 +2062,25 @@ def _query_compute_capability(lib: C.CDLL, ctx: C.c_void_p) -> str:
         ),
     )
     return f"{cc.value // 10}.{cc.value % 10}"
+
+
+class _LinkParameters(C.Structure):
+    _fields_ = [
+        ("kind", C.c_int),
+        ("coherence_band", C.c_int),
+        ("gain", C.c_float),
+        ("delay_steps", C.c_int),
+        ("transmission_threshold", C.c_float),
+        ("coherence_strength", C.c_float),
+        ("topology", C.c_int),
+        ("sparse_prob", C.c_float),
+        ("allow_negative_weights", C.c_int),
+        ("plasticity_rate", C.c_float),
+        ("weight_decay", C.c_float),
+        ("weight_clip", C.c_float),
+        ("normalize_rows", C.c_int),
+        ("bias", C.c_float),
+    ]
 
 
 class _NetworkParameters(C.Structure):

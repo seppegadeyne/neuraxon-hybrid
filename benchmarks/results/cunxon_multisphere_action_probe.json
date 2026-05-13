@@ -1,0 +1,269 @@
+{
+  "accuracy_by_split": {
+    "holdout": 0.3333333333333333,
+    "overall": 0.3333333333333333,
+    "train": 0.3333333333333333
+  },
+  "baseline_accuracy_by_split": {
+    "always_execute": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_query": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_retry": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    }
+  },
+  "case_count": 6,
+  "cases": [
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 204.14989196881652,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 207.41611125320196,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 210.18464406207204,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 212.8608218692243,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 216.48726877570152,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 219.4114912338555,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    }
+  ],
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 16,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "three-sphere sensory-to-association-to-motor topology completed",
+    "motor readout is decoded through the existing ActionDecoder/action contract",
+    "holdout and trivial-baseline comparison is required before any adapter claim"
+  ],
+  "sphere_count": 3,
+  "status": "multi-sphere action probe viable",
+  "train_steps": 24,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}
