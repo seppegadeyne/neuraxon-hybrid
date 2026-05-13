@@ -1,5 +1,5 @@
-# Upstream referentie
+# Upstream reference
 
-Plaats hier de clone of snapshot van externe broncode (bijv. `DavidVivancos/Neuraxon`).
+Place the clone or snapshot of external source code here (for example `DavidVivancos/Neuraxon`).
 
-Regel: upstream-code blijft referentie; wijzigingen gebeuren in onze plugin/adapters of via aparte patch-notes.
+Rule: upstream code remains a reference; changes happen in our plugin/adapters or through separate patch notes.
