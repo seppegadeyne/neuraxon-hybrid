@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution proves runtime/dynamics viability only. A short smoke test is insufficient for a brain-like Neuraxon learning claim; even the long-horizon probe does not prove intelligence, generalization, or decision quality.",
+  "claim_boundary": "cuNxon GPU execution now has runtime/dynamics viability and a tiny task-coupled action probe, but the action probe is baseline-level and does not prove intelligence, generalization, or useful learning.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -12,6 +12,12 @@
       "lane": "cuNxon long-horizon raw dynamics",
       "metric": "continuous runtime samples",
       "value": "65536 steps; 1 unique readout(s); 0 readout changes"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_action_probe.json",
+      "lane": "cuNxon task-coupled action probe",
+      "metric": "success_rate",
+      "value": 0.333333
     },
     {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
@@ -44,6 +50,15 @@
       "value": 1.0
     }
   ],
+  "cunxon_action_probe": {
+    "accuracy": 0.3333333333333333,
+    "decision_quality_measured": true,
+    "status": "task-coupled action probe viable",
+    "success_count": 1,
+    "trial_count": 3,
+    "trial_steps": 32,
+    "verdict": "task-coupled but not above baselines"
+  },
   "cunxon_long_horizon": {
     "decision_quality_measured": false,
     "energy_delta": 1119554.053346634,
@@ -52,11 +67,12 @@
     "samples": 8,
     "status": "long-horizon probe viable",
     "total_steps": 65536,
-    "unique_readouts": 1
+    "unique_readouts": 1,
+    "verdict": "long-horizon runtime viable, not benchmark-integrated"
   },
   "cunxon_smoke": {
     "decision_quality_measured": false,
-    "device_name": null,
+    "device_name": "NVIDIA GeForce RTX 5090",
     "readout": [
       0,
       0,
@@ -67,8 +83,9 @@
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_long_horizon.json",
+    "benchmarks/results/cunxon_action_probe.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "long-horizon runtime viable, not benchmark-integrated"
+  "verdict": "task-coupled but not above baselines"
 }

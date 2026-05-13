@@ -14,6 +14,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Sequence
 
+from neuraxon_agent.action import ActionDecoder
+from neuraxon_agent.action_contract import normalize_benchmark_action
+
 CUNXON_OK = 0
 CUNXON_PROP_DEVICE_NAME = 1
 CUNXON_PROP_COMPUTE_CAPABILITY = 2
@@ -76,6 +79,54 @@ class CunxonLongHorizonResult:
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable result dictionary."""
         return asdict(self)
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonActionProbeTrial:
+    """One task-coupled cuNxon readout decoded through the existing action contract."""
+
+    name: str
+    input_vector: list[float]
+    expected_action: str
+    readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    energy: float
+    elapsed_ms: float
+
+
+@dataclass(frozen=True)
+class CunxonActionProbeResult:
+    """Task-coupled cuNxon probe result scored against expected benchmark actions."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    trial_steps: int
+    trials: list[CunxonActionProbeTrial]
+    success_count: int
+    accuracy: float
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def trial_count(self) -> int:
+        """Return the number of scored task trials."""
+        return len(self.trials)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["trial_count"] = self.trial_count
+        return data
 
     def to_json(self, *, indent: int | None = 2) -> str:
         """Return this result as stable JSON."""
@@ -229,6 +280,83 @@ def write_long_horizon_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_long_horizon_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_action_probe_markdown_report(result: CunxonActionProbeResult) -> str:
+    """Render a task-coupled cuNxon action probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    trial_rows = [
+        "| Trial | Input | Readout | Decoded | Normalized | Expected | Outcome | Energy |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: |",
+    ]
+    for trial in result.trials:
+        input_vector = ", ".join(f"{value:.3g}" for value in trial.input_vector)
+        readout = ", ".join(_format_trinary(value) for value in trial.readout)
+        trial_rows.append(
+            "| "
+            f"{trial.name} | [{input_vector}] | [{readout}] | {trial.decoded_action} "
+            f"({trial.confidence:.4f}) | {trial.normalized_action} | "
+            f"{trial.expected_action} | {trial.outcome} | {trial.energy:.6g} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon task-coupled action probe",
+            "",
+            f"Status: `{result.status}`",
+            f"Accuracy: {result.accuracy:.6f} ({result.success_count}/{result.trial_count})",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Trial steps: {result.trial_steps}",
+            f"- Trials: {result.trial_count}",
+            "",
+            "## Decision-quality boundary",
+            "",
+            "This probe is task-coupled: each input drive has an expected benchmark action "
+            "and the cuNxon readout is decoded through the existing Neuraxon-Hybrid "
+            "ActionDecoder/action-contract mapping. That makes it decision-quality evidence, "
+            "but flat or baseline-level results still do not prove intelligence, "
+            "generalization, or useful learning. A task-coupled GPU probe does not prove "
+            "intelligence unless it beats simple baselines and survives holdout tests.",
+            "",
+            "## Trials",
+            "",
+            *trial_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "A GPU-backed action probe only becomes interesting if it beats simple baselines "
+            "and survives richer temporal/generalization tests. A flat or baseline-level "
+            "readout should be treated as a negative/diagnostic result, not as evidence "
+            "for Neuraxon intelligence.",
+            "",
+        ]
+    )
+
+
+def write_action_probe_artifacts(
+    result: CunxonActionProbeResult, *, json_path: str | Path, markdown_path: str | Path
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown task-coupled action probe artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_action_probe_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -452,6 +580,128 @@ def run_ctypes_long_horizon_probe(
             lib.cunxonNetworkDestroy(net)
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_action_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    trial_steps: int = 32,
+    device_id: int = 0,
+) -> CunxonActionProbeResult:
+    """Run a tiny task-coupled cuNxon action probe through the action contract."""
+    if trial_steps <= 0:
+        raise ValueError("trial_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    start = time.perf_counter()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_action"))
+
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = 79
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"ACTION", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_base, readout_base + 1, readout_base + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        trials: list[CunxonActionProbeTrial] = []
+        for name, input_vector, expected_action in _default_action_probe_specs():
+            input_buffer = (C.c_float * 3)(*input_vector)
+            input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+            ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+            for _ in range(trial_steps):
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            _check(lib, lib.cunxonContextSync(ctx))
+            readout = _capture_readout(lib, net, sphere_id.value)
+            energy = _capture_energy(lib, net)
+            decoded = decoder.decode(readout)
+            normalized_action = normalize_benchmark_action(decoded.actie_type)
+            outcome = "success" if normalized_action == expected_action else "failure"
+            trials.append(
+                CunxonActionProbeTrial(
+                    name=name,
+                    input_vector=list(input_vector),
+                    expected_action=expected_action,
+                    readout=readout,
+                    decoded_action=decoded.actie_type,
+                    normalized_action=normalized_action,
+                    confidence=decoded.confidence,
+                    outcome=outcome,
+                    energy=energy,
+                    elapsed_ms=(time.perf_counter() - start) * 1000.0,
+                )
+            )
+
+        success_count = sum(1 for trial in trials if trial.outcome == "success")
+        accuracy = success_count / len(trials) if trials else 0.0
+        return CunxonActionProbeResult(
+            status="task-coupled action probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            trial_steps=trial_steps,
+            trials=trials,
+            success_count=success_count,
+            accuracy=accuracy,
+            notes=[
+                "sequential one-sphere task-coupled probe completed",
+                "readouts are decoded with the existing ActionDecoder/action-contract mapping",
+                "flat or baseline-level accuracy is negative evidence, not intelligence evidence",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float], str]]:
+    """Return a tiny fixed action-contract task suite for cuNxon probes."""
+    return [
+        ("execute-positive-drive", (1.0, 0.25, 0.0), "execute"),
+        ("retry-negative-drive", (-1.0, -0.25, 0.0), "retry"),
+        ("query-neutral-drive", (0.0, 0.0, 0.0), "query"),
+    ]
 
 
 def _capture_readout(lib: C.CDLL, net: C.c_void_p, sphere_id: int) -> list[int]:

@@ -7,13 +7,17 @@ from pathlib import Path
 import pytest
 
 from neuraxon_agent.cunxon_smoke import (
+    CunxonActionProbeResult,
+    CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
     CunxonSmokeResult,
     classify_cunxon_status,
+    render_action_probe_markdown_report,
     render_long_horizon_markdown_report,
     render_markdown_report,
     validate_trinary_readout,
+    write_action_probe_artifacts,
     write_long_horizon_artifacts,
     write_smoke_artifacts,
 )
@@ -127,6 +131,63 @@ def test_long_horizon_report_frames_neuraxon_as_time_dependent_learning_process(
     assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_action_probe_report_scores_decoded_readout_against_expected_actions(
+    tmp_path: Path,
+) -> None:
+    result = CunxonActionProbeResult(
+        status="task-coupled action probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        trial_steps=32,
+        trials=[
+            CunxonActionProbeTrial(
+                name="execute-positive-drive",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                readout=[1, 0, 0],
+                decoded_action="PROCEED",
+                normalized_action="execute",
+                confidence=0.3333,
+                outcome="success",
+                energy=12.0,
+                elapsed_ms=1.0,
+            ),
+            CunxonActionProbeTrial(
+                name="retry-negative-drive",
+                input_vector=[-1.0, -0.25, 0.0],
+                expected_action="retry",
+                readout=[0, 0, 0],
+                decoded_action="PAUSE",
+                normalized_action="query",
+                confidence=1.0,
+                outcome="failure",
+                energy=13.0,
+                elapsed_ms=2.0,
+            ),
+        ],
+        success_count=1,
+        accuracy=0.5,
+        notes=["fake task-coupled probe"],
+    )
+
+    markdown = render_action_probe_markdown_report(result)
+    assert "task-coupled action probe" in markdown
+    assert "decision-quality" in markdown
+    assert "Accuracy: 0.500000" in markdown
+    assert "execute-positive-drive" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "action_probe.json"
+    markdown_path = tmp_path / "action_probe.md"
+    write_action_probe_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    assert '"accuracy": 0.5' in json_path.read_text(encoding="utf-8")
+    assert "decision-quality" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_tracked_cunxon_investigation_report_preserves_live_smoke_and_boundary() -> None:
     markdown = Path("benchmarks/results/cunxon_smoke.md").read_text(encoding="utf-8")
     data = Path("benchmarks/results/cunxon_smoke.json").read_text(encoding="utf-8")
@@ -147,15 +208,31 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
 
     assert "cuNxon raw CUDA smoke" in markdown
     assert "cuNxon long-horizon raw dynamics" in markdown
+    assert "cuNxon task-coupled action probe" in markdown
     assert "short smoke tests are insufficient" in markdown
     assert "no decision-quality score measured" in markdown
+    assert "decision-quality measured but not useful" in markdown
     assert "raw_network" in markdown
     assert "0.145833" in markdown
     assert "random" in markdown
     assert "always_execute" in markdown
     assert "does not prove intelligence" in markdown
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
+    assert '"verdict": "task-coupled but not above baselines"' in data
     assert '"decision_quality_measured": false' in data
+    assert '"decision_quality_measured": true' in data
+
+
+def test_tracked_cunxon_action_probe_report_preserves_flat_readout_caveat() -> None:
+    markdown = Path("benchmarks/results/cunxon_action_probe.md").read_text(encoding="utf-8")
+    data = Path("benchmarks/results/cunxon_action_probe.json").read_text(encoding="utf-8")
+
+    assert "task-coupled action probe" in markdown
+    assert "Accuracy:" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "flat or baseline-level" in markdown
+    assert '"status": "task-coupled action probe viable"' in data
+    assert '"accuracy":' in data
 
 
 def test_tracked_cunxon_long_horizon_report_preserves_learning_caveat() -> None:

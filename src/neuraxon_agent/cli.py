@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import Any, Callable, cast
 
 from neuraxon_agent.cunxon_smoke import (
+    run_ctypes_action_probe,
     run_ctypes_long_horizon_probe,
     run_ctypes_smoke,
+    write_action_probe_artifacts,
     write_long_horizon_artifacts,
     write_smoke_artifacts,
 )
@@ -216,6 +218,34 @@ def cmd_cunxon_long_horizon(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_action_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_action_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            trial_steps=args.trial_steps,
+            device_id=args.device,
+        )
+        write_action_probe_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon task-coupled action probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Decision-quality boundary: a failed task-coupled probe does not support "
+            "any GPU-backed action-quality or learning claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -302,6 +332,40 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_long.set_defaults(func=cmd_cunxon_long_horizon)
+
+    p_cunxon_action = sub.add_parser(
+        "cunxon-action-probe",
+        help="Run optional cuNxon CUDA task-coupled action probe",
+        description=(
+            "Run a tiny cuNxon task suite, decode trinary readouts with the existing "
+            "ActionDecoder, and score them against expected benchmark actions."
+        ),
+    )
+    p_cunxon_action.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_action.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_action.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_action.add_argument(
+        "--trial-steps",
+        type=int,
+        default=32,
+        help="Simulation steps per task trial",
+    )
+    p_cunxon_action.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_action.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_action_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_action.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_action_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_action.set_defaults(func=cmd_cunxon_action_probe)
 
     try:
         args = parser.parse_args(argv)
