@@ -1,0 +1,69 @@
+{
+  "status": "source semantics audited",
+  "audited_at": "2026-05-13T21:39:54+02:00",
+  "active_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80",
+  "upstream_repo": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "runtime": {
+    "device": "NVIDIA GeForce RTX 5090",
+    "compute_capability": "12.0",
+    "library": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0"
+  },
+  "decision_quality_measured": false,
+  "desired_output_api_present": false,
+  "teacher_forcing_output_ports_supported_by_step_input": false,
+  "source_findings": [
+    {
+      "id": "api-has-reward-not-desired-output",
+      "source": "include/cuNxon.h:173-194,205-220",
+      "finding": "The public execution API exposes StepInfer, StepTrain, neuromodulator injection and readout copy. It does not expose a desired-output, label, loss, error-vector or output-target API for supervised motor targets."
+    },
+    {
+      "id": "external-inputs-scatter-to-sensory-ports",
+      "source": "src/cuNxon.cu:880-903",
+      "finding": "Step input buffers are scattered only through the sphere's sensory_input_ids list into the per-sphere ext_in buffer."
+    },
+    {
+      "id": "ext-inputs-only-directly-drive-input-neurons",
+      "source": "src/cuNxon_kernels.cu:422-433,503-508",
+      "finding": "The membrane kernel treats input-class neurons as pass-through from ext_in. Non-input neurons, including output neurons, do not directly consume ext_in as teacher-forced target drive; their state comes from dendritic/synaptic drive, oscillator/spontaneous terms, adaptation and CTSN."
+    },
+    {
+      "id": "ctsn-learning-is-homeostatic-rate-target-not-label-target",
+      "source": "src/cuNxon_kernels.cu:591-608",
+      "finding": "CTSN online learning updates phi_gain and phi_bias toward the configured target_firing_rate. It is a homeostatic firing-rate objective, not an externally supplied desired-output objective."
+    },
+    {
+      "id": "readout-is-state-copy-not-error-channel",
+      "source": "src/cuNxon.cu:1090-1110",
+      "finding": "cunxonSphereGetReadout copies N.s at port_out_readout indices. It is a host-visible state copy and not a trainable supervised readout/error head."
+    },
+    {
+      "id": "cpp-example-uses-absolute-output-indices",
+      "source": "examples/example_4sphere.cu:192-256",
+      "finding": "The C++ example explicitly documents absolute index blocks and assigns relay/readout ports from the output-neuron block n_in+n_hidden..n_total."
+    },
+    {
+      "id": "python-example-still-uses-relative-output-indices",
+      "source": "examples/python_binding.py:533-556",
+      "finding": "The Python example still passes relative output indices such as range(num_output_neurons - 2, num_output_neurons), which select input neurons rather than the absolute output block under the C++ API semantics. This explains the earlier Python demo INVALID_ARGUMENT/port mismatch caveat and should not be copied into Hybrid adapters."
+    }
+  ],
+  "live_runtime_check": {
+    "command": "./example_4sphere 3000 400 0",
+    "working_directory": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153",
+    "exit_code": 0,
+    "warmup_steps": 3000,
+    "online_testing_steps": 400,
+    "salient_hits": 98,
+    "salient_total": 216,
+    "nonsalient_rejects": 95,
+    "nonsalient_total": 184,
+    "overall_accuracy": 0.4825,
+    "chance_accuracy": 0.5,
+    "summary": "The upstream reward-only 4-sphere demo runs on RTX 5090 and shows ongoing activity/energy, but the observed online-testing accuracy is 48.2%, below the stated 50.0% chance reference for this run."
+  },
+  "verdict": "source-level semantics explain why output-port teacher forcing is unsupported",
+  "next_hypothesis": "If more live probing is useful, test a lower-level input-port supervised proxy or direct upstream patch/probe rather than reusing output ports as sensory target slots."
+}

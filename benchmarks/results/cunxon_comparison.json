@@ -1,11 +1,17 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, but teacher-forcing absolute output-neuron target ports did not produce a holdout-beating motor signal.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
       "lane": "cuNxon raw CUDA smoke",
       "metric": "decision-quality score",
       "value": "no decision-quality score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
+      "lane": "cuNxon source semantics audit",
+      "metric": "desired-output API surface",
+      "value": "no desired-output API surface; output-port teacher forcing through sensory inputs unsupported"
     },
     {
       "evidence": "benchmarks/results/cunxon_long_horizon.json",
@@ -86,6 +92,20 @@
       "value": 1.0
     }
   ],
+  "cunxon_source_semantics_audit": {
+    "decision_quality_measured": false,
+    "desired_output_api_present": false,
+    "live_runtime_check": {
+      "chance_accuracy": 0.5,
+      "command": "./example_4sphere 3000 400 0",
+      "overall_accuracy": 0.4825,
+      "online_testing_steps": 400,
+      "warmup_steps": 3000
+    },
+    "status": "source semantics audited",
+    "teacher_forcing_output_ports_supported_by_step_input": false,
+    "verdict": "source-level semantics explain why output-port teacher forcing is unsupported"
+  },
   "cunxon_action_probe": {
     "accuracy": 0.3333333333333333,
     "decision_quality_measured": true,
@@ -502,6 +522,7 @@
   },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
+    "benchmarks/results/cunxon_source_semantics_audit.json",
     "benchmarks/results/cunxon_long_horizon.json",
     "benchmarks/results/cunxon_long_sweep.json",
     "benchmarks/results/cunxon_action_probe.json",
@@ -513,5 +534,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "supervised cuNxon motor targets still baseline-level"
+  "verdict": "source semantics audit: output-port teacher forcing unsupported"
 }

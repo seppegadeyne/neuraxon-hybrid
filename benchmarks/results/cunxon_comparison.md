@@ -1,10 +1,14 @@
 # cuNxon comparison against existing Neuraxon-Hybrid evidence
 
-Verdict: `supervised cuNxon motor targets still baseline-level`
+Verdict: `source semantics audit: output-port teacher forcing unsupported`
 
 ## What changed
 
-The previous cuNxon slices established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, a three-sphere action adapter, a longer task-coupled sweep over 108 live RTX 5090 samples, and an interface-semantics probe for absolute output-neuron ports. This follow-up adds `neuraxon-agent cunxon-supervised-motor-probe`: a teacher-forced motor-target adapter that drives absolute output-neuron target ports during `StepTrain`, then evaluates train/holdout cases without target drive.
+The previous cuNxon slices established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, a three-sphere action adapter, a longer task-coupled sweep over 108 live RTX 5090 samples, an interface-semantics probe for absolute output-neuron ports, and a supervised motor-target adapter. This follow-up adds `benchmarks/results/cunxon_source_semantics_audit.*`: a source-level C/CUDA audit plus a live upstream 4-sphere demo rerun.
+
+The source audit found no desired-output API surface in the public cuNxon execution path. `StepTrain` exposes continuous plasticity and neuromodulator reward injection, but not a label/loss/error-vector argument. External step inputs are scattered only through `sensory_input_ids`, and the membrane kernel treats external input as direct pass-through only for input-class neurons; output neurons are readout-capable but are not directly teacher-forced by putting their absolute ids into `sensory_input_ids`.
+
+The live upstream 4-sphere reward-only example still runs on Aorus RTX 5090, but the checked run (`./example_4sphere 3000 400 0`) scored 193/400 = `0.4825` overall accuracy against the example's stated `50.0%` chance reference. This is useful source/runtime evidence, not decision-quality evidence.
 
 The longer sweep remains baseline-level. Every mode × horizon accuracy is `0.333333`, exactly equal to the constant-action baselines on the balanced toy set. Shorter frozen infer samples show a little readout diversity, but by `4096`/`32768` steps infer also collapses to `query=9`; both `train` and `train_rewarded` are flat `query=9` at every tested horizon.
 
@@ -17,6 +21,7 @@ The earlier snapshot/pattern, multi-sphere, long-sweep and new supervised-target
 | Lane | Metric | Value | Evidence |
 | --- | --- | ---: | --- |
 | cuNxon raw CUDA smoke | decision-quality score | no decision-quality score measured | `benchmarks/results/cunxon_smoke.json` |
+| cuNxon source semantics audit | desired-output API surface | no desired-output API surface; output-port teacher forcing through sensory inputs unsupported | `benchmarks/results/cunxon_source_semantics_audit.json` |
 | cuNxon long-horizon raw dynamics | continuous runtime samples | 65536 steps; 1 unique readout(s); 0 readout changes | `benchmarks/results/cunxon_long_horizon.json` |
 | cuNxon long sweep action diagnostic | success_rate vs trivial baselines | 108 samples; all mode/horizon accuracies=0.333333; train/train_rewarded flat query | `benchmarks/results/cunxon_long_sweep.json` |
 | cuNxon task-coupled action probe | success_rate | 0.333333 | `benchmarks/results/cunxon_action_probe.json` |
@@ -33,10 +38,10 @@ The earlier snapshot/pattern, multi-sphere, long-sweep and new supervised-target
 
 ## Interpretation
 
-cuNxon remains interesting as a GPU runtime and diagnostics surface, and the interface semantics probe removed one ambiguity from adapter design: readout ports should be treated as absolute neuron indices when targeting output neurons. However, teacher-forcing those absolute output-neuron target ports did not rescue the decision-quality evidence. The supervised motor-target adapter remained flat `[0, 0, 0]`/`query` across train and holdout cases, with holdout accuracy equal to all constant-action baselines.
+cuNxon remains interesting as a GPU runtime and diagnostics surface, and the interface semantics probe removed one ambiguity from adapter design: readout ports should be treated as absolute neuron indices when targeting output neurons. The new source audit removes a second ambiguity: output-neuron readout ports are not a public desired-output/teacher-forcing channel. `StepTrain` turns on plasticity, CTSN/DSN updates and neuromodulator-sensitive learning, but source inspection found no API route that supplies desired motor labels directly to output neurons.
 
-The next useful direction is no longer “just run longer” or “just add a target port”. A plausible next slice is lower-level CTSN/readout/plasticity semantics inspection: why do absolute output ports remain neutral even when used as teacher-forced sensory targets during `StepTrain`, and is there any sanctioned C API route for desired-output/error signals beyond neuromodulator reward injection?
+The supervised motor-target adapter's flat `[0, 0, 0]`/`query` result is therefore best interpreted as an unsupported adapter route, not as proof that all possible cuNxon learning semantics are exhausted. The next useful direction is either a lower-level input-port proxy probe or an upstream-level desired-output/error-channel patch/probe, not another longer run of the same output-port teacher-forcing adapter.
 
 ## Evidence boundary
 
-This comparison deliberately separates runtime viability and interface semantics from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, reward injection, absolute-neuron-index port mapping, and explicit teacher-forced output targets prove useful diagnostic surfaces, but flat recall and baseline-level action accuracy do not prove intelligence, generalization, or useful learning.
+This comparison deliberately separates runtime viability and interface semantics from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, reward injection, absolute-neuron-index port mapping, explicit but unsupported output-port target attempts, and source-level absence of a desired-output API surface prove useful diagnostic boundaries. The flat recall, below-chance upstream reward-only demo accuracy in this run, and baseline-level Hybrid action accuracy do not prove intelligence, generalization, or useful learning.

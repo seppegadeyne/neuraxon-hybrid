@@ -647,6 +647,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     data = Path("benchmarks/results/cunxon_comparison.json").read_text(encoding="utf-8")
 
     assert "cuNxon raw CUDA smoke" in markdown
+    assert "cuNxon source semantics audit" in markdown
     assert "cuNxon long-horizon raw dynamics" in markdown
     assert "cuNxon long sweep action diagnostic" in markdown
     assert "cuNxon task-coupled action probe" in markdown
@@ -658,6 +659,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "train-mode flat" in markdown
     assert "flat recall" in markdown
     assert "baseline-level holdout accuracy" in markdown
+    assert "no desired-output API surface" in markdown
     assert "raw_network" in markdown
     assert "0.145833" in markdown
     assert "random" in markdown
@@ -681,8 +683,32 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
         'trivial baselines"'
         in data
     )
+    assert (
+        '"verdict": "source-level semantics explain why output-port teacher forcing is unsupported"'
+        in data
+    )
     assert '"decision_quality_measured": false' in data
     assert '"decision_quality_measured": true' in data
+
+
+def test_tracked_cunxon_source_semantics_audit_records_output_target_boundary() -> None:
+    markdown = Path("benchmarks/results/cunxon_source_semantics_audit.md").read_text(
+        encoding="utf-8"
+    )
+    data = Path("benchmarks/results/cunxon_source_semantics_audit.json").read_text(
+        encoding="utf-8"
+    )
+
+    assert "cuNxon source semantics audit" in markdown
+    assert "no desired-output API surface" in markdown
+    assert "External inputs are scattered only onto `sensory_input_ids`" in markdown
+    assert "C++ example uses absolute output-neuron port ids" in markdown
+    assert "Python example still uses relative output-port ids" in markdown
+    assert "overall accuracy              : 48.2%" in markdown
+    assert "does not prove intelligence" in markdown
+    assert '"status": "source semantics audited"' in data
+    assert '"overall_accuracy": 0.4825' in data
+    assert '"desired_output_api_present": false' in data
 
 
 def test_tracked_cunxon_sensitivity_probe_report_records_train_mode_flatness() -> None:
