@@ -26,6 +26,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonSmokeResult,
     CunxonSnapshotObservation,
     CunxonSnapshotPatternProbeResult,
+    CunxonVramResidentResult,
+    CunxonVramResidentSample,
 )
 
 
@@ -164,6 +166,86 @@ def test_cli_cunxon_long_horizon_writes_json_and_markdown(
     assert rc == 0
     assert '"status": "long-horizon probe viable"' in json_path.read_text(encoding="utf-8")
     assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_vram_resident_writes_json_markdown_and_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonVramResidentResult:
+        callback = kwargs.get("artifact_callback")
+        result = CunxonVramResidentResult(
+            status="completed",
+            hypothesis=str(kwargs["hypothesis"]),
+            active_issue=str(kwargs["active_issue"]),
+            pid=9876,
+            command=str(kwargs["command"]),
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            started_at="2026-05-13T20:00:00Z",
+            updated_at="2026-05-13T20:01:00Z",
+            expected_end_at="2026-05-13T20:02:00Z",
+            next_poll_after="2026-05-13T20:01:30Z",
+            max_runtime_seconds=120,
+            sample_interval_seconds=30,
+            steps_per_sample=1024,
+            total_steps=1024,
+            samples=[
+                CunxonVramResidentSample(
+                    sample_index=1,
+                    step=1024,
+                    elapsed_seconds=1.0,
+                    readout=[0, 0, 0],
+                    active_state_count=0,
+                    neutral_state_count=15,
+                    energy=1.0,
+                    energy_delta=1.0,
+                )
+            ],
+            stop_condition="stop after 120 seconds or on cuNxon/API/resource error",
+            notes=["fake resident run"],
+        )
+        if callable(callback):
+            callback(result)
+        return result
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_vram_resident_probe", fake_probe)
+    json_path = tmp_path / "resident.json"
+    markdown_path = tmp_path / "resident.md"
+    state_path = tmp_path / "resident-state.json"
+
+    rc = main(
+        [
+            "cunxon-vram-resident",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--hypothesis",
+            "wall-clock VRAM residence changes dynamics",
+            "--max-runtime-seconds",
+            "120",
+            "--sample-interval-seconds",
+            "30",
+            "--steps-per-sample",
+            "1024",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+            "--state-output",
+            str(state_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "completed"' in json_path.read_text(encoding="utf-8")
+    assert "VRAM-resident" in markdown_path.read_text(encoding="utf-8")
+    assert '"pid": 9876' in state_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_long_sweep_writes_json_and_markdown(

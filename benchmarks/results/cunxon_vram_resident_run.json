@@ -1,0 +1,80 @@
+{
+  "active_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/79",
+  "command": "neuraxon-agent cunxon-vram-resident --library /home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0 --upstream-commit bd2242fabad08cb73dab2c4170d11fa941030e8c --cunxon-commit b4f6db85f7aff04ddb4e1078d523d514a278521b --hypothesis Short bootstrap: verify that the VRAM-resident runner writes durable progress/state before launching the multi-hour process. --max-runtime-seconds 12 --sample-interval-seconds 4 --steps-per-sample 4096 --json-output benchmarks/results/cunxon_vram_resident_run.json --markdown-output benchmarks/results/cunxon_vram_resident_run.md --state-output benchmarks/results/cunxon_vram_resident_run_state.json",
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "expected_end_at": "2026-05-13T20:58:49.413163Z",
+  "hypothesis": "Short bootstrap: verify that the VRAM-resident runner writes durable progress/state before launching the multi-hour process.",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "max_runtime_seconds": 12,
+  "next_poll_after": "2026-05-13T20:58:49.413163Z",
+  "notes": [
+    "same cuNxon process keeps one network/context resident between samples",
+    "samples capture readout, full-state occupancy, energy and nvidia-smi resource data",
+    "runtime/dynamics evidence only; not a task-learning or intelligence claim"
+  ],
+  "pid": 1927338,
+  "sample_count": 3,
+  "sample_interval_seconds": 4,
+  "samples": [
+    {
+      "active_state_count": 4,
+      "elapsed_seconds": 0.33380745799513534,
+      "energy": 154056.82708072662,
+      "energy_delta": 154056.82708072662,
+      "gpu_memory_used_mb": 2454,
+      "gpu_temperature_c": 39,
+      "gpu_utilization_percent": 25,
+      "neutral_state_count": 11,
+      "readout": [
+        0,
+        -1,
+        0
+      ],
+      "sample_index": 1,
+      "step": 4096
+    },
+    {
+      "active_state_count": 5,
+      "elapsed_seconds": 4.334920439985581,
+      "energy": 307498.05012989044,
+      "energy_delta": 153441.22304916382,
+      "gpu_memory_used_mb": 2454,
+      "gpu_temperature_c": 39,
+      "gpu_utilization_percent": 25,
+      "neutral_state_count": 10,
+      "readout": [
+        0,
+        -1,
+        0
+      ],
+      "sample_index": 2,
+      "step": 8192
+    },
+    {
+      "active_state_count": 5,
+      "elapsed_seconds": 8.336649018980097,
+      "energy": 461186.54819202423,
+      "energy_delta": 153688.4980621338,
+      "gpu_memory_used_mb": 2454,
+      "gpu_temperature_c": 40,
+      "gpu_utilization_percent": 25,
+      "neutral_state_count": 10,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "sample_index": 3,
+      "step": 12288
+    }
+  ],
+  "started_at": "2026-05-13T20:58:37.413163Z",
+  "status": "completed",
+  "steps_per_sample": 4096,
+  "stop_condition": "stop after 12 seconds or on cuNxon/API/resource error",
+  "total_steps": 12288,
+  "updated_at": "2026-05-13T20:58:49.413260Z",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

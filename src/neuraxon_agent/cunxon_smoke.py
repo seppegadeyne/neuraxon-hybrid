@@ -9,10 +9,13 @@ from __future__ import annotations
 
 import ctypes as C
 import json
+import os
+import subprocess
 import time
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 from neuraxon_agent.action import ActionDecoder
 from neuraxon_agent.action_contract import normalize_benchmark_action
@@ -88,6 +91,100 @@ class CunxonLongHorizonResult:
     def to_json(self, *, indent: int | None = 2) -> str:
         """Return this result as stable JSON."""
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonVramResidentSample:
+    """One progress sample from a wall-clock/VRAM-resident cuNxon run."""
+
+    sample_index: int
+    step: int
+    elapsed_seconds: float
+    readout: list[int]
+    active_state_count: int
+    neutral_state_count: int
+    energy: float
+    energy_delta: float
+    gpu_memory_used_mb: int | None = None
+    gpu_utilization_percent: int | None = None
+    gpu_temperature_c: int | None = None
+
+
+@dataclass(frozen=True)
+class CunxonVramResidentResult:
+    """Current/final state of one long wall-clock cuNxon process kept in VRAM."""
+
+    status: str
+    hypothesis: str
+    active_issue: str
+    pid: int
+    command: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    started_at: str
+    updated_at: str
+    expected_end_at: str
+    next_poll_after: str
+    max_runtime_seconds: int
+    sample_interval_seconds: int
+    steps_per_sample: int
+    total_steps: int
+    samples: list[CunxonVramResidentSample]
+    stop_condition: str
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of progress samples recorded so far."""
+        return len(self.samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+    def to_state_dict(
+        self,
+        *,
+        json_path: str | Path,
+        markdown_path: str | Path,
+        state_path: str | Path,
+    ) -> dict[str, object]:
+        """Return the durable anti-duplicate state file payload."""
+        return {
+            "status": self.status,
+            "pid": self.pid,
+            "command": self.command,
+            "active_issue": self.active_issue,
+            "hypothesis": self.hypothesis,
+            "started_at": self.started_at,
+            "updated_at": self.updated_at,
+            "expected_end_at": self.expected_end_at,
+            "next_poll_after": self.next_poll_after,
+            "max_runtime_seconds": self.max_runtime_seconds,
+            "sample_interval_seconds": self.sample_interval_seconds,
+            "steps_per_sample": self.steps_per_sample,
+            "total_steps": self.total_steps,
+            "sample_count": self.sample_count,
+            "json_path": str(json_path),
+            "markdown_path": str(markdown_path),
+            "state_path": str(state_path),
+            "library_path": self.library_path,
+            "gpu": {
+                "device_name": self.device_name,
+                "compute_capability": self.compute_capability,
+            },
+            "stop_condition": self.stop_condition,
+            "notes": self.notes,
+        }
 
 
 @dataclass(frozen=True)
@@ -611,6 +708,151 @@ def write_long_horizon_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_long_horizon_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
+
+
+def render_vram_resident_markdown_report(result: CunxonVramResidentResult) -> str:
+    """Render a progress/final report for a VRAM-resident cuNxon run."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    sample_rows = [
+        (
+            "| Sample | Step | Elapsed s | Readout | Active | Neutral | Energy | "
+            "Energy delta | GPU MiB | GPU util % | Temp C |"
+        ),
+        "| ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for sample in result.samples:
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        sample_rows.append(
+            "| "
+            f"{sample.sample_index} | {sample.step} | {sample.elapsed_seconds:.1f} | "
+            f"[{readout}] | {sample.active_state_count} | {sample.neutral_state_count} | "
+            f"{sample.energy:.6g} | {sample.energy_delta:.6g} | "
+            f"{_format_optional_int(sample.gpu_memory_used_mb)} | "
+            f"{_format_optional_int(sample.gpu_utilization_percent)} | "
+            f"{_format_optional_int(sample.gpu_temperature_c)} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon VRAM-resident dynamics run",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Hypothesis",
+            "",
+            result.hypothesis,
+            "",
+            "## Durable state",
+            "",
+            f"- Active issue: {result.active_issue}",
+            f"- PID: `{result.pid}`",
+            f"- Command: `{result.command}`",
+            f"- Started at: {result.started_at}",
+            f"- Updated at: {result.updated_at}",
+            f"- Expected end: {result.expected_end_at}",
+            f"- Next poll after: {result.next_poll_after}",
+            f"- Stop condition: {result.stop_condition}",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Max runtime seconds: {result.max_runtime_seconds}",
+            f"- Sample interval seconds: {result.sample_interval_seconds}",
+            f"- Steps per sample: {result.steps_per_sample}",
+            f"- Total steps so far: {result.total_steps}",
+            f"- Samples: {result.sample_count}",
+            "",
+            "## Why this run exists",
+            "",
+            "Earlier smoke, long-horizon, action, sensitivity, snapshot/pattern, multi-sphere, "
+            "long-sweep, supervised-motor and source-semantics probes were runtime-viable but "
+            "flat or baseline-level. This run tests a different hypothesis: whether keeping "
+            "the same cuNxon process/network resident in VRAM across wall-clock time exposes "
+            "hidden-state, energy, occupancy, readout or resource drift that short process-local "
+            "runs reset away.",
+            "",
+            "## Samples",
+            "",
+            *sample_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is runtime/dynamics evidence only. A VRAM-resident process, changing energy, "
+            "or changing occupancy does not prove intelligence, task learning, useful recall, "
+            "or generalization unless a later task-coupled benchmark beats trivial baselines.",
+            "",
+        ]
+    )
+
+
+def write_vram_resident_artifacts(
+    result: CunxonVramResidentResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+    state_path: str | Path,
+) -> tuple[Path, Path, Path]:
+    """Write progress JSON/Markdown plus the durable anti-duplicate state file."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    state_output = Path(state_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    state_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_vram_resident_markdown_report(result), encoding="utf-8")
+    state_output.write_text(
+        json.dumps(
+            result.to_state_dict(
+                json_path=json_output,
+                markdown_path=markdown_output,
+                state_path=state_output,
+            ),
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return json_output, markdown_output, state_output
+
+
+def read_active_vram_resident_state(state_path: str | Path) -> dict[str, object] | None:
+    """Return active VRAM-run state when the recorded PID is still alive."""
+    path = Path(state_path)
+    if not path.exists():
+        return None
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        return None
+    status = raw.get("status")
+    pid_raw = raw.get("pid")
+    if status not in {"starting", "running"} or not isinstance(pid_raw, int):
+        return None
+    if not _pid_is_running(pid_raw):
+        return None
+    return raw
+
+
+def ensure_no_active_vram_resident_run(state_path: str | Path) -> None:
+    """Raise if the durable state file points at a still-running VRAM resident probe."""
+    state = read_active_vram_resident_state(state_path)
+    if state is None:
+        return
+    raise RuntimeError(
+        "active cuNxon VRAM-resident run already exists: "
+        f"pid={state.get('pid')} state_path={state_path}"
+    )
 
 
 def render_long_sweep_markdown_report(result: CunxonLongSweepProbeResult) -> str:
@@ -1729,6 +1971,194 @@ def run_ctypes_long_horizon_probe(
                 "short smoke tests are insufficient for learning claims",
                 "inter-sphere Python demo remains separate from this probe",
             ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_vram_resident_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    hypothesis: str,
+    active_issue: str,
+    command: str,
+    max_runtime_seconds: int = 14_400,
+    sample_interval_seconds: int = 900,
+    steps_per_sample: int = 262_144,
+    device_id: int = 0,
+    artifact_callback: Callable[[CunxonVramResidentResult], None] | None = None,
+) -> CunxonVramResidentResult:
+    """Keep one cuNxon network/process resident and stream dynamics/resource samples."""
+    if max_runtime_seconds <= 0:
+        raise ValueError("max_runtime_seconds must be positive")
+    if sample_interval_seconds <= 0:
+        raise ValueError("sample_interval_seconds must be positive")
+    if steps_per_sample <= 0:
+        raise ValueError("steps_per_sample must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    started_at_dt = datetime.now(timezone.utc)
+    end_at_dt = started_at_dt.timestamp() + max_runtime_seconds
+    start_monotonic = time.monotonic()
+    pid = os.getpid()
+    samples: list[CunxonVramResidentSample] = []
+    total_steps = 0
+    last_energy = 0.0
+    stop_condition = f"stop after {max_runtime_seconds} seconds or on cuNxon/API/resource error"
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_vram_resident"),
+        )
+
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 9
+        params.num_output_neurons = 3
+        params.random_seed_offset = 279
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"VRAM_RESIDENT", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_base, readout_base + 1, readout_base + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        input_buffer = (C.c_float * 3)(0.9, -0.25, 0.5)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+
+        initial_result = _make_vram_resident_result(
+            status="running",
+            hypothesis=hypothesis,
+            active_issue=active_issue,
+            pid=pid,
+            command=command,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            started_at=started_at_dt,
+            expected_end_timestamp=end_at_dt,
+            sample_interval_seconds=sample_interval_seconds,
+            steps_per_sample=steps_per_sample,
+            max_runtime_seconds=max_runtime_seconds,
+            total_steps=total_steps,
+            samples=samples,
+            stop_condition=stop_condition,
+        )
+        if artifact_callback is not None:
+            artifact_callback(initial_result)
+
+        sample_index = 0
+        while time.monotonic() - start_monotonic < max_runtime_seconds:
+            sample_start = time.monotonic()
+            for _ in range(steps_per_sample):
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            total_steps += steps_per_sample
+            _check(lib, lib.cunxonContextSync(ctx))
+            sample_index += 1
+            readout = _capture_readout(lib, net, sphere_id.value)
+            snapshot_states = _capture_snapshot_states(lib, net, sphere_id.value)
+            energy = _capture_energy(lib, net)
+            gpu_sample = _query_nvidia_smi_sample(device_id)
+            samples.append(
+                CunxonVramResidentSample(
+                    sample_index=sample_index,
+                    step=total_steps,
+                    elapsed_seconds=time.monotonic() - start_monotonic,
+                    readout=readout,
+                    active_state_count=sum(1 for value in snapshot_states if value != 0),
+                    neutral_state_count=sum(1 for value in snapshot_states if value == 0),
+                    energy=energy,
+                    energy_delta=energy - last_energy,
+                    gpu_memory_used_mb=gpu_sample.get("memory_used_mb"),
+                    gpu_utilization_percent=gpu_sample.get("utilization_percent"),
+                    gpu_temperature_c=gpu_sample.get("temperature_c"),
+                )
+            )
+            last_energy = energy
+            progress_result = _make_vram_resident_result(
+                status="running",
+                hypothesis=hypothesis,
+                active_issue=active_issue,
+                pid=pid,
+                command=command,
+                upstream_commit=upstream_commit,
+                cunxon_commit=cunxon_commit,
+                library_path=str(lib_path),
+                device_name=device_name,
+                compute_capability=compute_capability,
+                started_at=started_at_dt,
+                expected_end_timestamp=end_at_dt,
+                sample_interval_seconds=sample_interval_seconds,
+                steps_per_sample=steps_per_sample,
+                max_runtime_seconds=max_runtime_seconds,
+                total_steps=total_steps,
+                samples=list(samples),
+                stop_condition=stop_condition,
+            )
+            if artifact_callback is not None:
+                artifact_callback(progress_result)
+            sleep_seconds = sample_interval_seconds - (time.monotonic() - sample_start)
+            remaining_seconds = max_runtime_seconds - (time.monotonic() - start_monotonic)
+            if sleep_seconds > 0 and remaining_seconds > 0:
+                time.sleep(min(sleep_seconds, remaining_seconds))
+
+        return _make_vram_resident_result(
+            status="completed",
+            hypothesis=hypothesis,
+            active_issue=active_issue,
+            pid=pid,
+            command=command,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            started_at=started_at_dt,
+            expected_end_timestamp=end_at_dt,
+            sample_interval_seconds=sample_interval_seconds,
+            steps_per_sample=steps_per_sample,
+            max_runtime_seconds=max_runtime_seconds,
+            total_steps=total_steps,
+            samples=samples,
+            stop_condition=stop_condition,
         )
     finally:
         if net.value:
@@ -3139,6 +3569,120 @@ def _capture_energy(lib: C.CDLL, net: C.c_void_p) -> float:
     energy = C.c_double(0.0)
     _check(lib, lib.cunxonNetworkGetEnergy(net, C.byref(energy)))
     return float(energy.value)
+
+
+def _make_vram_resident_result(
+    *,
+    status: str,
+    hypothesis: str,
+    active_issue: str,
+    pid: int,
+    command: str,
+    upstream_commit: str,
+    cunxon_commit: str,
+    library_path: str,
+    device_name: str,
+    compute_capability: str,
+    started_at: datetime,
+    expected_end_timestamp: float,
+    max_runtime_seconds: int,
+    sample_interval_seconds: int,
+    steps_per_sample: int,
+    total_steps: int,
+    samples: list[CunxonVramResidentSample],
+    stop_condition: str,
+) -> CunxonVramResidentResult:
+    now = datetime.now(timezone.utc)
+    next_poll_timestamp = min(now.timestamp() + sample_interval_seconds, expected_end_timestamp)
+    expected_end_at = _format_utc_datetime(
+        datetime.fromtimestamp(expected_end_timestamp, timezone.utc)
+    )
+    next_poll_after = _format_utc_datetime(
+        datetime.fromtimestamp(next_poll_timestamp, timezone.utc)
+    )
+    return CunxonVramResidentResult(
+        status=status,
+        hypothesis=hypothesis,
+        active_issue=active_issue,
+        pid=pid,
+        command=command,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=library_path,
+        device_name=device_name,
+        compute_capability=compute_capability,
+        started_at=_format_utc_datetime(started_at),
+        updated_at=_format_utc_datetime(now),
+        expected_end_at=expected_end_at,
+        next_poll_after=next_poll_after,
+        max_runtime_seconds=max_runtime_seconds,
+        sample_interval_seconds=sample_interval_seconds,
+        steps_per_sample=steps_per_sample,
+        total_steps=total_steps,
+        samples=samples,
+        stop_condition=stop_condition,
+        notes=[
+            "same cuNxon process keeps one network/context resident between samples",
+            "samples capture readout, full-state occupancy, energy and nvidia-smi resource data",
+            "runtime/dynamics evidence only; not a task-learning or intelligence claim",
+        ],
+    )
+
+
+def _query_nvidia_smi_sample(device_id: int) -> dict[str, int | None]:
+    try:
+        completed = subprocess.run(
+            [
+                "nvidia-smi",
+                f"--id={device_id}",
+                "--query-gpu=memory.used,utilization.gpu,temperature.gpu",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return {
+            "memory_used_mb": None,
+            "utilization_percent": None,
+            "temperature_c": None,
+        }
+    line = completed.stdout.strip().splitlines()[0] if completed.stdout.strip() else ""
+    parts = [part.strip() for part in line.split(",")]
+    return {
+        "memory_used_mb": _parse_optional_int(parts[0] if len(parts) > 0 else ""),
+        "utilization_percent": _parse_optional_int(parts[1] if len(parts) > 1 else ""),
+        "temperature_c": _parse_optional_int(parts[2] if len(parts) > 2 else ""),
+    }
+
+
+def _parse_optional_int(raw: str) -> int | None:
+    try:
+        return int(raw)
+    except ValueError:
+        return None
+
+
+def _format_optional_int(value: int | None) -> str:
+    return "n/a" if value is None else str(value)
+
+
+def _format_utc_datetime(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _pid_is_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
 
 
 def _format_trinary(value: int) -> str:

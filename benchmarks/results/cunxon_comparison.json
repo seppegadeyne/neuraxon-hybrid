@@ -1,11 +1,17 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The VRAM-resident runner adds process-residence/state-file evidence only; it is not decision-quality evidence unless later task-coupled resident probes beat trivial baselines.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
       "lane": "cuNxon raw CUDA smoke",
       "metric": "decision-quality score",
       "value": "no decision-quality score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_vram_resident_run.json",
+      "lane": "cuNxon VRAM-resident dynamics run",
+      "metric": "wall-clock resident runtime samples",
+      "value": "bootstrap 12s run wrote 3 samples/12288 steps and durable anti-duplicate state; multi-hour run can be polled separately"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -105,6 +111,14 @@
     "status": "source semantics audited",
     "teacher_forcing_output_ports_supported_by_step_input": false,
     "verdict": "source-level semantics explain why output-port teacher forcing is unsupported"
+  },
+  "cunxon_vram_resident_run": {
+    "decision_quality_measured": false,
+    "status": "completed bootstrap",
+    "sample_count": 3,
+    "total_steps": 12288,
+    "state_artifact": "benchmarks/results/cunxon_vram_resident_run_state.json",
+    "verdict": "runner/state artifacts are viable for a longer VRAM-resident dynamics run, but bootstrap dynamics are not task-learning evidence"
   },
   "cunxon_action_probe": {
     "accuracy": 0.3333333333333333,

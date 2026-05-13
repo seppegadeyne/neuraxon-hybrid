@@ -26,6 +26,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonSnapshotPatternProbeResult,
     CunxonSupervisedMotorCase,
     CunxonSupervisedMotorProbeResult,
+    CunxonVramResidentResult,
+    CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
     render_interface_semantics_markdown_report,
@@ -36,6 +38,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_sensitivity_probe_markdown_report,
     render_snapshot_pattern_markdown_report,
     render_supervised_motor_markdown_report,
+    render_vram_resident_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_interface_semantics_artifacts,
@@ -46,6 +49,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_smoke_artifacts,
     write_snapshot_pattern_artifacts,
     write_supervised_motor_artifacts,
+    write_vram_resident_artifacts,
 )
 
 
@@ -155,6 +159,69 @@ def test_long_horizon_report_frames_neuraxon_as_time_dependent_learning_process(
 
     assert '"total_steps": 1024' in json_path.read_text(encoding="utf-8")
     assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_vram_resident_report_writes_progress_and_durable_state(tmp_path: Path) -> None:
+    result = CunxonVramResidentResult(
+        status="running",
+        hypothesis="Keeping the same cuNxon process in VRAM may expose wall-clock drift.",
+        active_issue="https://github.com/sisutuulenisa/neuraxon-hybrid/issues/79",
+        pid=12345,
+        command="neuraxon-agent cunxon-vram-resident --max-runtime-seconds 7200",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        started_at="2026-05-13T20:00:00Z",
+        updated_at="2026-05-13T20:15:00Z",
+        expected_end_at="2026-05-13T22:00:00Z",
+        next_poll_after="2026-05-13T20:30:00Z",
+        max_runtime_seconds=7200,
+        sample_interval_seconds=900,
+        steps_per_sample=262144,
+        total_steps=262144,
+        samples=[
+            CunxonVramResidentSample(
+                sample_index=1,
+                step=262144,
+                elapsed_seconds=42.0,
+                readout=[0, 0, 0],
+                active_state_count=2,
+                neutral_state_count=13,
+                energy=123.5,
+                energy_delta=123.5,
+                gpu_memory_used_mb=2800,
+                gpu_utilization_percent=12,
+                gpu_temperature_c=44,
+            )
+        ],
+        stop_condition="stop after 7200 seconds or on cuNxon/API/resource error",
+        notes=["runtime/dynamics evidence only"],
+    )
+
+    markdown = render_vram_resident_markdown_report(result)
+    assert "VRAM-resident" in markdown
+    assert "same cuNxon process/network resident" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "Next poll after: 2026-05-13T20:30:00Z" in markdown
+
+    json_path = tmp_path / "resident.json"
+    markdown_path = tmp_path / "resident.md"
+    state_path = tmp_path / "resident-state.json"
+    write_vram_resident_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+        state_path=state_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    state = state_path.read_text(encoding="utf-8")
+    assert '"sample_count": 1' in data
+    assert '"pid": 12345' in state
+    assert "resident.json" in state
+    assert "runtime/dynamics evidence only" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_long_sweep_report_scores_longer_modes_horizons_and_baselines(tmp_path: Path) -> None:

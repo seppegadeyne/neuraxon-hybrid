@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any, Callable, cast
 
 from neuraxon_agent.cunxon_smoke import (
+    CunxonVramResidentResult,
+    ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
     run_ctypes_interface_semantics_probe,
     run_ctypes_long_horizon_probe,
@@ -19,6 +21,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_smoke,
     run_ctypes_snapshot_pattern_probe,
     run_ctypes_supervised_motor_probe,
+    run_ctypes_vram_resident_probe,
     write_action_probe_artifacts,
     write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
@@ -28,6 +31,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_smoke_artifacts,
     write_snapshot_pattern_artifacts,
     write_supervised_motor_artifacts,
+    write_vram_resident_artifacts,
 )
 from neuraxon_agent.evolution import AgentEvolution, EvolutionConfig
 from neuraxon_agent.tissue import AgentTissue, TissueState
@@ -248,6 +252,52 @@ def cmd_cunxon_long_horizon(args: argparse.Namespace) -> int:
             "Long-horizon learning caveat: short smoke tests are insufficient for "
             "judging a brain-like Neuraxon system, but a failed probe also does not "
             "support any GPU-backed learning claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_vram_resident(args: argparse.Namespace) -> int:
+    try:
+        ensure_no_active_vram_resident_run(args.state_output)
+        command = "neuraxon-agent " + " ".join(sys.argv[1:])
+
+        def write_progress(result: CunxonVramResidentResult) -> None:
+            write_vram_resident_artifacts(
+                result,
+                json_path=args.json_output,
+                markdown_path=args.markdown_output,
+                state_path=args.state_output,
+            )
+
+        result = run_ctypes_vram_resident_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            hypothesis=args.hypothesis,
+            active_issue=args.active_issue,
+            command=command,
+            max_runtime_seconds=args.max_runtime_seconds,
+            sample_interval_seconds=args.sample_interval_seconds,
+            steps_per_sample=args.steps_per_sample,
+            device_id=args.device,
+            artifact_callback=write_progress,
+        )
+        write_vram_resident_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+            state_path=args.state_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon VRAM-resident dynamics run\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "This failed or blocked VRAM-resident run does not support any GPU-backed "
+            "learning or intelligence claim.\n",
             encoding="utf-8",
         )
         return 1
@@ -543,6 +593,63 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_long.set_defaults(func=cmd_cunxon_long_horizon)
+
+    p_cunxon_vram = sub.add_parser(
+        "cunxon-vram-resident",
+        help="Run one cuNxon process/network resident in VRAM with progress artifacts",
+        description=(
+            "Keep the same cuNxon context/network alive across wall-clock time and write "
+            "a durable state file so follow-up cron runs can poll instead of starting duplicates."
+        ),
+    )
+    p_cunxon_vram.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_vram.add_argument("--upstream-commit", required=True, help="Upstream Neuraxon commit")
+    p_cunxon_vram.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_vram.add_argument(
+        "--hypothesis",
+        required=True,
+        help="Bounded hypothesis for this resident runtime run",
+    )
+    p_cunxon_vram.add_argument(
+        "--active-issue",
+        default="https://github.com/sisutuulenisa/neuraxon-hybrid/issues/79",
+        help="Issue URL this long run is attached to",
+    )
+    p_cunxon_vram.add_argument(
+        "--max-runtime-seconds",
+        type=int,
+        default=14400,
+        help="Maximum wall-clock runtime before clean exit",
+    )
+    p_cunxon_vram.add_argument(
+        "--sample-interval-seconds",
+        type=int,
+        default=900,
+        help="Wall-clock seconds between progress samples",
+    )
+    p_cunxon_vram.add_argument(
+        "--steps-per-sample",
+        type=int,
+        default=262144,
+        help="cuNxon infer steps before each progress sample",
+    )
+    p_cunxon_vram.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_vram.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_vram_resident_run.json",
+        help="Progress JSON artifact path",
+    )
+    p_cunxon_vram.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_vram_resident_run.md",
+        help="Progress Markdown artifact path",
+    )
+    p_cunxon_vram.add_argument(
+        "--state-output",
+        default="benchmarks/results/cunxon_vram_resident_run_state.json",
+        help="Durable anti-duplicate state path",
+    )
+    p_cunxon_vram.set_defaults(func=cmd_cunxon_vram_resident)
 
     p_cunxon_long_sweep = sub.add_parser(
         "cunxon-long-sweep",

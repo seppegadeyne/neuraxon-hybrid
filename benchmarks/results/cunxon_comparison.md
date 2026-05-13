@@ -1,10 +1,10 @@
 # cuNxon comparison against existing Neuraxon-Hybrid evidence
 
-Verdict: `source semantics audit: output-port teacher forcing unsupported`
+Verdict: `source semantics audit: output-port teacher forcing unsupported; VRAM-resident run started as runtime/dynamics evidence`
 
 ## What changed
 
-The previous cuNxon slices established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, a three-sphere action adapter, a longer task-coupled sweep over 108 live RTX 5090 samples, an interface-semantics probe for absolute output-neuron ports, and a supervised motor-target adapter. This follow-up adds `benchmarks/results/cunxon_source_semantics_audit.*`: a source-level C/CUDA audit plus a live upstream 4-sphere demo rerun.
+The previous cuNxon slices established CUDA runtime viability, long-horizon raw dynamics, a tiny task-coupled action probe, infer-vs-train sensitivity, hidden-state/pattern inspection, a three-sphere action adapter, a longer task-coupled sweep over 108 live RTX 5090 samples, an interface-semantics probe for absolute output-neuron ports, and a supervised motor-target adapter. This follow-up adds `benchmarks/results/cunxon_source_semantics_audit.*`: a source-level C/CUDA audit plus a live upstream 4-sphere demo rerun. It also adds a bounded `cunxon-vram-resident` runner and bootstrap artifact under `benchmarks/results/cunxon_vram_resident_run.*` so follow-up cron runs can poll a single long-lived process instead of repeatedly restarting the network.
 
 The source audit found no desired-output API surface in the public cuNxon execution path. `StepTrain` exposes continuous plasticity and neuromodulator reward injection, but not a label/loss/error-vector argument. External step inputs are scattered only through `sensory_input_ids`, and the membrane kernel treats external input as direct pass-through only for input-class neurons; output neurons are readout-capable but are not directly teacher-forced by putting their absolute ids into `sensory_input_ids`.
 
@@ -21,6 +21,7 @@ The earlier snapshot/pattern, multi-sphere, long-sweep and new supervised-target
 | Lane | Metric | Value | Evidence |
 | --- | --- | ---: | --- |
 | cuNxon raw CUDA smoke | decision-quality score | no decision-quality score measured | `benchmarks/results/cunxon_smoke.json` |
+| cuNxon VRAM-resident dynamics run | wall-clock resident runtime samples | bootstrap 12s run wrote 3 samples/12288 steps and durable anti-duplicate state; multi-hour run can be polled separately | `benchmarks/results/cunxon_vram_resident_run.json` |
 | cuNxon source semantics audit | desired-output API surface | no desired-output API surface; output-port teacher forcing through sensory inputs unsupported | `benchmarks/results/cunxon_source_semantics_audit.json` |
 | cuNxon long-horizon raw dynamics | continuous runtime samples | 65536 steps; 1 unique readout(s); 0 readout changes | `benchmarks/results/cunxon_long_horizon.json` |
 | cuNxon long sweep action diagnostic | success_rate vs trivial baselines | 108 samples; all mode/horizon accuracies=0.333333; train/train_rewarded flat query | `benchmarks/results/cunxon_long_sweep.json` |
@@ -44,4 +45,4 @@ The supervised motor-target adapter's flat `[0, 0, 0]`/`query` result is therefo
 
 ## Evidence boundary
 
-This comparison deliberately separates runtime viability and interface semantics from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, reward injection, absolute-neuron-index port mapping, explicit but unsupported output-port target attempts, and source-level absence of a desired-output API surface prove useful diagnostic boundaries. The flat recall, below-chance upstream reward-only demo accuracy in this run, and baseline-level Hybrid action accuracy do not prove intelligence, generalization, or useful learning.
+This comparison deliberately separates runtime viability and interface semantics from decision quality. Snapshot activity, callable pattern APIs, inter-sphere topology construction, longer horizons, reward injection, absolute-neuron-index port mapping, explicit but unsupported output-port target attempts, source-level absence of a desired-output API surface, and the new VRAM-resident run state/progress artifacts prove useful diagnostic boundaries. The flat recall, below-chance upstream reward-only demo accuracy in this run, baseline-level Hybrid action accuracy, and resident-process dynamics by themselves do not prove intelligence, generalization, or useful learning.
