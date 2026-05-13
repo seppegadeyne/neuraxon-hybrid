@@ -12,9 +12,11 @@ from typing import Any, Callable, cast
 from neuraxon_agent.cunxon_smoke import (
     run_ctypes_action_probe,
     run_ctypes_long_horizon_probe,
+    run_ctypes_sensitivity_probe,
     run_ctypes_smoke,
     write_action_probe_artifacts,
     write_long_horizon_artifacts,
+    write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
 )
 from neuraxon_agent.evolution import AgentEvolution, EvolutionConfig
@@ -31,6 +33,13 @@ def _load_json(path: str) -> dict[str, Any]:
 
 def _save_json(path: str, data: dict[str, Any]) -> None:
     Path(path).write_text(json.dumps(data, indent=2))
+
+
+def _parse_seed_offsets(raw: str) -> list[int]:
+    offsets = [int(part.strip()) for part in raw.split(",") if part.strip()]
+    if not offsets:
+        raise ValueError("--seed-offsets must contain at least one integer")
+    return offsets
 
 
 def _encode_state(tissue: AgentTissue) -> str:
@@ -246,6 +255,35 @@ def cmd_cunxon_action_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_sensitivity_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_sensitivity_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            steps=args.steps,
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            device_id=args.device,
+        )
+        write_sensitivity_probe_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon infer-vs-train sensitivity probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed sensitivity probe does not support any "
+            "GPU-backed learning or decision-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -366,6 +404,45 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_action.set_defaults(func=cmd_cunxon_action_probe)
+
+    p_cunxon_sensitivity = sub.add_parser(
+        "cunxon-sensitivity-probe",
+        help="Compare cuNxon frozen infer and plastic train sensitivity",
+        description=(
+            "Run fresh one-sphere cuNxon samples in StepInfer and StepTrain modes over "
+            "fixed stimuli/seeds to check whether train-mode exposes non-flat action signal."
+        ),
+    )
+    p_cunxon_sensitivity.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_sensitivity.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_sensitivity.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_sensitivity.add_argument(
+        "--steps",
+        type=int,
+        default=32,
+        help="Simulation steps per mode/seed/stimulus sample",
+    )
+    p_cunxon_sensitivity.add_argument(
+        "--seed-offsets",
+        default="79,80,81",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_sensitivity.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_sensitivity.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_sensitivity_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_sensitivity.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_sensitivity_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_sensitivity.set_defaults(func=cmd_cunxon_sensitivity_probe)
 
     try:
         args = parser.parse_args(argv)

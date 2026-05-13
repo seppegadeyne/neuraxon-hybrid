@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution now has runtime/dynamics viability and a tiny task-coupled action probe, but the action probe is baseline-level and does not prove intelligence, generalization, or useful learning.",
+  "claim_boundary": "cuNxon GPU execution now has runtime/dynamics viability, a tiny task-coupled action probe, and an infer-vs-train sensitivity diagnostic. The sensitivity probe shows frozen-infer readout diversity but train-mode collapses to query for this one-sphere setup; this remains diagnostic/negative evidence, not intelligence, generalization, or useful learning.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -18,6 +18,12 @@
       "lane": "cuNxon task-coupled action probe",
       "metric": "success_rate",
       "value": 0.333333
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_sensitivity_probe.json",
+      "lane": "cuNxon infer-vs-train sensitivity probe",
+      "metric": "readout/action diversity",
+      "value": "infer unique=3; train unique=1; train-mode flat/query=9"
     },
     {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
@@ -70,6 +76,31 @@
     "unique_readouts": 1,
     "verdict": "long-horizon runtime viable, not benchmark-integrated"
   },
+  "cunxon_sensitivity_probe": {
+    "action_change_count_by_stimulus": {
+      "execute-positive-drive": 1,
+      "query-neutral-drive": 0,
+      "retry-negative-drive": 0
+    },
+    "action_distribution_by_mode": {
+      "infer": {
+        "query": 8,
+        "retry": 1
+      },
+      "train": {
+        "query": 9
+      }
+    },
+    "decision_quality_measured": false,
+    "sample_count": 18,
+    "status": "sensitivity probe viable",
+    "steps": 32,
+    "unique_readouts_by_mode": {
+      "infer": 3,
+      "train": 1
+    },
+    "verdict": "sensitivity diagnostic train-mode flat"
+  },
   "cunxon_smoke": {
     "decision_quality_measured": false,
     "device_name": "NVIDIA GeForce RTX 5090",
@@ -84,8 +115,9 @@
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_long_horizon.json",
     "benchmarks/results/cunxon_action_probe.json",
+    "benchmarks/results/cunxon_sensitivity_probe.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "task-coupled but not above baselines"
+  "verdict": "sensitivity diagnostic train-mode flat"
 }

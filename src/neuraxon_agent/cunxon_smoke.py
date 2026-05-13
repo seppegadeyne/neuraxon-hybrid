@@ -133,6 +133,55 @@ class CunxonActionProbeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonSensitivityProbeSample:
+    """One cuNxon stimulus readout from either frozen infer or plastic train mode."""
+
+    mode: str
+    seed_offset: int
+    stimulus: str
+    input_vector: list[float]
+    readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    energy: float
+    elapsed_ms: float
+
+
+@dataclass(frozen=True)
+class CunxonSensitivityProbeResult:
+    """Infer-vs-train cuNxon sensitivity probe result."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    steps: int
+    samples: list[CunxonSensitivityProbeSample]
+    unique_readouts_by_mode: dict[str, int]
+    action_distribution_by_mode: dict[str, dict[str, int]]
+    action_change_count_by_stimulus: dict[str, int]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of stimulus/mode/seed samples."""
+        return len(self.samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -357,6 +406,98 @@ def write_action_probe_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_action_probe_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_sensitivity_probe_markdown_report(result: CunxonSensitivityProbeResult) -> str:
+    """Render an infer-vs-train sensitivity report for cuNxon readouts."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    sample_rows = [
+        "| Mode | Seed | Stimulus | Input | Readout | Decoded | Normalized | Energy |",
+        "| --- | ---: | --- | --- | --- | --- | --- | ---: |",
+    ]
+    for sample in result.samples:
+        input_vector = ", ".join(f"{value:.3g}" for value in sample.input_vector)
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        sample_rows.append(
+            "| "
+            f"{sample.mode} | {sample.seed_offset} | {sample.stimulus} | [{input_vector}] | "
+            f"[{readout}] | {sample.decoded_action} ({sample.confidence:.4f}) | "
+            f"{sample.normalized_action} | {sample.energy:.6g} |"
+        )
+    mode_rows = ["| Mode | Unique readouts | Action distribution |", "| --- | ---: | --- |"]
+    for mode, unique_count in sorted(result.unique_readouts_by_mode.items()):
+        distribution = result.action_distribution_by_mode.get(mode, {})
+        distribution_text = ", ".join(
+            f"{action}={count}" for action, count in sorted(distribution.items())
+        ) or "none"
+        mode_rows.append(f"| {mode} | {unique_count} | {distribution_text} |")
+    stimulus_rows = ["| Stimulus | action changes by stimulus |", "| --- | ---: |"]
+    for stimulus, change_count in sorted(result.action_change_count_by_stimulus.items()):
+        stimulus_rows.append(f"| {stimulus} | {change_count} |")
+    return "\n".join(
+        [
+            "# cuNxon infer-vs-train sensitivity probe",
+            "",
+            f"Status: `{result.status}`",
+            f"Samples: {result.sample_count}",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Steps per sample: {result.steps}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The previous cuNxon action probe used frozen `cunxonNetworkStepInfer`. Upstream "
+            "documents `cunxonNetworkStepTrain` as the paper-canonical continuous-learning "
+            "mode, so this diagnostic compares frozen infer readouts with plastic train "
+            "readouts on the same stimuli/seeds before claiming a richer adapter works.",
+            "",
+            "## Mode summary",
+            "",
+            *mode_rows,
+            "",
+            "## Stimulus sensitivity",
+            "",
+            *stimulus_rows,
+            "",
+            "## Samples",
+            "",
+            *sample_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is a sensitivity diagnostic, not a benchmark win. Input sensitivity, train-mode "
+            "diversity, or action changes do not prove intelligence by themselves; this probe "
+            "does not prove intelligence and only shows whether cuNxon exposes enough non-flat "
+            "signal to justify a richer task adapter.",
+            "",
+        ]
+    )
+
+
+def write_sensitivity_probe_artifacts(
+    result: CunxonSensitivityProbeResult, *, json_path: str | Path, markdown_path: str | Path
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown infer-vs-train sensitivity artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_sensitivity_probe_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -695,6 +836,189 @@ def run_ctypes_action_probe(
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
 
+
+def run_ctypes_sensitivity_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    steps: int = 32,
+    seed_offsets: Sequence[int] = (79, 80, 81),
+    device_id: int = 0,
+) -> CunxonSensitivityProbeResult:
+    """Compare frozen infer and plastic train cuNxon responses to fixed stimuli."""
+    if steps <= 0:
+        raise ValueError("steps must be positive")
+    if not seed_offsets:
+        raise ValueError("seed_offsets must not be empty")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    start = time.perf_counter()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        samples: list[CunxonSensitivityProbeSample] = []
+        for mode in ("infer", "train"):
+            for seed_offset in seed_offsets:
+                for stimulus, input_vector, _expected_action in _default_action_probe_specs():
+                    samples.append(
+                        _run_sensitivity_sample(
+                            lib=lib,
+                            ctx=ctx,
+                            mode=mode,
+                            seed_offset=int(seed_offset),
+                            stimulus=stimulus,
+                            input_vector=input_vector,
+                            steps=steps,
+                            decoder=decoder,
+                            start=start,
+                        )
+                    )
+        return CunxonSensitivityProbeResult(
+            status="sensitivity probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            steps=steps,
+            samples=samples,
+            unique_readouts_by_mode=_count_unique_readouts_by_mode(samples),
+            action_distribution_by_mode=_count_actions_by_mode(samples),
+            action_change_count_by_stimulus=_count_action_changes_by_stimulus(samples),
+            notes=[
+                "fresh one-sphere network per mode/seed/stimulus sample",
+                "infer uses frozen cunxonNetworkStepInfer; train uses paper-canonical StepTrain",
+                "sensitivity/diversity is diagnostic evidence, not benchmark success",
+            ],
+        )
+    finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def _run_sensitivity_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mode: str,
+    seed_offset: int,
+    stimulus: str,
+    input_vector: tuple[float, float, float],
+    steps: int,
+    decoder: ActionDecoder,
+    start: float,
+) -> CunxonSensitivityProbeSample:
+    net = C.c_void_p()
+    try:
+        name = f"neuraxon_hybrid_cunxon_sensitivity_{mode}_{seed_offset}_{stimulus}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = seed_offset
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"SENS", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_base, readout_base + 1, readout_base + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        input_buffer = (C.c_float * 3)(*input_vector)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        step_function = (
+            lib.cunxonNetworkStepTrain if mode == "train" else lib.cunxonNetworkStepInfer
+        )
+        for _ in range(steps):
+            _check(lib, step_function(net, ext_inputs, C.c_float(1.0)))
+        _check(lib, lib.cunxonContextSync(ctx))
+        readout = _capture_readout(lib, net, sphere_id.value)
+        energy = _capture_energy(lib, net)
+        decoded = decoder.decode(readout)
+        normalized_action = normalize_benchmark_action(decoded.actie_type)
+        return CunxonSensitivityProbeSample(
+            mode=mode,
+            seed_offset=seed_offset,
+            stimulus=stimulus,
+            input_vector=list(input_vector),
+            readout=readout,
+            decoded_action=decoded.actie_type,
+            normalized_action=normalized_action,
+            confidence=decoded.confidence,
+            energy=energy,
+            elapsed_ms=(time.perf_counter() - start) * 1000.0,
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+
+
+def _count_unique_readouts_by_mode(
+    samples: Sequence[CunxonSensitivityProbeSample],
+) -> dict[str, int]:
+    readouts: dict[str, set[tuple[int, ...]]] = {}
+    for sample in samples:
+        readouts.setdefault(sample.mode, set()).add(tuple(sample.readout))
+    return {mode: len(values) for mode, values in readouts.items()}
+
+
+def _count_actions_by_mode(
+    samples: Sequence[CunxonSensitivityProbeSample],
+) -> dict[str, dict[str, int]]:
+    distributions: dict[str, dict[str, int]] = {}
+    for sample in samples:
+        mode_distribution = distributions.setdefault(sample.mode, {})
+        previous_count = mode_distribution.get(sample.normalized_action, 0)
+        mode_distribution[sample.normalized_action] = previous_count + 1
+    return distributions
+
+
+def _count_action_changes_by_stimulus(
+    samples: Sequence[CunxonSensitivityProbeSample],
+) -> dict[str, int]:
+    by_stimulus_seed: dict[tuple[str, int], dict[str, str]] = {}
+    for sample in samples:
+        actions = by_stimulus_seed.setdefault((sample.stimulus, sample.seed_offset), {})
+        actions[sample.mode] = sample.normalized_action
+    change_counts: dict[str, int] = {
+        stimulus: 0 for stimulus, _, _ in _default_action_probe_specs()
+    }
+    for (stimulus, _seed_offset), actions in by_stimulus_seed.items():
+        if actions.get("infer") != actions.get("train"):
+            change_counts[stimulus] = change_counts.get(stimulus, 0) + 1
+    return change_counts
+
+
 def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float], str]]:
     """Return a tiny fixed action-contract task suite for cuNxon probes."""
     return [
@@ -774,6 +1098,8 @@ def _load_library(path: Path) -> C.CDLL:
     lib.cunxonNetworkFinalize.restype = C.c_int
     lib.cunxonNetworkStepInfer.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
     lib.cunxonNetworkStepInfer.restype = C.c_int
+    lib.cunxonNetworkStepTrain.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
+    lib.cunxonNetworkStepTrain.restype = C.c_int
     lib.cunxonSphereGetReadout.argtypes = [
         C.c_void_p,
         C.c_int,

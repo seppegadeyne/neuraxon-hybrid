@@ -13,6 +13,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonLongHorizonResult,
     CunxonLongHorizonSample,
+    CunxonSensitivityProbeResult,
+    CunxonSensitivityProbeSample,
     CunxonSmokeResult,
 )
 
@@ -212,6 +214,67 @@ def test_cli_cunxon_action_probe_writes_json_and_markdown(
         encoding="utf-8"
     )
     assert "decision-quality" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_sensitivity_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonSensitivityProbeResult:
+        return CunxonSensitivityProbeResult(
+            status="sensitivity probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            steps=8,
+            samples=[
+                CunxonSensitivityProbeSample(
+                    mode="train",
+                    seed_offset=79,
+                    stimulus="positive-drive",
+                    input_vector=[1.0, 0.25, 0.0],
+                    readout=[1, 0, 0],
+                    decoded_action="PROCEED",
+                    normalized_action="execute",
+                    confidence=0.3333,
+                    energy=2.0,
+                    elapsed_ms=1.0,
+                )
+            ],
+            unique_readouts_by_mode={"train": 1},
+            action_distribution_by_mode={"train": {"execute": 1}},
+            action_change_count_by_stimulus={"positive-drive": 0},
+            notes=["fake sensitivity probe"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_sensitivity_probe", fake_probe)
+    json_path = tmp_path / "sensitivity.json"
+    markdown_path = tmp_path / "sensitivity.md"
+
+    rc = main(
+        [
+            "cunxon-sensitivity-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--steps",
+            "8",
+            "--seed-offsets",
+            "79,80",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "sensitivity probe viable"' in json_path.read_text(encoding="utf-8")
+    assert "infer-vs-train sensitivity probe" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:
