@@ -407,6 +407,62 @@ class CunxonInterfaceSemanticsProbeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonSupervisedMotorCase:
+    """One train/holdout case from a teacher-forced motor-target probe."""
+
+    name: str
+    split: str
+    input_vector: list[float]
+    expected_action: str
+    target_readout: list[int]
+    teacher_readout: list[int]
+    eval_readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    target_alignment: float
+    baseline_actions: dict[str, str]
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonSupervisedMotorProbeResult:
+    """Probe result for explicit supervised motor-target semantics."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    train_epochs: int
+    train_steps_per_case: int
+    eval_steps: int
+    target_port_ids: list[int]
+    cases: list[CunxonSupervisedMotorCase]
+    accuracy_by_split: dict[str, float]
+    target_alignment_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of scored supervised motor cases."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -1046,16 +1102,19 @@ def render_interface_semantics_markdown_report(
         ),
         "| --- | --- | --- | --- | --- | ---: | ---: |",
     ]
-    for sample in result.relay_samples:
-        source = ", ".join(_format_trinary(value) for value in sample.source_relay_readout)
+    for relay_sample in result.relay_samples:
+        source = ", ".join(
+            _format_trinary(value) for value in relay_sample.source_relay_readout
+        )
         downstream = ", ".join(
-            _format_trinary(value) for value in sample.downstream_input_readout
+            _format_trinary(value) for value in relay_sample.downstream_input_readout
         )
         relay_rows.append(
             "| "
-            f"{sample.mapping} | {sample.source_port_ids} | {sample.source_neuron_class} | "
-            f"[{source}] | [{downstream}] | {sample.downstream_active_state_count} | "
-            f"{sample.downstream_energy:.6g} |"
+            f"{relay_sample.mapping} | {relay_sample.source_port_ids} | "
+            f"{relay_sample.source_neuron_class} | "
+            f"[{source}] | [{downstream}] | {relay_sample.downstream_active_state_count} | "
+            f"{relay_sample.downstream_energy:.6g} |"
         )
     return "\n".join(
         [
@@ -1120,6 +1179,108 @@ def write_interface_semantics_artifacts(
     markdown_output.write_text(
         render_interface_semantics_markdown_report(result), encoding="utf-8"
     )
+    return json_output, markdown_output
+
+
+def render_supervised_motor_markdown_report(result: CunxonSupervisedMotorProbeResult) -> str:
+    """Render a supervised motor-target semantics probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    accuracy_rows = ["| Split | Accuracy | Target alignment |", "| --- | ---: | ---: |"]
+    for split, accuracy in sorted(result.accuracy_by_split.items()):
+        target_alignment = result.target_alignment_by_split.get(split, 0.0)
+        accuracy_rows.append(f"| {split} | {accuracy:.6f} | {target_alignment:.6f} |")
+    baseline_rows = ["| Baseline | Split | Accuracy |", "| --- | --- | ---: |"]
+    for baseline, by_split in sorted(result.baseline_accuracy_by_split.items()):
+        for split, accuracy in sorted(by_split.items()):
+            baseline_rows.append(f"| {baseline} | {split} | {accuracy:.6f} |")
+    case_rows = [
+        (
+            "| Case | Split | Expected | Target | Teacher readout | Eval readout | "
+            "Decoded | Outcome | Target alignment | Energy |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | --- | ---: | ---: |",
+    ]
+    for case in result.cases:
+        target = ", ".join(_format_trinary(value) for value in case.target_readout)
+        teacher = ", ".join(_format_trinary(value) for value in case.teacher_readout)
+        evaluation = ", ".join(_format_trinary(value) for value in case.eval_readout)
+        case_rows.append(
+            "| "
+            f"{case.name} | {case.split} | {case.expected_action} | [{target}] | "
+            f"[{teacher}] | [{evaluation}] | "
+            f"{case.decoded_action} ({case.normalized_action}, {case.confidence:.4f}) | "
+            f"{case.outcome} | {case.target_alignment:.6f} | {case.energy:.6g} |"
+        )
+    target_ports = ", ".join(str(port) for port in result.target_port_ids)
+    return "\n".join(
+        [
+            "# cuNxon supervised motor-target probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Train epochs: {result.train_epochs}",
+            f"- Train steps per case: {result.train_steps_per_case}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Cases: {result.case_count}",
+            f"- Absolute output-neuron target ports: [{target_ports}]",
+            "",
+            "## Why this probe exists",
+            "",
+            "The interface-semantics probe supports absolute neuron indices for output "
+            "ports. This follow-up tests whether teacher-forcing those absolute "
+            "output-neuron target ports can create a motor readout that beats trivial "
+            "constant-action baselines on holdout cases.",
+            "",
+            "## Accuracy and Target alignment",
+            "",
+            *accuracy_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Cases",
+            "",
+            *case_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This supervised motor-target adapter is still diagnostic. Teacher-forcing "
+            "absolute output-neuron ports, a positive target-alignment score, or a single "
+            "train-case success does not prove intelligence, generalization, or useful "
+            "learning unless holdout accuracy beats trivial baselines.",
+            "",
+        ]
+    )
+
+
+def write_supervised_motor_artifacts(
+    result: CunxonSupervisedMotorProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown supervised motor-target artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_supervised_motor_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -1201,6 +1362,155 @@ def run_ctypes_interface_semantics_probe(
             ],
         )
     finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_supervised_motor_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    train_epochs: int = 8,
+    train_steps_per_case: int = 16,
+    eval_steps: int = 16,
+    device_id: int = 0,
+) -> CunxonSupervisedMotorProbeResult:
+    """Test teacher-forced absolute output-neuron motor targets against holdouts."""
+    if train_epochs <= 0:
+        raise ValueError("train_epochs must be positive")
+    if train_steps_per_case <= 0:
+        raise ValueError("train_steps_per_case must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_supervised_motor"),
+        )
+
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = 179
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"SUPERVISED_MOTOR", CUNXON_SPHERE_MOTOR, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        target_port_ids = [readout_base, readout_base + 1, readout_base + 2]
+        sensory_and_target_ids = (C.c_int * 6)(0, 1, 2, *target_port_ids)
+        readout_ids = (C.c_int * 3)(*target_port_ids)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_and_target_ids,
+                6,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        teacher_readouts: dict[str, list[int]] = {}
+        for _epoch in range(train_epochs):
+            for name, split, input_vector, expected_action in _default_supervised_motor_specs():
+                if split != "train":
+                    continue
+                target = _target_readout_for_action(expected_action)
+                ext_inputs = _pack_supervised_motor_inputs(input_vector, target)
+                for _ in range(train_steps_per_case):
+                    _check(lib, lib.cunxonNetworkStepTrain(net, ext_inputs, C.c_float(1.0)))
+                    _inject_expected_action_modulator(lib, net, expected_action)
+                _check(lib, lib.cunxonContextSync(ctx))
+                teacher_readouts[name] = _capture_readout(lib, net, sphere_id.value)
+
+        cases: list[CunxonSupervisedMotorCase] = []
+        for index, (name, split, input_vector, expected_action) in enumerate(
+            _default_supervised_motor_specs()
+        ):
+            target = _target_readout_for_action(expected_action)
+            ext_inputs = _pack_supervised_motor_inputs(input_vector, (0.0, 0.0, 0.0))
+            for _ in range(eval_steps):
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            _check(lib, lib.cunxonContextSync(ctx))
+            eval_readout = _capture_readout(lib, net, sphere_id.value)
+            decoded = decoder.decode(eval_readout)
+            normalized_action = normalize_benchmark_action(decoded.actie_type)
+            cases.append(
+                CunxonSupervisedMotorCase(
+                    name=name,
+                    split=split,
+                    input_vector=list(input_vector),
+                    expected_action=expected_action,
+                    target_readout=list(target),
+                    teacher_readout=teacher_readouts.get(name, []),
+                    eval_readout=eval_readout,
+                    decoded_action=decoded.actie_type,
+                    normalized_action=normalized_action,
+                    confidence=decoded.confidence,
+                    outcome="success" if normalized_action == expected_action else "failure",
+                    target_alignment=_target_alignment(eval_readout, target),
+                    baseline_actions=_baseline_actions_for_case(index),
+                    energy=_capture_energy(lib, net),
+                )
+            )
+        return CunxonSupervisedMotorProbeResult(
+            status="supervised motor-target probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            train_epochs=train_epochs,
+            train_steps_per_case=train_steps_per_case,
+            eval_steps=eval_steps,
+            target_port_ids=target_port_ids,
+            cases=cases,
+            accuracy_by_split=_supervised_accuracy_by_split(cases),
+            target_alignment_by_split=_supervised_target_alignment_by_split(cases),
+            baseline_accuracy_by_split=_supervised_baseline_accuracy_by_split(cases),
+            notes=[
+                (
+                    "single motor sphere with sensory inputs plus teacher-forced "
+                    "absolute output-neuron target ports"
+                ),
+                (
+                    "training uses StepTrain and expected-action neuromodulator pulses; "
+                    "evaluation uses StepInfer without target drive"
+                ),
+                (
+                    "holdout accuracy must beat trivial baselines before this becomes "
+                    "useful adapter evidence"
+                ),
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
 
@@ -2535,6 +2845,98 @@ def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float],
         ("retry-negative-drive", (-1.0, -0.25, 0.0), "retry"),
         ("query-neutral-drive", (0.0, 0.0, 0.0), "query"),
     ]
+
+
+def _default_supervised_motor_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return train/holdout cases for absolute-output motor-target testing."""
+    return [
+        ("execute-train", "train", (1.0, 0.25, 0.0), "execute"),
+        ("retry-train", "train", (-1.0, -0.25, 0.0), "retry"),
+        ("query-train", "train", (0.0, 0.0, 0.0), "query"),
+        ("execute-holdout-noisy", "holdout", (0.8, 0.2, 0.1), "execute"),
+        ("retry-holdout-noisy", "holdout", (-0.8, -0.2, 0.1), "retry"),
+        ("query-holdout-low-drive", "holdout", (0.05, 0.0, -0.05), "query"),
+    ]
+
+
+def _target_readout_for_action(action: str) -> tuple[int, int, int]:
+    if action == "execute":
+        return (1, 0, 0)
+    if action == "retry":
+        return (-1, 0, 0)
+    return (0, 0, 0)
+
+
+def _target_alignment(readout: Sequence[int], target: Sequence[int]) -> float:
+    if not target:
+        return 0.0
+    matches = sum(1 for actual, expected in zip(readout, target) if actual == expected)
+    return matches / len(target)
+
+
+def _pack_supervised_motor_inputs(
+    sensory_vector: Sequence[float], target_vector: Sequence[float | int]
+) -> Any:
+    combined = [float(value) for value in sensory_vector] + [
+        float(value) for value in target_vector
+    ]
+    input_buffer = (C.c_float * len(combined))(*combined)
+    input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+    ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+    ext_inputs._input_buffer = input_buffer  # type: ignore[attr-defined]
+    return ext_inputs
+
+
+def _supervised_accuracy_by_split(
+    cases: Sequence[CunxonSupervisedMotorCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonSupervisedMotorCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(1 for case in split_cases if case.outcome == "success") / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _supervised_target_alignment_by_split(
+    cases: Sequence[CunxonSupervisedMotorCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonSupervisedMotorCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(case.target_alignment for case in split_cases) / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _supervised_baseline_accuracy_by_split(
+    cases: Sequence[CunxonSupervisedMotorCase],
+) -> dict[str, dict[str, float]]:
+    baseline_names = sorted({name for case in cases for name in case.baseline_actions})
+    result: dict[str, dict[str, float]] = {}
+    for baseline_name in baseline_names:
+        split_scores: dict[str, float] = {}
+        for split in sorted({case.split for case in cases} | {"overall"}):
+            split_cases = (
+                cases if split == "overall" else [case for case in cases if case.split == split]
+            )
+            if not split_cases:
+                continue
+            split_scores[split] = sum(
+                1
+                for case in split_cases
+                if case.baseline_actions[baseline_name] == case.expected_action
+            ) / len(split_cases)
+        result[baseline_name] = split_scores
+    return result
 
 
 def _run_interface_readout_sample(

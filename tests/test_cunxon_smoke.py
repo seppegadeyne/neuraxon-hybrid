@@ -24,6 +24,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonSmokeResult,
     CunxonSnapshotObservation,
     CunxonSnapshotPatternProbeResult,
+    CunxonSupervisedMotorCase,
+    CunxonSupervisedMotorProbeResult,
     classify_cunxon_status,
     render_action_probe_markdown_report,
     render_interface_semantics_markdown_report,
@@ -33,6 +35,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_multisphere_action_markdown_report,
     render_sensitivity_probe_markdown_report,
     render_snapshot_pattern_markdown_report,
+    render_supervised_motor_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_interface_semantics_artifacts,
@@ -42,6 +45,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
     write_snapshot_pattern_artifacts,
+    write_supervised_motor_artifacts,
 )
 
 
@@ -550,6 +554,80 @@ def test_interface_semantics_report_records_absolute_port_mapping(tmp_path: Path
     assert "absolute neuron indices" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_supervised_motor_report_scores_target_alignment_and_holdout_baselines(
+    tmp_path: Path,
+) -> None:
+    result = CunxonSupervisedMotorProbeResult(
+        status="supervised motor-target probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        train_epochs=3,
+        train_steps_per_case=8,
+        eval_steps=5,
+        target_port_ids=[8, 9, 10],
+        cases=[
+            CunxonSupervisedMotorCase(
+                name="execute-train",
+                split="train",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                target_readout=[1, 0, 0],
+                teacher_readout=[1, 0, 0],
+                eval_readout=[1, 0, 0],
+                decoded_action="PROCEED",
+                normalized_action="execute",
+                confidence=0.3333,
+                outcome="success",
+                target_alignment=1.0,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=4.0,
+            ),
+            CunxonSupervisedMotorCase(
+                name="retry-holdout-noisy",
+                split="holdout",
+                input_vector=[-0.8, -0.2, 0.1],
+                expected_action="retry",
+                target_readout=[-1, 0, 0],
+                teacher_readout=[-1, 0, 0],
+                eval_readout=[0, 0, 0],
+                decoded_action="PAUSE",
+                normalized_action="query",
+                confidence=1.0,
+                outcome="failure",
+                target_alignment=0.6667,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=5.0,
+            ),
+        ],
+        accuracy_by_split={"holdout": 0.0, "overall": 0.5, "train": 1.0},
+        target_alignment_by_split={"holdout": 0.6667, "overall": 0.83335, "train": 1.0},
+        baseline_accuracy_by_split={
+            "always_execute": {"holdout": 0.0, "overall": 0.5, "train": 1.0},
+            "always_query": {"holdout": 0.0, "overall": 0.0, "train": 0.0},
+        },
+        notes=["fake supervised motor-target probe"],
+    )
+
+    markdown = render_supervised_motor_markdown_report(result)
+    assert "supervised motor-target" in markdown
+    assert "absolute output-neuron target ports" in markdown
+    assert "Target alignment" in markdown
+    assert "Trivial baselines" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "supervised.json"
+    markdown_path = tmp_path / "supervised.md"
+    write_supervised_motor_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "supervised motor-target probe viable"' in data
+    assert '"target_port_ids": [' in data
+    assert "absolute output-neuron target ports" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_tracked_cunxon_investigation_report_preserves_live_smoke_and_boundary() -> None:
     markdown = Path("benchmarks/results/cunxon_smoke.md").read_text(encoding="utf-8")
     data = Path("benchmarks/results/cunxon_smoke.json").read_text(encoding="utf-8")
@@ -575,6 +653,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon infer-vs-train sensitivity probe" in markdown
     assert "cuNxon snapshot/pattern probe" in markdown
     assert "cuNxon multi-sphere/action adapter" in markdown
+    assert "cuNxon supervised motor-target adapter" in markdown
     assert "no decision-quality score measured" in markdown
     assert "train-mode flat" in markdown
     assert "flat recall" in markdown
@@ -594,6 +673,11 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert (
         '"verdict": "three-sphere adapter runs but is flat query and does not beat '
+        'trivial baselines"'
+        in data
+    )
+    assert (
+        '"verdict": "supervised motor-target adapter remains flat query and does not beat '
         'trivial baselines"'
         in data
     )

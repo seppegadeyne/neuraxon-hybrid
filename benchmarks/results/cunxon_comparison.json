@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, and a 108-sample long sweep through 32..32768 steps matches constant-action baselines at 0.333333 accuracy. The interface semantics probe supports absolute neuron-index readout/relay mapping but is not a decision-quality result.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, but teacher-forcing absolute output-neuron target ports did not produce a holdout-beating motor signal.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -48,6 +48,12 @@
       "lane": "cuNxon interface semantics probe",
       "metric": "readout/relay port mapping",
       "value": "same-sphere readouts match snapshot slices; input-port relay activates downstream; output-port relay stays neutral in this setup"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_supervised_motor_probe.json",
+      "lane": "cuNxon supervised motor-target adapter",
+      "metric": "holdout success_rate vs trivial baselines",
+      "value": "holdout=0.333333; overall=0.333333; target_alignment=0.777778; eval readouts flat query"
     },
     {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
@@ -421,6 +427,79 @@
     "status": "snapshot-pattern probe viable",
     "verdict": "snapshot channels viable; pattern recall callable but flat zero in this setup"
   },
+  "cunxon_supervised_motor_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "decision_quality_measured": true,
+    "eval_readouts": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "eval_steps": 16,
+    "status": "supervised motor-target probe viable",
+    "target_alignment_by_split": {
+      "holdout": 0.7777777777777777,
+      "overall": 0.7777777777777777,
+      "train": 0.7777777777777777
+    },
+    "target_port_ids": [
+      8,
+      9,
+      10
+    ],
+    "train_epochs": 8,
+    "train_steps_per_case": 16,
+    "verdict": "supervised motor-target adapter remains flat query and does not beat trivial baselines"
+  },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_long_horizon.json",
@@ -430,8 +509,9 @@
     "benchmarks/results/cunxon_snapshot_pattern_probe.json",
     "benchmarks/results/cunxon_multisphere_action_probe.json",
     "benchmarks/results/cunxon_interface_semantics_probe.json",
+    "benchmarks/results/cunxon_supervised_motor_probe.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "cuNxon interface semantics clarified; decision probes remain flat/baseline-level"
+  "verdict": "supervised cuNxon motor targets still baseline-level"
 }
