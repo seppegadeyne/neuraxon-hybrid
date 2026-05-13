@@ -1,0 +1,100 @@
+{
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "energy_delta": 1119554.053346634,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "continuous one-sphere long-horizon probe completed",
+    "short smoke tests are insufficient for learning claims",
+    "inter-sphere Python demo remains separate from this probe"
+  ],
+  "readout_change_count": 0,
+  "sample_interval": 8192,
+  "samples": [
+    {
+      "elapsed_ms": 513.4293989976868,
+      "energy": 157619.10979413986,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 8192
+    },
+    {
+      "elapsed_ms": 914.6218859823421,
+      "energy": 316491.2856001854,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 16384
+    },
+    {
+      "elapsed_ms": 1318.0667610140517,
+      "energy": 475920.84398031235,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 24576
+    },
+    {
+      "elapsed_ms": 1714.1060149879195,
+      "energy": 635719.7659373283,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 32768
+    },
+    {
+      "elapsed_ms": 2118.2180900359526,
+      "energy": 795778.684155941,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 40960
+    },
+    {
+      "elapsed_ms": 2529.346789990086,
+      "energy": 956072.8399596214,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 49152
+    },
+    {
+      "elapsed_ms": 2927.323330019135,
+      "energy": 1116538.1206564903,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 57344
+    },
+    {
+      "elapsed_ms": 3325.7903599878773,
+      "energy": 1277173.1631407738,
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "step": 65536
+    }
+  ],
+  "status": "long-horizon probe viable",
+  "total_steps": 65536,
+  "unique_readouts": 1,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

@@ -45,6 +45,43 @@ class CunxonSmokeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonLongHorizonSample:
+    """One sample from a continuous cuNxon long-horizon probe."""
+
+    step: int
+    readout: list[int]
+    energy: float
+    elapsed_ms: float
+
+
+@dataclass(frozen=True)
+class CunxonLongHorizonResult:
+    """Result of a longer continuous cuNxon probe on one network instance."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    total_steps: int
+    sample_interval: int
+    samples: list[CunxonLongHorizonSample]
+    readout_change_count: int
+    unique_readouts: int
+    energy_delta: float
+    notes: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        return asdict(self)
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -121,6 +158,80 @@ def write_smoke_artifacts(
     return json_output, markdown_output
 
 
+def render_long_horizon_markdown_report(result: CunxonLongHorizonResult) -> str:
+    """Render a long-horizon cuNxon probe report with a learning-time caveat."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    sample_rows = [
+        "| Step | Readout | Energy | Elapsed ms |",
+        "| ---: | --- | ---: | ---: |",
+    ]
+    for sample in result.samples:
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        sample_rows.append(
+            f"| {sample.step} | [{readout}] | {sample.energy:.6g} | {sample.elapsed_ms:.3f} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon long-horizon learning probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Total steps: {result.total_steps}",
+            f"- Sample interval: {result.sample_interval}",
+            f"- Samples: {len(result.samples)}",
+            f"- Unique readouts: {result.unique_readouts}",
+            f"- readout changes: {result.readout_change_count}",
+            f"- Energy delta: {result.energy_delta:.6g}",
+            "",
+            "## Long-horizon learning caveat",
+            "",
+            "Neuraxon should be treated as a brain-like, time-dependent learning system: "
+            "short smoke tests are insufficient for judging whether it learns. This probe "
+            "keeps one cuNxon network instance active for a longer step horizon and samples "
+            "readout/energy over time. It is still only runtime/dynamics evidence, not a "
+            "decision-quality benchmark.",
+            "",
+            "## Samples",
+            "",
+            *sample_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This long-horizon probe does not prove intelligence, generalization, or useful "
+            "learning by itself. It only checks whether a continuous cuNxon run produces "
+            "valid trinary readouts and observable dynamics over a longer active window.",
+            "",
+        ]
+    )
+
+
+def write_long_horizon_artifacts(
+    result: CunxonLongHorizonResult, *, json_path: str | Path, markdown_path: str | Path
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown long-horizon artifacts and return their paths."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_long_horizon_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
 def run_ctypes_smoke(
     *,
     library_path: str | Path,
@@ -194,22 +305,8 @@ def run_ctypes_smoke(
             _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
         _check(lib, lib.cunxonContextSync(ctx))
 
-        readout_size = C.c_int(0)
-        _check(lib, lib.cunxonSphereGetReadout(net, sphere_id.value, None, C.byref(readout_size)))
-        if readout_size.value <= 0:
-            raise CunxonError("cuNxon returned an empty readout size")
-        readout_buffer = (C.c_int8 * readout_size.value)()
-        _check(
-            lib,
-            lib.cunxonSphereGetReadout(
-                net, sphere_id.value, readout_buffer, C.byref(readout_size)
-            ),
-        )
-        readout = [int(readout_buffer[i]) for i in range(readout_size.value)]
-        validate_trinary_readout(readout)
-
-        energy = C.c_double(0.0)
-        _check(lib, lib.cunxonNetworkGetEnergy(net, C.byref(energy)))
+        readout = _capture_readout(lib, net, sphere_id.value)
+        energy = _capture_energy(lib, net)
         elapsed_ms = (time.perf_counter() - start) * 1000.0
         return CunxonSmokeResult(
             status="smoke-test viable",
@@ -220,7 +317,7 @@ def run_ctypes_smoke(
             compute_capability=compute_capability,
             steps=steps,
             readout=readout,
-            energy=float(energy.value),
+            energy=energy,
             elapsed_ms=elapsed_ms,
             notes=[
                 "minimal one-sphere ctypes smoke completed",
@@ -232,6 +329,150 @@ def run_ctypes_smoke(
             lib.cunxonNetworkDestroy(net)
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_long_horizon_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    total_steps: int = 4096,
+    sample_interval: int = 512,
+    device_id: int = 0,
+) -> CunxonLongHorizonResult:
+    """Run one cuNxon network continuously and sample dynamics over a longer horizon."""
+    if total_steps <= 0:
+        raise ValueError("total_steps must be positive")
+    if sample_interval <= 0:
+        raise ValueError("sample_interval must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    start = time.perf_counter()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_long_horizon"),
+        )
+
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = 79
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"LONG", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_base = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_base, readout_base + 1, readout_base + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        input_buffer = (C.c_float * 3)(0.9, -0.25, 0.5)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        samples: list[CunxonLongHorizonSample] = []
+        previous_readout: list[int] | None = None
+        readout_change_count = 0
+        unique_readouts: set[tuple[int, ...]] = set()
+        first_energy: float | None = None
+        last_energy = 0.0
+        for step in range(1, total_steps + 1):
+            _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            if step % sample_interval != 0 and step != total_steps:
+                continue
+            _check(lib, lib.cunxonContextSync(ctx))
+            readout = _capture_readout(lib, net, sphere_id.value)
+            energy = _capture_energy(lib, net)
+            if previous_readout is not None and readout != previous_readout:
+                readout_change_count += 1
+            previous_readout = readout
+            unique_readouts.add(tuple(readout))
+            if first_energy is None:
+                first_energy = energy
+            last_energy = energy
+            samples.append(
+                CunxonLongHorizonSample(
+                    step=step,
+                    readout=readout,
+                    energy=energy,
+                    elapsed_ms=(time.perf_counter() - start) * 1000.0,
+                )
+            )
+
+        return CunxonLongHorizonResult(
+            status="long-horizon probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            total_steps=total_steps,
+            sample_interval=sample_interval,
+            samples=samples,
+            readout_change_count=readout_change_count,
+            unique_readouts=len(unique_readouts),
+            energy_delta=last_energy - (first_energy if first_energy is not None else last_energy),
+            notes=[
+                "continuous one-sphere long-horizon probe completed",
+                "short smoke tests are insufficient for learning claims",
+                "inter-sphere Python demo remains separate from this probe",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def _capture_readout(lib: C.CDLL, net: C.c_void_p, sphere_id: int) -> list[int]:
+    readout_size = C.c_int(0)
+    _check(lib, lib.cunxonSphereGetReadout(net, sphere_id, None, C.byref(readout_size)))
+    if readout_size.value <= 0:
+        raise CunxonError("cuNxon returned an empty readout size")
+    readout_buffer = (C.c_int8 * readout_size.value)()
+    _check(
+        lib,
+        lib.cunxonSphereGetReadout(net, sphere_id, readout_buffer, C.byref(readout_size)),
+    )
+    readout = [int(readout_buffer[i]) for i in range(readout_size.value)]
+    validate_trinary_readout(readout)
+    return readout
+
+
+def _capture_energy(lib: C.CDLL, net: C.c_void_p) -> float:
+    energy = C.c_double(0.0)
+    _check(lib, lib.cunxonNetworkGetEnergy(net, C.byref(energy)))
+    return float(energy.value)
 
 
 def _format_trinary(value: int) -> str:

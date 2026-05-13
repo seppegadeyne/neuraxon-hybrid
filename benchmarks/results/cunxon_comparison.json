@@ -1,21 +1,17 @@
 {
-  "claim_boundary": "cuNxon GPU execution proves only that the CUDA runtime can load and emit a valid trinary readout; it does not prove intelligence, generalization, or decision quality.",
-  "cunxon_smoke": {
-    "decision_quality_measured": false,
-    "device_name": "NVIDIA GeForce RTX 5090",
-    "readout": [
-      0,
-      0,
-      0
-    ],
-    "status": "smoke-test viable"
-  },
+  "claim_boundary": "cuNxon GPU execution proves runtime/dynamics viability only. A short smoke test is insufficient for a brain-like Neuraxon learning claim; even the long-horizon probe does not prove intelligence, generalization, or decision quality.",
   "comparison_lanes": [
     {
-      "evidence": "ctypes one-sphere GPU smoke only",
+      "evidence": "benchmarks/results/cunxon_smoke.json",
       "lane": "cuNxon raw CUDA smoke",
       "metric": "decision-quality score",
       "value": "no decision-quality score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_long_horizon.json",
+      "lane": "cuNxon long-horizon raw dynamics",
+      "metric": "continuous runtime samples",
+      "value": "65536 steps; 1 unique readout(s); 0 readout changes"
     },
     {
       "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
@@ -48,10 +44,31 @@
       "value": 1.0
     }
   ],
+  "cunxon_long_horizon": {
+    "decision_quality_measured": false,
+    "energy_delta": 1119554.053346634,
+    "readout_change_count": 0,
+    "sample_interval": 8192,
+    "samples": 8,
+    "status": "long-horizon probe viable",
+    "total_steps": 65536,
+    "unique_readouts": 1
+  },
+  "cunxon_smoke": {
+    "decision_quality_measured": false,
+    "device_name": null,
+    "readout": [
+      0,
+      0,
+      0
+    ],
+    "status": "smoke-test viable"
+  },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
+    "benchmarks/results/cunxon_long_horizon.json",
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "smoke-test viable, not benchmark-integrated"
+  "verdict": "long-horizon runtime viable, not benchmark-integrated"
 }

@@ -9,7 +9,12 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable, cast
 
-from neuraxon_agent.cunxon_smoke import run_ctypes_smoke, write_smoke_artifacts
+from neuraxon_agent.cunxon_smoke import (
+    run_ctypes_long_horizon_probe,
+    run_ctypes_smoke,
+    write_long_horizon_artifacts,
+    write_smoke_artifacts,
+)
 from neuraxon_agent.evolution import AgentEvolution, EvolutionConfig
 from neuraxon_agent.tissue import AgentTissue, TissueState
 from neuraxon_agent.vendor.neuraxon2 import NetworkParameters
@@ -181,6 +186,36 @@ def cmd_cunxon_smoke(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_long_horizon(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_long_horizon_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            total_steps=args.steps,
+            sample_interval=args.sample_interval,
+            device_id=args.device,
+        )
+        write_long_horizon_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon long-horizon learning probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Long-horizon learning caveat: short smoke tests are insufficient for "
+            "judging a brain-like Neuraxon system, but a failed probe also does not "
+            "support any GPU-backed learning claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -231,6 +266,42 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon.set_defaults(func=cmd_cunxon_smoke)
+
+    p_cunxon_long = sub.add_parser(
+        "cunxon-long-horizon",
+        help="Run optional cuNxon CUDA long-horizon learning probe",
+        description=(
+            "Run one cuNxon network continuously for a longer horizon. Short smoke "
+            "tests are insufficient for judging whether brain-like Neuraxon dynamics learn."
+        ),
+    )
+    p_cunxon_long.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_long.add_argument("--upstream-commit", required=True, help="Upstream Neuraxon commit")
+    p_cunxon_long.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_long.add_argument(
+        "--steps",
+        type=int,
+        default=4096,
+        help="Continuous simulation steps",
+    )
+    p_cunxon_long.add_argument(
+        "--sample-interval",
+        type=int,
+        default=512,
+        help="Steps between samples",
+    )
+    p_cunxon_long.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_long.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_long_horizon.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_long.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_long_horizon.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_long.set_defaults(func=cmd_cunxon_long_horizon)
 
     try:
         args = parser.parse_args(argv)

@@ -8,7 +8,11 @@ from pathlib import Path
 import pytest
 
 from neuraxon_agent.cli import main
-from neuraxon_agent.cunxon_smoke import CunxonSmokeResult
+from neuraxon_agent.cunxon_smoke import (
+    CunxonLongHorizonResult,
+    CunxonLongHorizonSample,
+    CunxonSmokeResult,
+)
 
 
 def test_cli_help() -> None:
@@ -90,6 +94,62 @@ def test_cli_cunxon_smoke_writes_json_and_markdown(
     assert rc == 0
     assert '"status": "smoke-test viable"' in json_path.read_text(encoding="utf-8")
     assert "No broad Neuraxon intelligence claim" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_long_horizon_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonLongHorizonResult:
+        return CunxonLongHorizonResult(
+            status="long-horizon probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            total_steps=1024,
+            sample_interval=256,
+            samples=[
+                CunxonLongHorizonSample(
+                    step=256,
+                    readout=[0, 0, 0],
+                    energy=1.0,
+                    elapsed_ms=1.0,
+                )
+            ],
+            readout_change_count=0,
+            unique_readouts=1,
+            energy_delta=0.0,
+            notes=["fake long horizon"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_long_horizon_probe", fake_probe)
+    json_path = tmp_path / "long.json"
+    markdown_path = tmp_path / "long.md"
+
+    rc = main(
+        [
+            "cunxon-long-horizon",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--steps",
+            "1024",
+            "--sample-interval",
+            "256",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "long-horizon probe viable"' in json_path.read_text(encoding="utf-8")
+    assert "short smoke tests are insufficient" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:
