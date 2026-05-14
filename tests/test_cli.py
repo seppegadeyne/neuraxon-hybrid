@@ -11,6 +11,8 @@ from neuraxon_agent.cli import main
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonAigarthReadoutProbeResult,
+    CunxonAigarthReadoutRun,
     CunxonInputProxyTargetCase,
     CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
@@ -794,6 +796,71 @@ def test_cli_cunxon_input_proxy_target_probe_writes_json_and_markdown(
         encoding="utf-8"
     )
     assert "input-port proxy target probe" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_aigarth_readout_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthReadoutProbeResult:
+        return CunxonAigarthReadoutProbeResult(
+            status="aigarth readout semantics probe viable",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(kwargs["generations"]),
+            population_size=int(kwargs["population_size"]),
+            eval_steps=int(kwargs["eval_steps"]),
+            runs=[
+                CunxonAigarthReadoutRun(
+                    mapping="absolute-output-readout",
+                    readout_ids=[36, 37, 38, 39, 40, 41, 42, 43],
+                    neuron_class="absolute output block",
+                    baseline_margin=0.0,
+                    generation_margins=[0.0],
+                    final_margin=0.0,
+                    improvement=0.0,
+                    positive_mean=0.0,
+                    negative_mean=0.0,
+                    positive_readout=[0, 0, 0, 0, 0, 0, 0, 0],
+                    negative_readout=[0, 0, 0, 0, 0, 0, 0, 0],
+                )
+            ],
+            notes=["fake Aigarth readout probe"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_aigarth_readout_probe", fake_probe)
+    json_path = tmp_path / "aigarth.json"
+    markdown_path = tmp_path / "aigarth.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-readout-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "aigarth readout semantics probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "Aigarth readout semantics" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:

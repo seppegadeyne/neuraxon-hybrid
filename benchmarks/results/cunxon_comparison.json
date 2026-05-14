@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The external-drive port-window probe confirms the sharper boundary: identical external values drive input-class windows in infer/train, while hidden/output windows stay zero in this controlled 4/4/4 setup, so those windows should not be treated as desired-output channels. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only. The task-coupled resident action probe adds explicit scoring but still does not beat trivial baselines.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The external-drive port-window probe confirms the sharper boundary: identical external values drive input-class windows in infer/train, while hidden/output windows stay zero in this controlled 4/4/4 setup, so those windows should not be treated as desired-output channels. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only. The task-coupled resident action probe adds explicit scoring but still does not beat trivial baselines. The new Aigarth readout semantics probe shows a different lower-level surface: relative demo readout margin improved 1.000000->1.500000, while absolute output readout margin improved 0.625000->1.500000 on the same two-pattern fitness task. This is positive interface/evolution evidence, but not holdout/action evidence and not a Neuraxon-Hybrid decision-quality win.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -18,6 +18,12 @@
       "lane": "cuNxon resident task-coupled action probe",
       "metric": "epoch task accuracy vs trivial baselines",
       "value": "12 epochs / 72 scored cases; every epoch/split accuracy=0.333333; motor readouts flat query; equals constant-action baselines"
+    },
+    {
+      "lane": "cuNxon Aigarth readout semantics probe",
+      "metric": "two-pattern classification margin, relative demo vs absolute output ports",
+      "value": "relative demo margin improved 1.000000->1.500000; absolute output readout margin improved 0.625000->1.500000; no holdout/action score measured",
+      "evidence": "benchmarks/results/cunxon_aigarth_readout_probe.json"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -780,5 +786,18 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "source semantics audit: output-port teacher forcing unsupported; input-proxy target drive observable but motor readout baseline-level; external-drive window probe keeps hidden/output drive non-teacher-forcing; VRAM-resident 4h run flat; resident task-coupled action probe still baseline-level"
+  "verdict": "source semantics audit: output-port teacher forcing unsupported; input-proxy target drive observable but motor readout baseline-level; external-drive window probe keeps hidden/output drive non-teacher-forcing; VRAM-resident 4h run flat; resident task-coupled action probe still baseline-level",
+  "cunxon_aigarth_readout_probe": {
+    "status": "aigarth readout semantics probe viable",
+    "generations": 12,
+    "population_size": 24,
+    "eval_steps": 25,
+    "relative_demo_improvement": 0.5,
+    "relative_demo_final_margin": 1.5,
+    "absolute_output_improvement": 0.875,
+    "absolute_output_final_margin": 1.5,
+    "decision_quality_measured": false,
+    "holdout_measured": false,
+    "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
+  }
 }

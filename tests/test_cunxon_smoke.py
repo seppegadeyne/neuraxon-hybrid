@@ -9,6 +9,8 @@ import pytest
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonAigarthReadoutProbeResult,
+    CunxonAigarthReadoutRun,
     CunxonExternalDriveWindowProbeResult,
     CunxonExternalDriveWindowSample,
     CunxonInputProxyTargetCase,
@@ -36,6 +38,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_aigarth_readout_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
     render_interface_semantics_markdown_report,
@@ -50,6 +53,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_vram_resident_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
+    write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
@@ -313,6 +317,65 @@ def test_resident_action_report_keeps_task_scoring_and_baselines_explicit(
     assert "holdout accuracy must beat trivial baselines" in markdown_path.read_text(
         encoding="utf-8"
     )
+
+
+def test_aigarth_readout_report_separates_relative_demo_from_absolute_output(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAigarthReadoutProbeResult(
+        status="aigarth readout semantics probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=2,
+        population_size=4,
+        eval_steps=5,
+        runs=[
+            CunxonAigarthReadoutRun(
+                mapping="relative-demo-readout",
+                readout_ids=[0, 1, 2, 3, 4, 5, 6, 7],
+                neuron_class="input/hidden alias, not output block",
+                baseline_margin=0.5,
+                generation_margins=[0.75, 1.0],
+                final_margin=1.0,
+                improvement=0.5,
+                positive_mean=0.5,
+                negative_mean=-0.5,
+                positive_readout=[1, 1, 0, 0, 0, 0, 0, 0],
+                negative_readout=[-1, -1, 0, 0, 0, 0, 0, 0],
+            ),
+            CunxonAigarthReadoutRun(
+                mapping="absolute-output-readout",
+                readout_ids=[36, 37, 38, 39, 40, 41, 42, 43],
+                neuron_class="absolute output block",
+                baseline_margin=0.0,
+                generation_margins=[0.0, 0.0],
+                final_margin=0.0,
+                improvement=0.0,
+                positive_mean=0.0,
+                negative_mean=0.0,
+                positive_readout=[0, 0, 0, 0, 0, 0, 0, 0],
+                negative_readout=[0, 0, 0, 0, 0, 0, 0, 0],
+            ),
+        ],
+        notes=["example_aigarth.cu configures readout ids 0..7"],
+    )
+
+    markdown = render_aigarth_readout_markdown_report(result)
+    assert "Aigarth readout semantics" in markdown
+    assert "relative-demo-readout" in markdown
+    assert "absolute-output-readout" in markdown
+    assert "input/hidden alias" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "aigarth.json"
+    markdown_path = tmp_path / "aigarth.md"
+    write_aigarth_readout_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    assert '"mapping": "absolute-output-readout"' in json_path.read_text(encoding="utf-8")
+    assert "Aigarth readout semantics" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
@@ -950,6 +1013,8 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon multi-sphere/action adapter" in markdown
     assert "cuNxon supervised motor-target adapter" in markdown
     assert "cuNxon resident task-coupled action probe" in markdown
+    assert "cuNxon Aigarth readout semantics probe" in markdown
+    assert "absolute output readout margin improved 0.625000→1.500000" in markdown
     assert "12 epochs / 72 scored cases" in markdown
     assert "4h run completed with 16 samples/4194304 steps" in markdown
     assert "resident readout stayed `[0, 0, 0]`" in markdown
@@ -990,6 +1055,13 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
         'trivial baselines"'
         in data
     )
+    assert (
+        '"verdict": "Aigarth can improve absolute output margins on the two-pattern fitness '
+        'task, but this is not holdout/action evidence"'
+        in data
+    )
+    assert '"absolute_output_improvement": 0.875' in data
+    assert '"relative_demo_improvement": 0.5' in data
     assert '"case_count": 72' in data
     assert '"unique_motor_readouts": 1' in data
     assert '"verdict": "sensitivity diagnostic train-mode flat"' in data

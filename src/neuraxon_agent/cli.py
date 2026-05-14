@@ -13,6 +13,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentResult,
     ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
+    run_ctypes_aigarth_readout_probe,
     run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
     run_ctypes_interface_semantics_probe,
@@ -26,6 +27,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_supervised_motor_probe,
     run_ctypes_vram_resident_probe,
     write_action_probe_artifacts,
+    write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
@@ -455,6 +457,37 @@ def cmd_cunxon_multisphere_action_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_aigarth_readout_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_aigarth_readout_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            generations=args.generations,
+            population_size=args.population_size,
+            eval_steps=args.eval_steps,
+            device_id=args.device,
+        )
+        write_aigarth_readout_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon Aigarth readout semantics probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed Aigarth/readout probe does not support any "
+            "GPU-backed learning, output-readout, or action-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+
 def cmd_cunxon_resident_action_probe(args: argparse.Namespace) -> int:
     try:
         result = run_ctypes_resident_action_probe(
@@ -821,6 +854,52 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_action.set_defaults(func=cmd_cunxon_action_probe)
+
+    p_cunxon_aigarth = sub.add_parser(
+        "cunxon-aigarth-readout-probe",
+        help="Contrast cuNxon Aigarth relative-demo and absolute-output readouts",
+        description=(
+            "Run the public Aigarth-style evolutionary loop twice: once with the upstream "
+            "demo's relative readout ids 0..7 and once with absolute output ids 36..43."
+        ),
+    )
+    p_cunxon_aigarth.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_aigarth.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_aigarth.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_aigarth.add_argument(
+        "--generations",
+        type=int,
+        default=12,
+        help="Aigarth generations per readout mapping",
+    )
+    p_cunxon_aigarth.add_argument(
+        "--population-size",
+        type=int,
+        default=24,
+        help="Aigarth mutation population size per generation",
+    )
+    p_cunxon_aigarth.add_argument(
+        "--eval-steps",
+        type=int,
+        default=25,
+        help="Inference steps per positive/negative class evaluation",
+    )
+    p_cunxon_aigarth.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_aigarth.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_aigarth_readout_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_aigarth.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_aigarth_readout_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_aigarth.set_defaults(func=cmd_cunxon_aigarth_readout_probe)
 
     p_cunxon_sensitivity = sub.add_parser(
         "cunxon-sensitivity-probe",

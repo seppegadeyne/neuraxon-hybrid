@@ -1,0 +1,124 @@
+{
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 25,
+  "generations": 12,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "contrasts upstream example_aigarth.cu readout ids 0..7 with absolute output ids 36..43",
+    "Aigarth is evaluated as interface semantics, not as an intelligence claim",
+    "absolute output readout must improve on its own before using this route as a motor adapter"
+  ],
+  "population_size": 24,
+  "runs": [
+    {
+      "baseline_margin": 1.0,
+      "final_margin": 1.5,
+      "generation_margins": [
+        1.25,
+        1.25,
+        1.375,
+        1.375,
+        1.375,
+        1.5,
+        1.375,
+        1.5,
+        1.5,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "improvement": 0.5,
+      "mapping": "relative-demo-readout",
+      "negative_mean": -0.75,
+      "negative_readout": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1
+      ],
+      "neuron_class": "input/hidden alias, not output block",
+      "positive_mean": 0.75,
+      "positive_readout": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        -1
+      ],
+      "readout_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "baseline_margin": 0.625,
+      "final_margin": 1.5,
+      "generation_margins": [
+        1.375,
+        1.5,
+        1.5,
+        1.5,
+        1.5,
+        1.5,
+        1.375,
+        1.5,
+        1.375,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "improvement": 0.875,
+      "mapping": "absolute-output-readout",
+      "negative_mean": -0.75,
+      "negative_readout": [
+        -1,
+        -1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "neuron_class": "absolute output block",
+      "positive_mean": 0.75,
+      "positive_readout": [
+        1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "readout_ids": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ]
+    }
+  ],
+  "status": "aigarth readout semantics probe viable",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

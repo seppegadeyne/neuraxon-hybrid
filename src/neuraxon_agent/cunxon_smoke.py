@@ -29,6 +29,7 @@ CUNXON_SPHERE_MOTOR = 2
 CUNXON_LINK_FEEDFORWARD = 0
 CUNXON_BAND_GAMMA = 5
 CUNXON_TOPO_DENSE = 0
+_CUNXON_FITNESS_FN = C.CFUNCTYPE(C.c_float, C.c_void_p, C.c_void_p)
 
 
 @dataclass(frozen=True)
@@ -185,6 +186,48 @@ class CunxonVramResidentResult:
             "stop_condition": self.stop_condition,
             "notes": self.notes,
         }
+
+
+@dataclass(frozen=True)
+class CunxonAigarthReadoutRun:
+    """One Aigarth evolution run for a specific readout-port mapping."""
+
+    mapping: str
+    readout_ids: list[int]
+    neuron_class: str
+    baseline_margin: float
+    generation_margins: list[float]
+    final_margin: float
+    improvement: float
+    positive_mean: float
+    negative_mean: float
+    positive_readout: list[int]
+    negative_readout: list[int]
+
+
+@dataclass(frozen=True)
+class CunxonAigarthReadoutProbeResult:
+    """Aigarth evolution result contrasting demo-relative vs absolute-output readouts."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    runs: list[CunxonAigarthReadoutRun]
+    notes: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        return asdict(self)
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
 @dataclass(frozen=True)
@@ -987,6 +1030,98 @@ def write_vram_resident_artifacts(
         encoding="utf-8",
     )
     return json_output, markdown_output, state_output
+
+
+def render_aigarth_readout_markdown_report(result: CunxonAigarthReadoutProbeResult) -> str:
+    """Render an Aigarth readout mapping semantics report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    run_rows = [
+        (
+            "| Mapping | Ports | Neuron class | Baseline margin | Final margin | "
+            "Improvement | Pos mean | Neg mean | Pos readout | Neg readout |"
+        ),
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |",
+    ]
+    trajectory_lines: list[str] = []
+    for run in result.runs:
+        ports = ", ".join(str(port) for port in run.readout_ids)
+        pos = ", ".join(_format_trinary(value) for value in run.positive_readout)
+        neg = ", ".join(_format_trinary(value) for value in run.negative_readout)
+        run_rows.append(
+            "| "
+            f"{run.mapping} | [{ports}] | {run.neuron_class} | "
+            f"{run.baseline_margin:.6f} | {run.final_margin:.6f} | "
+            f"{run.improvement:.6f} | {run.positive_mean:.6f} | "
+            f"{run.negative_mean:.6f} | [{pos}] | [{neg}] |"
+        )
+        margins = ", ".join(f"{margin:.6f}" for margin in run.generation_margins)
+        trajectory_lines.append(f"- `{run.mapping}` generation margins: {margins or 'none'}")
+    return "\n".join(
+        [
+            "# cuNxon Aigarth readout semantics probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Generations: {result.generations}",
+            f"- Population size: {result.population_size}",
+            f"- Eval steps per class: {result.eval_steps}",
+            "",
+            "## Why this probe exists",
+            "",
+            "Upstream `example_aigarth.cu` is the public supervised/evolutionary cuNxon example, "
+            "but it configures readout ids `0..7` for a 4-input/32-hidden/8-output sphere. "
+            "Those ids are relative to the sphere start and therefore alias input/hidden neurons, "
+            "not the absolute output block `36..43`. This probe contrasts the demo-relative "
+            "mapping with the absolute output mapping before treating Aigarth as a sanctioned "
+            "motor/readout route for Neuraxon-Hybrid.",
+            "",
+            "## Mapping results",
+            "",
+            *run_rows,
+            "",
+            "## Evolution trajectories",
+            "",
+            *(trajectory_lines or ["- None"]),
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "Aigarth margin movement is useful interface evidence, but it does not prove "
+            "intelligence, task learning, or a useful motor adapter unless absolute output "
+            "readouts improve against baselines and survive holdout/generalization tests. "
+            "Relative demo-readout improvement alone is confounded by input/hidden aliasing.",
+            "",
+        ]
+    )
+
+
+def write_aigarth_readout_artifacts(
+    result: CunxonAigarthReadoutProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth readout semantics artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_aigarth_readout_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
 
 
 def render_resident_action_markdown_report(result: CunxonResidentActionProbeResult) -> str:
@@ -2136,6 +2271,83 @@ def run_ctypes_interface_semantics_probe(
                 (
                     "absolute output ports are input_count + hidden_count + output offset "
                     "for this 4/4/4 probe"
+                ),
+            ],
+        )
+    finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_aigarth_readout_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    generations: int = 12,
+    population_size: int = 24,
+    eval_steps: int = 25,
+    device_id: int = 0,
+) -> CunxonAigarthReadoutProbeResult:
+    """Contrast upstream Aigarth demo-relative readouts with absolute output readouts."""
+    if generations <= 0:
+        raise ValueError("generations must be positive")
+    if population_size <= 0:
+        raise ValueError("population_size must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xA164A27E, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        runs = [
+            _run_aigarth_readout_mapping(
+                lib=lib,
+                ctx=ctx,
+                mapping="relative-demo-readout",
+                readout_ids=list(range(8)),
+                neuron_class="input/hidden alias, not output block",
+                generations=generations,
+                population_size=population_size,
+                eval_steps=eval_steps,
+                seed_offset=1,
+            ),
+            _run_aigarth_readout_mapping(
+                lib=lib,
+                ctx=ctx,
+                mapping="absolute-output-readout",
+                readout_ids=list(range(36, 44)),
+                neuron_class="absolute output block",
+                generations=generations,
+                population_size=population_size,
+                eval_steps=eval_steps,
+                seed_offset=1,
+            ),
+        ]
+        return CunxonAigarthReadoutProbeResult(
+            status="aigarth readout semantics probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            runs=runs,
+            notes=[
+                (
+                    "contrasts upstream example_aigarth.cu readout ids 0..7 with "
+                    "absolute output ids 36..43"
+                ),
+                "Aigarth is evaluated as interface semantics, not as an intelligence claim",
+                (
+                    "absolute output readout must improve on its own before using this "
+                    "route as a motor adapter"
                 ),
             ],
         )
@@ -3746,6 +3958,187 @@ def _inject_expected_action_modulator(lib: C.CDLL, net: C.c_void_p, expected_act
         _check(lib, lib.cunxonNetworkInjectNeuromodulator(net, 1, C.c_float(0.2)))
 
 
+def _run_aigarth_readout_mapping(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mapping: str,
+    readout_ids: list[int],
+    neuron_class: str,
+    generations: int,
+    population_size: int,
+    eval_steps: int,
+    seed_offset: int,
+) -> CunxonAigarthReadoutRun:
+    net = C.c_void_p()
+    callback_errors: list[Exception] = []
+    try:
+        name = f"neuraxon_hybrid_cunxon_aigarth_{mapping}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 4
+        params.num_hidden_neurons = 32
+        params.num_output_neurons = 8
+        params.random_seed_offset = seed_offset
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"AIGARTH_READOUT", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 4)(0, 1, 2, 3)
+        readout_ids_array = (C.c_int * len(readout_ids))(*readout_ids)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                4,
+                None,
+                0,
+                None,
+                0,
+                readout_ids_array,
+                len(readout_ids),
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        baseline_margin, _baseline_pos, _baseline_neg, _, _ = _aigarth_margin_and_readouts(
+            lib=lib,
+            net=net,
+            sphere_id=sphere_id.value,
+            n_inputs=params.num_input_neurons,
+            eval_steps=eval_steps,
+        )
+
+        def fitness(candidate_net: C.c_void_p, _user_data: C.c_void_p) -> float:
+            try:
+                margin, _, _, _, _ = _aigarth_margin_and_readouts(
+                    lib=lib,
+                    net=candidate_net,
+                    sphere_id=sphere_id.value,
+                    n_inputs=params.num_input_neurons,
+                    eval_steps=eval_steps,
+                )
+                return float(margin)
+            except Exception as exc:  # pragma: no cover - ctypes callback safety net
+                callback_errors.append(exc)
+                return 0.0
+
+        callback = _CUNXON_FITNESS_FN(fitness)
+        generation_margins: list[float] = []
+        for generation_index in range(generations):
+            fraction = generation_index / max(1, generations - 1)
+            mutation_fast = 0.15 * (1.0 - 0.6 * fraction)
+            mutation_slow = 0.07 * (1.0 - 0.6 * fraction)
+            mutation_meta = 0.03 * (1.0 - 0.6 * fraction)
+            _check(
+                lib,
+                lib.cunxonNetworkAigarthConfig(
+                    net,
+                    population_size,
+                    C.c_float(mutation_fast),
+                    C.c_float(mutation_slow),
+                    C.c_float(mutation_meta),
+                ),
+            )
+            _check(lib, lib.cunxonNetworkAigarthStep(net, callback, None))
+            if callback_errors:
+                raise callback_errors[0]
+            margin, _, _, _, _ = _aigarth_margin_and_readouts(
+                lib=lib,
+                net=net,
+                sphere_id=sphere_id.value,
+                n_inputs=params.num_input_neurons,
+                eval_steps=eval_steps,
+            )
+            generation_margins.append(margin)
+
+        final_margin, positive_mean, negative_mean, positive_readout, negative_readout = (
+            _aigarth_margin_and_readouts(
+                lib=lib,
+                net=net,
+                sphere_id=sphere_id.value,
+                n_inputs=params.num_input_neurons,
+                eval_steps=eval_steps,
+            )
+        )
+        return CunxonAigarthReadoutRun(
+            mapping=mapping,
+            readout_ids=readout_ids,
+            neuron_class=neuron_class,
+            baseline_margin=baseline_margin,
+            generation_margins=generation_margins,
+            final_margin=final_margin,
+            improvement=final_margin - baseline_margin,
+            positive_mean=positive_mean,
+            negative_mean=negative_mean,
+            positive_readout=positive_readout,
+            negative_readout=negative_readout,
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+
+
+def _aigarth_margin_and_readouts(
+    *,
+    lib: C.CDLL,
+    net: C.c_void_p,
+    sphere_id: int,
+    n_inputs: int,
+    eval_steps: int,
+) -> tuple[float, float, float, list[int], list[int]]:
+    positive_mean, positive_readout = _aigarth_mean_for_input(
+        lib=lib,
+        net=net,
+        sphere_id=sphere_id,
+        n_inputs=n_inputs,
+        input_value=0.85,
+        eval_steps=eval_steps,
+    )
+    negative_mean, negative_readout = _aigarth_mean_for_input(
+        lib=lib,
+        net=net,
+        sphere_id=sphere_id,
+        n_inputs=n_inputs,
+        input_value=-0.85,
+        eval_steps=eval_steps,
+    )
+    return (
+        positive_mean - negative_mean,
+        positive_mean,
+        negative_mean,
+        positive_readout,
+        negative_readout,
+    )
+
+
+def _aigarth_mean_for_input(
+    *,
+    lib: C.CDLL,
+    net: C.c_void_p,
+    sphere_id: int,
+    n_inputs: int,
+    input_value: float,
+    eval_steps: int,
+) -> tuple[float, list[int]]:
+    _check(lib, lib.cunxonNetworkReset(net))
+    input_buffer = (C.c_float * n_inputs)(*[input_value] * n_inputs)
+    input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+    ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+    for _ in range(eval_steps):
+        _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+    readout = _capture_readout(lib, net, sphere_id)
+    return sum(readout) / len(readout), readout
+
+
+
 def _default_multisphere_action_specs() -> list[
     tuple[str, str, tuple[float, float, float, float], str]
 ]:
@@ -4716,6 +5109,12 @@ def _load_library(path: Path) -> C.CDLL:
     lib.cunxonNetworkAddLink.restype = C.c_int
     lib.cunxonNetworkFinalize.argtypes = [C.c_void_p]
     lib.cunxonNetworkFinalize.restype = C.c_int
+    lib.cunxonNetworkReset.argtypes = [C.c_void_p]
+    lib.cunxonNetworkReset.restype = C.c_int
+    lib.cunxonNetworkAigarthConfig.argtypes = [C.c_void_p, C.c_int, C.c_float, C.c_float, C.c_float]
+    lib.cunxonNetworkAigarthConfig.restype = C.c_int
+    lib.cunxonNetworkAigarthStep.argtypes = [C.c_void_p, _CUNXON_FITNESS_FN, C.c_void_p]
+    lib.cunxonNetworkAigarthStep.restype = C.c_int
     lib.cunxonNetworkStepInfer.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
     lib.cunxonNetworkStepInfer.restype = C.c_int
     lib.cunxonNetworkStepTrain.argtypes = [C.c_void_p, C.POINTER(C.POINTER(C.c_float)), C.c_float]
