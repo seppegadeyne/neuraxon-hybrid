@@ -1,0 +1,99 @@
+{
+  "source": {
+    "title": "Brain Criticality and the Branching Ratio in Neural and Artificial Networks: A Bioinspired Principle in Neuraxon",
+    "url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
+    "publisher": "Qubic Scientific Team",
+    "published": "2026-05-13",
+    "captured_with": "dokobot local read",
+    "raw_wiki_source": "raw/articles/qubic-nia-vol-8-criticality-branching-ratio-2026-05-13.md"
+  },
+  "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
+  "claims": [
+    {
+      "id": "branching-ratio-regimes",
+      "claim": "Branching ratio sigma summarizes three neural activity regimes: subcritical decay below 1, critical reverberation near 1, and supercritical runaway above 1.",
+      "source_lines": "article lines 29, 37-51",
+      "testable_hypothesis": "A cuNxon probe can estimate active-state propagation over time and classify dead/subcritical, reverberating/near-critical, or runaway regimes from observed activity, not from prose labels."
+    },
+    {
+      "id": "slightly-subcritical-reverberating",
+      "claim": "Biological cortex is framed as often slightly subcritical/reverberating rather than exactly sigma=1, leaving room for task-dependent modulation without runaway activity.",
+      "source_lines": "article lines 51 and 78-80",
+      "testable_hypothesis": "The useful target band for Neuraxon-Hybrid should be a bounded near-critical/reverberating window, not a brittle equality check against sigma=1."
+    },
+    {
+      "id": "artificial-edge-of-chaos",
+      "claim": "Artificial recurrent/reservoir systems are claimed to maximize temporal computation near the order-chaos transition, often related to spectral radius near 1 or branching ratio near 1 in spiking networks.",
+      "source_lines": "article lines 55-63",
+      "testable_hypothesis": "Regime metrics must be correlated with task scores and simple baselines; near-critical-looking dynamics alone should not be treated as useful computation."
+    },
+    {
+      "id": "neuraxon-real-time-invariant",
+      "claim": "Neuraxon uses branching ratio as a real-time operational invariant for stability: a scalar diagnostic for whether the system is computationally alive rather than silent or explosive.",
+      "source_lines": "article lines 82-89",
+      "testable_hypothesis": "cuNxon runtime reports should include a measured branching/activity-ratio lane beside readout/action quality, GPU resource use, and energy."
+    },
+    {
+      "id": "self-organized-criticality",
+      "claim": "The article claims Neuraxon self-organizes toward criticality through local rules without centralized fine-tuning, reducing hyperparameter sensitivity and improving robustness to distribution shifts.",
+      "source_lines": "article lines 90-96",
+      "testable_hypothesis": "Self-organization must be demonstrated by trajectory evidence across seeds/interventions where branching/activity metrics move toward a bounded target band and held-out task quality improves versus baselines."
+    },
+    {
+      "id": "functional-generalization-claim",
+      "claim": "The article says internal evaluations/submitted publications qualitatively show improved generalization, stability under perturbation, representational richness, and temporal coherence near the reverberating regime.",
+      "source_lines": "article lines 102-110",
+      "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
+    }
+  ],
+  "evidence_map": [
+    {
+      "id": "hybrid-criticality-summary",
+      "artifact": "benchmarks/results/analysis/criticality_summary.csv",
+      "observed": "neuraxon_tissue branching_ratio_mean=1.194208, neutral_state_occupancy_mean=0.757844, transition_entropy_mean=0.332013, modulation_action_change_rate=0.000000, regime label near_useful_dynamic_regime",
+      "status": "partially relevant historical CPU/adapter evidence",
+      "interpretation": "This already measures a branching-like signal, but its action-change rate was zero and raw-network anti-oracle success stayed below the always_execute baseline; the metric is not enough by itself."
+    },
+    {
+      "id": "cunxon-vram-resident",
+      "artifact": "benchmarks/results/cunxon_vram_resident_run.json",
+      "observed": "4h resident cuNxon run, 16 samples, 4194304 infer steps, readout always [0, 0, 0], active-state sequence 3,5,5,5,5,3,3,3,3,3,3,3,3,3,3,3; VRAM-resident active-state ratio mean≈1.017778 over coarse samples",
+      "status": "runtime/dynamics evidence only",
+      "interpretation": "The coarse active-state ratio sits near 1 numerically, but the readout stayed flat and no task quality was measured; it cannot support the article's functional claims."
+    },
+    {
+      "id": "cunxon-resident-action",
+      "artifact": "benchmarks/results/cunxon_resident_action_probe.json",
+      "observed": "12 resident train/eval epochs and 72 scored cases all decoded to query with train/holdout/overall accuracy=0.333333, equal to constant-action baselines",
+      "status": "negative task-coupled resident evidence",
+      "interpretation": "Keeping one cuNxon process resident did not produce useful action dynamics in the tested three-sphere route."
+    },
+    {
+      "id": "cunxon-aigarth-augmented-train",
+      "artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_augmented_train_probe.json",
+      "observed": "target-contract augmented-train Aigarth audit reached holdout mean=1.000000 and hard-holdout mean=0.866667 with zero unexpected labels, but stress_holdout mean=0.333333 and counterfactual_control mean=0.066667",
+      "status": "constructive but brittle toy/evolution evidence",
+      "interpretation": "The strongest current cuNxon action lane uses explicit evolutionary fitness/objective shaping, not demonstrated self-organized criticality; low-margin stress behavior remains baseline-level."
+    }
+  ],
+  "current_evidence_boundary": "The article is a hypothesis source, not direct evidence for Neuraxon-Hybrid. Existing repo evidence supports measuring branching/activity regimes, but cuNxon results so far separate runtime viability from decision quality: flat resident dynamics and baseline resident action results do not validate functional criticality claims; Aigarth objective-shaping is constructive but remains toy and stress-brittle.",
+  "recommended_next_probe": {
+    "id": "cunxon-branching-ratio-regime-scan",
+    "purpose": "Operationalize the NIA Vol. 8 branching-ratio claim in the cuNxon lane without treating sigma≈1 as sufficient evidence.",
+    "shape": "Run a small seed/config scan that records active-state branching/activity ratio, neutral occupancy, transition entropy, energy slope, readout diversity, action accuracy, and trivial baselines for the same cases.",
+    "acceptance_criteria": [
+      "Reports a bounded branching/activity-ratio estimate per run and labels dead/subcritical, reverberating/near-critical, or runaway regimes with explicit caveats about subsampling.",
+      "Includes at least one task-coupled action score and constant-action baselines for every regime bucket.",
+      "Shows whether near-critical/reverberating metrics correlate with holdout/stress performance; if they do not, the report states the negative result plainly.",
+      "Keeps holdout, stress_holdout, counterfactual_control, and permuted_control labels outside any optimization callback.",
+      "Updates cunxon_comparison artifacts and does not claim intelligence unless task quality beats baselines on held-out cases."
+    ],
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/84"
+  },
+  "open_questions": [
+    "Does a near-1 branching/activity ratio in cuNxon predict anything about action quality, or is it only an occupancy statistic in the current tiny networks?",
+    "Can the stress_holdout baseline failure be explained by regime metrics such as subcritical collapse, supercritical saturation, or insufficient readout diversity?",
+    "Do Aigarth-evolved networks land in a measurably different activity regime than flat StepTrain/StepInfer resident networks?",
+    "Can a source-level or CUDA-level branching estimator be added without conflating readout ports, input-class drive, and hidden-state snapshots?"
+  ]
+}
