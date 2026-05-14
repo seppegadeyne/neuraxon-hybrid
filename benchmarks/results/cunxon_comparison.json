@@ -1,11 +1,11 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels. The stress audit exposed baseline-level low-margin stress_holdout behavior, and the augmented-train follow-up improved hard_holdout/holdout while stress_holdout stayed at 0.333333 and counterfactual_control stayed non-zero at 0.066667. This is useful objective-shaping/brittleness evidence, not broad intelligence/generalization evidence. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The first bounded branching-regime scan observed near-critical-looking proxy ratios (mean 0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline (0.333333, 0/5 seeds beating it), so branching/criticality remains necessary instrumentation rather than intelligence evidence.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels. The stress audit exposed baseline-level low-margin stress_holdout behavior, and the augmented-train follow-up improved hard_holdout/holdout while stress_holdout stayed at 0.333333 and counterfactual_control stayed non-zero at 0.066667. This is useful objective-shaping/brittleness evidence, not broad intelligence/generalization evidence. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The first bounded branching-regime scan observed near-critical-looking proxy ratios (mean 0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline (0.333333, 0/5 seeds beating it), so branching/criticality remains necessary instrumentation rather than intelligence evidence. The avalanche-window intervention matrix shows the snapshot estimator is sensitive to bounded window/sample settings (range 0.000000..0.483938), but only one mode-specific short-window bump beat constants and no configuration robustly beat baselines across infer and train.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
       "lane": "Qubic NIA Vol. 8 criticality claim map",
       "metric": "source-claim evidence map",
-      "value": "branching-ratio/criticality claims mapped to existing artifacts; recommends cunxon-branching-ratio-regime-scan; no new decision-quality score"
+      "value": "branching-ratio/criticality claims mapped to existing artifacts; branching-regime scan completed; next recommends cunxon-avalanche-intervention-task-correlation; no intelligence claim"
     },
     {
       "evidence": "benchmarks/results/cunxon_branching_regime_scan.json",
@@ -18,6 +18,12 @@
       "lane": "cuNxon avalanche-window snapshot probe",
       "metric": "snapshot-level branching estimate vs action quality",
       "value": "3 seeds / 18 action samples; mean branching-ratio estimate 0.154496, active-count ratio mean=0.994343, neutral occupancy mean=0.908077; infer/train accuracy=0.333333, equal to constant baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_avalanche_window_intervention_matrix.json",
+      "lane": "cuNxon avalanche-window intervention matrix",
+      "metric": "estimator sensitivity vs mode action quality",
+      "value": "3 configs / 36 samples; branching estimator range 0.000000..0.483938; one short-dense infer-mode bump but no config had both infer/train beat constant baselines"
     },
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -664,27 +670,20 @@
     "status": "aigarth readout semantics probe viable",
     "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
   },
-  "cunxon_branching_regime_scan": {
-    "beats_stress_baseline_count": 0,
-    "correlation_summary": {
-      "holdout_accuracy_vs_branching_proxy": 0.0,
-      "stress_holdout_accuracy_vs_branching_proxy": 0.0
-    },
-    "evidence_boundary": "coarse action-readout branching/activity proxy; near-critical-looking dynamics are diagnostic only and did not beat stress_holdout baselines",
-    "mean_branching_activity_ratio_proxy": 0.997701,
-    "mean_holdout": 1.0,
-    "mean_stress_holdout": 0.333333,
-    "regime_bucket": "reverberating/near-critical proxy",
-    "seed_count": 5,
-    "seed_offsets": [
-      117,
-      118,
-      119,
-      120,
-      121
+  "cunxon_avalanche_window_intervention_matrix": {
+    "branching_ratio_estimate_range": [
+      0.0,
+      0.483938
     ],
-    "source_probe": "target_contract_augmented_train",
-    "status": "branching-regime scan completed"
+    "config_count": 3,
+    "configurations_with_all_modes_beating_baseline": [],
+    "evidence_boundary": "This matrix tests whether the NIA Vol. 8 criticality/branching metric is stable under bounded window-length/sample-interval changes. It is not intelligence evidence: useful computation would require robust held-out/control task quality above baselines, not only movement in a snapshot estimator or one mode-specific bump.",
+    "hypothesis": "avalanche_window_estimator_sensitivity",
+    "max_mode_accuracy_delta_vs_constant_baseline": 0.166667,
+    "mean_active_count_ratio": 0.986828,
+    "mean_branching_ratio_estimate": 0.151814,
+    "mean_neutral_occupancy": 0.894234,
+    "sample_count": 36
   },
   "cunxon_avalanche_window_probe": {
     "accuracy_by_mode": {
@@ -716,6 +715,28 @@
     "status": "avalanche-window probe completed",
     "steps": 256,
     "verdict": "Snapshot-level avalanche metrics are measurable, but neither infer nor train mode beats trivial baselines; criticality remains instrumentation rather than sufficient evidence."
+  },
+  "cunxon_branching_regime_scan": {
+    "beats_stress_baseline_count": 0,
+    "correlation_summary": {
+      "holdout_accuracy_vs_branching_proxy": 0.0,
+      "stress_holdout_accuracy_vs_branching_proxy": 0.0
+    },
+    "evidence_boundary": "coarse action-readout branching/activity proxy; near-critical-looking dynamics are diagnostic only and did not beat stress_holdout baselines",
+    "mean_branching_activity_ratio_proxy": 0.997701,
+    "mean_holdout": 1.0,
+    "mean_stress_holdout": 0.333333,
+    "regime_bucket": "reverberating/near-critical proxy",
+    "seed_count": 5,
+    "seed_offsets": [
+      117,
+      118,
+      119,
+      120,
+      121
+    ],
+    "source_probe": "target_contract_augmented_train",
+    "status": "branching-regime scan completed"
   },
   "cunxon_external_drive_window_probe": {
     "decision_quality_measured": false,
@@ -1364,10 +1385,10 @@
   ],
   "qubic_nia_vol8_criticality_claim_map": {
     "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
-    "evidence_boundary": "source-claim map only; no new decision-quality score; branching ratio is a diagnostic, not intelligence evidence by itself",
+    "evidence_boundary": "hypothesis source only; branching/regime and avalanche-window metrics are diagnostics until robust held-out/stress task quality beats baselines",
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/84",
     "hypothesis": "branching_ratio_as_measured_regime_gate",
-    "recommended_next_probe": "cunxon-branching-ratio-regime-scan",
+    "recommended_next_probe": "cunxon-avalanche-intervention-task-correlation",
     "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8"
   },
   "sources": [
