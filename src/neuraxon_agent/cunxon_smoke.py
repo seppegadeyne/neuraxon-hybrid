@@ -1898,6 +1898,41 @@ def render_aigarth_action_target_contract_markdown_report(
     )
 
 
+def render_aigarth_action_target_contract_stress_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render a target-contract Aigarth action stress audit report."""
+    return (
+        render_aigarth_action_target_contract_markdown_report(result)
+        .replace(
+            "# cuNxon Aigarth target-contract action audit",
+            "# cuNxon Aigarth target-contract stress audit",
+            1,
+        )
+        .replace(
+            "The remap audit showed that a signed-first-lane decoder removes out-of-contract "
+            "labels but does not improve accuracy when applied only post hoc. This audit "
+            "moves that decoder contract into the train-only Aigarth fitness itself: "
+            "`target_contract_margin` decodes with the signed-first-lane project contract "
+            "and rewards target-readout margin while keeping holdout, hard-holdout, and "
+            "permuted-control labels outside the fitness callback.",
+            "The target-contract audit is the strongest cuNxon action lane so far, but the "
+            "task is tiny and one seed stayed baseline-level on hard-holdout. This audit "
+            "keeps the same train-only `target_contract_margin` objective and adds "
+            "harder/noisier and counterfactual splits (`stress_holdout` and "
+            "`counterfactual_control`) before treating the route as stronger adapter evidence.",
+            1,
+        )
+        .replace(
+            "This is a target-contract stress audit of a tiny Aigarth/evolutionary adapter "
+            "route, not ",
+            "This is a harder target-contract stress audit of a tiny Aigarth/evolutionary "
+            "adapter route, not ",
+            1,
+        )
+    )
+
+
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
     *,
@@ -1966,6 +2001,24 @@ def write_aigarth_action_target_contract_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_target_contract_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_target_contract_stress_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth target-contract stress audit artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_stress_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -3840,6 +3893,101 @@ def run_ctypes_aigarth_action_target_contract_probe(
         eval_steps=eval_steps,
         fitness_variant=fitness_variant,
         device_id=device_id,
+    )
+
+
+def run_ctypes_aigarth_action_target_contract_stress_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (107, 108, 109, 110, 111),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_margin",
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Run a target-contract audit with harder/noisier and counterfactual splits."""
+    if fitness_variant != "target_contract_margin":
+        raise ValueError(
+            "target-contract stress audit only supports fitness_variant='target_contract_margin'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    specs = _aigarth_action_target_contract_stress_specs()
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    runs = [
+        CunxonAigarthActionSeedRun(
+            seed_offset=result.seed_offset,
+            generation_train_scores=result.generation_train_scores,
+            accuracy_by_split=result.accuracy_by_split,
+            target_alignment_by_split=result.target_alignment_by_split,
+            baseline_accuracy_by_split=result.baseline_accuracy_by_split,
+            unique_readouts=result.unique_readouts,
+            action_distribution=result.action_distribution,
+            cases=result.cases,
+        )
+        for result in probe_results
+    ]
+    aggregate_distribution = _seed_sweep_action_distribution(runs)
+    strict_expected_actions = ["execute", "query", "retry"]
+    unexpected_action_count = sum(
+        count
+        for action, count in aggregate_distribution.items()
+        if action not in strict_expected_actions
+    )
+    total_actions = sum(aggregate_distribution.values())
+    accuracy_summary = _seed_sweep_accuracy_summary(runs)
+    train_values = [run.accuracy_by_split.get("train", 0.0) for run in runs]
+    hard_values = [run.accuracy_by_split.get("hard_holdout", 0.0) for run in runs]
+    gaps = [train - hard for train, hard in zip(train_values, hard_values, strict=False)]
+    return CunxonAigarthActionHardHoldoutResult(
+        status="aigarth target-contract stress audit completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        readout_ids=probe_results[0].readout_ids,
+        seed_offsets=list(seed_offsets),
+        strict_expected_actions=strict_expected_actions,
+        runs=runs,
+        accuracy_summary_by_split=accuracy_summary,
+        aggregate_action_distribution=aggregate_distribution,
+        seeds_beating_baseline_by_split=_seed_sweep_beating_baseline_counts(runs),
+        unexpected_action_count=unexpected_action_count,
+        unexpected_action_rate=unexpected_action_count / total_actions if total_actions else 0.0,
+        leakage_control_accuracy_mean=accuracy_summary.get("permuted_control", {}).get("mean", 0.0),
+        train_to_hard_holdout_gap_mean=sum(gaps) / len(gaps) if gaps else 0.0,
+        fitness_variant=fitness_variant,
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "target-contract fitness decodes with the signed-first-lane project contract",
+            "adds stress_holdout low-margin cases and counterfactual_control rotated-label cases",
+            (
+                "fitness callback uses train cases only; all holdout and control labels "
+                "are never optimized"
+            ),
+            "target-contract stress audit, not intelligence evidence",
+        ],
     )
 
 
@@ -6264,6 +6412,39 @@ def _aigarth_action_hard_holdout_specs() -> list[
         ("execute-train-permuted-as-retry", "permuted_control", (1.0, 0.25, 0.0), "retry"),
         ("retry-train-permuted-as-query", "permuted_control", (-1.0, -0.25, 0.0), "query"),
         ("query-train-permuted-as-execute", "permuted_control", (0.0, 0.0, 0.0), "execute"),
+    ]
+
+
+def _aigarth_action_target_contract_stress_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return stricter target-contract stress cases beyond the standard hard holdout."""
+    return [
+        *_aigarth_action_hard_holdout_specs(),
+        ("execute-stress-low-margin", "stress_holdout", (0.18, -0.12, 0.08), "execute"),
+        ("execute-stress-near-neutral", "stress_holdout", (0.12, 0.08, -0.12), "execute"),
+        ("retry-stress-low-margin", "stress_holdout", (-0.18, 0.12, -0.08), "retry"),
+        ("retry-stress-near-neutral", "stress_holdout", (-0.12, -0.08, 0.12), "retry"),
+        ("query-stress-positive-negative", "stress_holdout", (0.18, -0.18, 0.0), "query"),
+        ("query-stress-negative-positive", "stress_holdout", (-0.18, 0.18, 0.0), "query"),
+        (
+            "execute-holdout-counterfactual-query",
+            "counterfactual_control",
+            (0.8, 0.2, 0.1),
+            "query",
+        ),
+        (
+            "retry-holdout-counterfactual-execute",
+            "counterfactual_control",
+            (-0.8, -0.2, 0.1),
+            "execute",
+        ),
+        (
+            "query-holdout-counterfactual-retry",
+            "counterfactual_control",
+            (0.05, 0.0, -0.05),
+            "retry",
+        ),
     ]
 
 

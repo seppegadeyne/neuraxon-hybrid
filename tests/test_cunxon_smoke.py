@@ -52,6 +52,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_seed_sweep_markdown_report,
     render_aigarth_action_strict_label_markdown_report,
     render_aigarth_action_target_contract_markdown_report,
+    render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_readout_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
@@ -74,6 +75,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_action_strict_label_artifacts,
     write_aigarth_action_target_contract_artifacts,
+    write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -950,6 +952,110 @@ def test_aigarth_action_target_contract_report_records_decoder_aligned_objective
     assert "target-contract fitness" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_aigarth_action_target_contract_stress_report_records_harder_splits(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAigarthActionHardHoldoutResult(
+        status="aigarth target-contract stress audit completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        readout_ids=[35, 36, 37],
+        seed_offsets=[107, 108],
+        strict_expected_actions=["execute", "query", "retry"],
+        runs=[
+            CunxonAigarthActionSeedRun(
+                seed_offset=107,
+                generation_train_scores=[0.0, 0.9],
+                accuracy_by_split={
+                    "counterfactual_control": 0.0,
+                    "hard_holdout": 0.5,
+                    "holdout": 1.0,
+                    "overall": 0.5,
+                    "permuted_control": 0.0,
+                    "stress_holdout": 0.25,
+                    "train": 1.0,
+                },
+                target_alignment_by_split={"stress_holdout": 0.5, "overall": 0.75},
+                baseline_accuracy_by_split={
+                    "always_query": {"stress_holdout": 0.333333, "overall": 0.333333}
+                },
+                unique_readouts=3,
+                action_distribution={"execute": 2, "query": 3, "retry": 2},
+                cases=[
+                    CunxonAigarthActionCase(
+                        name="execute-stress-low-margin",
+                        split="stress_holdout",
+                        input_vector=[0.18, -0.12, 0.08],
+                        expected_action="execute",
+                        target_readout=[1, 0, 0],
+                        readout=[0, 0, 0],
+                        decoded_action="query",
+                        normalized_action="query",
+                        confidence=0.0,
+                        outcome="failure",
+                        target_alignment=0.666667,
+                        baseline_actions={"always_execute": "execute", "always_query": "query"},
+                        energy=7.0,
+                    )
+                ],
+            )
+        ],
+        accuracy_summary_by_split={
+            "counterfactual_control": {"mean": 0.0, "min": 0.0, "max": 0.0},
+            "hard_holdout": {"mean": 0.5, "min": 0.5, "max": 0.5},
+            "holdout": {"mean": 1.0, "min": 1.0, "max": 1.0},
+            "overall": {"mean": 0.5, "min": 0.5, "max": 0.5},
+            "permuted_control": {"mean": 0.0, "min": 0.0, "max": 0.0},
+            "stress_holdout": {"mean": 0.25, "min": 0.25, "max": 0.25},
+            "train": {"mean": 1.0, "min": 1.0, "max": 1.0},
+        },
+        aggregate_action_distribution={"execute": 2, "query": 3, "retry": 2},
+        seeds_beating_baseline_by_split={
+            "counterfactual_control": 0,
+            "hard_holdout": 1,
+            "holdout": 1,
+            "overall": 1,
+            "permuted_control": 0,
+            "stress_holdout": 0,
+            "train": 1,
+        },
+        unexpected_action_count=0,
+        unexpected_action_rate=0.0,
+        leakage_control_accuracy_mean=0.0,
+        train_to_hard_holdout_gap_mean=0.5,
+        fitness_variant="target_contract_margin",
+        notes=[
+            "target-contract stress audit adds stress_holdout and counterfactual_control splits",
+            "fitness callback still uses train cases only",
+        ],
+    )
+
+    markdown = render_aigarth_action_target_contract_stress_markdown_report(result)
+    assert "Aigarth target-contract stress audit" in markdown
+    assert "stress_holdout" in markdown
+    assert "counterfactual_control" in markdown
+    assert "harder/noisier and counterfactual splits" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-target-contract-stress.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract-stress.md"
+    write_aigarth_action_target_contract_stress_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "aigarth target-contract stress audit completed"' in data
+    assert "target-contract stress audit" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
     tmp_path: Path,
 ) -> None:
@@ -1650,6 +1756,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"cunxon_aigarth_action_contract_penalty_probe"' in data
     assert '"cunxon_aigarth_action_remap_audit"' in data
     assert '"cunxon_aigarth_action_target_contract_probe"' in data
+    assert '"cunxon_aigarth_action_target_contract_stress_probe"' in data
     assert '"remapped_unexpected_action_count": 0' in data
     assert '"fitness_variant": "target_contract_margin"' in data
     assert '"unexpected_action_count": 0' in data
@@ -1658,11 +1765,14 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon Aigarth contract-penalty action audit" in markdown
     assert "cuNxon Aigarth action remap audit" in markdown
     assert "cuNxon Aigarth target-contract action audit" in markdown
+    assert "cuNxon Aigarth target-contract stress audit" in markdown
     assert "hard-holdout mean=0.500000" in markdown
     assert "hard-holdout mean=0.466667" in markdown
     assert "remap removes assertive labels but does not improve aggregate accuracy" in markdown
     assert "target-contract fitness" in markdown
     assert "hard-holdout mean=0.666667" in markdown
+    assert "stress-holdout mean=0.333333" in markdown
+    assert "counterfactual-control mean=0.266667" in markdown
     assert "unexpected labels=0" in markdown
     assert "strict-label fitness" in markdown
     assert "heavy contract-penalty" in markdown
@@ -1778,6 +1888,25 @@ def test_tracked_cunxon_aigarth_action_contract_penalty_probe_records_negative_t
     assert '"status": "aigarth contract-penalty action audit completed"' in data
     assert '"fitness_variant": "strict_label_heavy_penalty"' in data
     assert '"unexpected_action_rate": 0.04' in data
+    assert '"seed_count": 5' in data
+
+
+def test_tracked_cunxon_aigarth_action_target_contract_stress_probe_records_brittleness() -> None:
+    markdown = Path(
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_probe.md"
+    ).read_text(encoding="utf-8")
+    data = Path(
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_probe.json"
+    ).read_text(encoding="utf-8")
+
+    assert "Aigarth target-contract stress audit" in markdown
+    assert "stress_holdout | 0.333333" in markdown
+    assert "counterfactual_control | 0.266667" in markdown
+    assert "Unexpected action rate: 0.000000" in markdown
+    assert "not intelligence evidence" in markdown
+    assert '"status": "aigarth target-contract stress audit completed"' in data
+    assert '"stress_holdout"' in data
+    assert '"counterfactual_control"' in data
     assert '"seed_count": 5' in data
 
 

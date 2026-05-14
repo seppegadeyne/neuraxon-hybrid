@@ -1362,6 +1362,105 @@ def test_cli_cunxon_aigarth_action_target_contract_probe_writes_artifacts(
     )
 
 
+def test_cli_cunxon_aigarth_action_target_contract_stress_probe_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthActionHardHoldoutResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        assert isinstance(raw_seed_offsets, list)
+        assert raw_seed_offsets == [107, 108]
+        assert kwargs["fitness_variant"] == "target_contract_margin"
+        return CunxonAigarthActionHardHoldoutResult(
+            status="aigarth target-contract stress audit completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            readout_ids=[35, 36, 37],
+            seed_offsets=raw_seed_offsets,
+            strict_expected_actions=["execute", "query", "retry"],
+            runs=[
+                CunxonAigarthActionSeedRun(
+                    seed_offset=107,
+                    generation_train_scores=[0.0, 0.5],
+                    accuracy_by_split={
+                        "stress_holdout": 0.25,
+                        "counterfactual_control": 0.0,
+                        "overall": 0.5,
+                    },
+                    target_alignment_by_split={"stress_holdout": 0.333333},
+                    baseline_accuracy_by_split={
+                        "always_query": {"stress_holdout": 0.333333, "overall": 0.333333}
+                    },
+                    unique_readouts=2,
+                    action_distribution={"execute": 2, "query": 2, "retry": 2},
+                    cases=[],
+                )
+            ],
+            accuracy_summary_by_split={
+                "stress_holdout": {"mean": 0.25, "min": 0.25, "max": 0.25},
+                "counterfactual_control": {"mean": 0.0, "min": 0.0, "max": 0.0},
+                "overall": {"mean": 0.5, "min": 0.5, "max": 0.5},
+            },
+            aggregate_action_distribution={"execute": 2, "query": 2, "retry": 2},
+            seeds_beating_baseline_by_split={
+                "stress_holdout": 0,
+                "counterfactual_control": 0,
+                "overall": 1,
+            },
+            unexpected_action_count=0,
+            unexpected_action_rate=0.0,
+            leakage_control_accuracy_mean=0.0,
+            train_to_hard_holdout_gap_mean=0.0,
+            fitness_variant=str(kwargs["fitness_variant"]),
+            notes=["fake target-contract stress audit"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_target_contract_stress_probe",
+        fake_probe,
+    )
+    json_path = tmp_path / "aigarth-action-target-contract-stress.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract-stress.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-target-contract-stress-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "107,108",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "aigarth target-contract stress audit completed"' in data
+    assert '"fitness_variant": "target_contract_margin"' in data
+    assert "Aigarth target-contract stress audit" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
 def test_cli_cunxon_aigarth_action_remap_audit_writes_artifacts(tmp_path: Path) -> None:
     source_path = tmp_path / "source.json"
     source_path.write_text(

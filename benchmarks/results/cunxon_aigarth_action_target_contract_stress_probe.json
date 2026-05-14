@@ -1,0 +1,4194 @@
+{
+  "accuracy_summary_by_split": {
+    "counterfactual_control": {
+      "max": 0.3333333333333333,
+      "mean": 0.26666666666666666,
+      "min": 0.0
+    },
+    "hard_holdout": {
+      "max": 1.0,
+      "mean": 0.5333333333333333,
+      "min": 0.3333333333333333
+    },
+    "holdout": {
+      "max": 1.0,
+      "mean": 0.6666666666666666,
+      "min": 0.3333333333333333
+    },
+    "overall": {
+      "max": 0.5833333333333334,
+      "mean": 0.45833333333333337,
+      "min": 0.375
+    },
+    "permuted_control": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0
+    },
+    "stress_holdout": {
+      "max": 0.3333333333333333,
+      "mean": 0.3333333333333333,
+      "min": 0.3333333333333333
+    },
+    "train": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0
+    }
+  },
+  "aggregate_action_distribution": {
+    "execute": 28,
+    "query": 68,
+    "retry": 24
+  },
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 24,
+  "fitness_variant": "target_contract_margin",
+  "generations": 16,
+  "leakage_control_accuracy_mean": 0.0,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "fresh cuNxon network/context per seed",
+    "target-contract fitness decodes with the signed-first-lane project contract",
+    "adds stress_holdout low-margin cases and counterfactual_control rotated-label cases",
+    "fitness callback uses train cases only; all holdout and control labels are never optimized",
+    "target-contract stress audit, not intelligence evidence"
+  ],
+  "population_size": 32,
+  "readout_ids": [
+    35,
+    36,
+    37
+  ],
+  "runs": [
+    {
+      "accuracy_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.3333333333333333,
+        "holdout": 0.3333333333333333,
+        "overall": 0.375,
+        "permuted_control": 0.0,
+        "stress_holdout": 0.3333333333333333,
+        "train": 1.0
+      },
+      "action_distribution": {
+        "execute": 6,
+        "query": 12,
+        "retry": 6
+      },
+      "baseline_accuracy_by_split": {
+        "always_execute": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_query": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_retry": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        }
+      },
+      "cases": [
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3847.115800857544,
+          "expected_action": "execute",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            0,
+            1
+          ],
+          "split": "train",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4049.9642543792725,
+          "expected_action": "retry",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            -1,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3156.9970140457153,
+          "expected_action": "execute",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-noisy",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3298.1075105667114,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-noisy",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-low-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3138.9675693511963,
+          "expected_action": "execute",
+          "input_vector": [
+            0.35,
+            0.05,
+            -0.1
+          ],
+          "name": "execute-hard-low-positive",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3753.5656356811523,
+          "expected_action": "execute",
+          "input_vector": [
+            0.6,
+            -0.4,
+            0.2
+          ],
+          "name": "execute-hard-conflict",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 2917.215703010559,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.35,
+            -0.05,
+            0.2
+          ],
+          "name": "retry-hard-low-negative",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4099.888353347778,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.6,
+            0.4,
+            -0.2
+          ],
+          "name": "retry-hard-conflict",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "name": "query-hard-balanced",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.05,
+            0.05,
+            0.1
+          ],
+          "name": "query-hard-weak-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3807.0518684387207,
+          "expected_action": "retry",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train-permuted-as-retry",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            0,
+            1
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4018.3340797424316,
+          "expected_action": "query",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train-permuted-as-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train-permuted-as-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.18,
+            -0.12,
+            0.08
+          ],
+          "name": "execute-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.12,
+            0.08,
+            -0.12
+          ],
+          "name": "execute-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.18,
+            0.12,
+            -0.08
+          ],
+          "name": "retry-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.12,
+            -0.08,
+            0.12
+          ],
+          "name": "retry-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.18,
+            -0.18,
+            0.0
+          ],
+          "name": "query-stress-positive-negative",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.18,
+            0.18,
+            0.0
+          ],
+          "name": "query-stress-negative-positive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3122.5238332748413,
+          "expected_action": "query",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-counterfactual-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3381.183436393738,
+          "expected_action": "execute",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-counterfactual-execute",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-counterfactual-retry",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "generation_train_scores": [
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4166666666666667,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4166666666666667,
+        1.4722222222222223,
+        1.5,
+        1.5,
+        1.5,
+        1.4722222222222223,
+        1.4166666666666667,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4722222222222223
+      ],
+      "seed_offset": 107,
+      "target_alignment_by_split": {
+        "counterfactual_control": 0.6666666666666666,
+        "hard_holdout": 0.5,
+        "holdout": 0.7777777777777777,
+        "overall": 0.6666666666666664,
+        "permuted_control": 0.5555555555555555,
+        "stress_holdout": 0.7777777777777777,
+        "train": 0.7777777777777777
+      },
+      "unique_readouts": 8
+    },
+    {
+      "accuracy_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.5,
+        "holdout": 1.0,
+        "overall": 0.5,
+        "permuted_control": 0.0,
+        "stress_holdout": 0.3333333333333333,
+        "train": 1.0
+      },
+      "action_distribution": {
+        "execute": 5,
+        "query": 14,
+        "retry": 5
+      },
+      "baseline_accuracy_by_split": {
+        "always_execute": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_query": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_retry": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        }
+      },
+      "cases": [
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 5077.775329589844,
+          "expected_action": "execute",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 5003.803533554077,
+          "expected_action": "retry",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3931.855447769165,
+          "expected_action": "execute",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-noisy",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3586.0472660064697,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-noisy",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            1,
+            1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-low-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3917.9666843414307,
+          "expected_action": "execute",
+          "input_vector": [
+            0.35,
+            0.05,
+            -0.1
+          ],
+          "name": "execute-hard-low-positive",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 5008.654294967651,
+          "expected_action": "execute",
+          "input_vector": [
+            0.6,
+            -0.4,
+            0.2
+          ],
+          "name": "execute-hard-conflict",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3576.203758239746,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.35,
+            -0.05,
+            0.2
+          ],
+          "name": "retry-hard-low-negative",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4858.631324768066,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.6,
+            0.4,
+            -0.2
+          ],
+          "name": "retry-hard-conflict",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            -1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "name": "query-hard-balanced",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.05,
+            0.05,
+            0.1
+          ],
+          "name": "query-hard-weak-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 5084.990440368652,
+          "expected_action": "retry",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train-permuted-as-retry",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4948.919456481934,
+          "expected_action": "query",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train-permuted-as-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train-permuted-as-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.18,
+            -0.12,
+            0.08
+          ],
+          "name": "execute-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.12,
+            0.08,
+            -0.12
+          ],
+          "name": "execute-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.18,
+            0.12,
+            -0.08
+          ],
+          "name": "retry-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.12,
+            -0.08,
+            0.12
+          ],
+          "name": "retry-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.18,
+            -0.18,
+            0.0
+          ],
+          "name": "query-stress-positive-negative",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.18,
+            0.18,
+            0.0
+          ],
+          "name": "query-stress-negative-positive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3664.3601570129395,
+          "expected_action": "query",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-counterfactual-query",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            1,
+            1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3632.4645252227783,
+          "expected_action": "execute",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-counterfactual-execute",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-counterfactual-retry",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "generation_train_scores": [
+        1.4444444444444444,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.0277777777777777,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.5,
+        1.5,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.5,
+        1.5,
+        1.5,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "seed_offset": 108,
+      "target_alignment_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.4444444444444444,
+        "holdout": 0.6666666666666666,
+        "overall": 0.6388888888888887,
+        "permuted_control": 0.6666666666666666,
+        "stress_holdout": 0.7777777777777777,
+        "train": 1.0
+      },
+      "unique_readouts": 7
+    },
+    {
+      "accuracy_by_split": {
+        "counterfactual_control": 0.0,
+        "hard_holdout": 1.0,
+        "holdout": 1.0,
+        "overall": 0.5833333333333334,
+        "permuted_control": 0.0,
+        "stress_holdout": 0.3333333333333333,
+        "train": 1.0
+      },
+      "action_distribution": {
+        "execute": 6,
+        "query": 12,
+        "retry": 6
+      },
+      "baseline_accuracy_by_split": {
+        "always_execute": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_query": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_retry": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        }
+      },
+      "cases": [
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4653.136077880859,
+          "expected_action": "execute",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            0,
+            1
+          ],
+          "split": "train",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4657.676010131836,
+          "expected_action": "retry",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4011.242762565613,
+          "expected_action": "execute",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-noisy",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4461.080011367798,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-noisy",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            -1,
+            1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-low-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4033.232523918152,
+          "expected_action": "execute",
+          "input_vector": [
+            0.35,
+            0.05,
+            -0.1
+          ],
+          "name": "execute-hard-low-positive",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 5454.860218048096,
+          "expected_action": "execute",
+          "input_vector": [
+            0.6,
+            -0.4,
+            0.2
+          ],
+          "name": "execute-hard-conflict",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4511.9066553115845,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.35,
+            -0.05,
+            0.2
+          ],
+          "name": "retry-hard-low-negative",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            -1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 5435.553184509277,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.6,
+            0.4,
+            -0.2
+          ],
+          "name": "retry-hard-conflict",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            -1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "name": "query-hard-balanced",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.05,
+            0.05,
+            0.1
+          ],
+          "name": "query-hard-weak-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4652.60481262207,
+          "expected_action": "retry",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train-permuted-as-retry",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4652.740898132324,
+          "expected_action": "query",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train-permuted-as-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            1
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train-permuted-as-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.18,
+            -0.12,
+            0.08
+          ],
+          "name": "execute-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.12,
+            0.08,
+            -0.12
+          ],
+          "name": "execute-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.18,
+            0.12,
+            -0.08
+          ],
+          "name": "retry-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.12,
+            -0.08,
+            0.12
+          ],
+          "name": "retry-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.18,
+            -0.18,
+            0.0
+          ],
+          "name": "query-stress-positive-negative",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.18,
+            0.18,
+            0.0
+          ],
+          "name": "query-stress-negative-positive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4056.9409894943237,
+          "expected_action": "query",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-counterfactual-query",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            1,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4228.838105201721,
+          "expected_action": "execute",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-counterfactual-execute",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            -1,
+            1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-counterfactual-retry",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "generation_train_scores": [
+        1.4166666666666667,
+        1.4166666666666667,
+        1.4444444444444444,
+        1.4444444444444444,
+        0.9999999999999999,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.5,
+        1.4722222222222223,
+        1.3888888888888888,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.4722222222222223,
+        1.4444444444444444
+      ],
+      "seed_offset": 109,
+      "target_alignment_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.6666666666666666,
+        "holdout": 0.6666666666666666,
+        "overall": 0.6527777777777777,
+        "permuted_control": 0.4444444444444444,
+        "stress_holdout": 0.7777777777777777,
+        "train": 0.8888888888888888
+      },
+      "unique_readouts": 7
+    },
+    {
+      "accuracy_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.3333333333333333,
+        "holdout": 0.3333333333333333,
+        "overall": 0.375,
+        "permuted_control": 0.0,
+        "stress_holdout": 0.3333333333333333,
+        "train": 1.0
+      },
+      "action_distribution": {
+        "execute": 6,
+        "query": 13,
+        "retry": 5
+      },
+      "baseline_accuracy_by_split": {
+        "always_execute": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_query": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_retry": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        }
+      },
+      "cases": [
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3642.354259490967,
+          "expected_action": "execute",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            -1
+          ],
+          "split": "train",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3644.085350036621,
+          "expected_action": "retry",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            0,
+            1
+          ],
+          "split": "train",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3219.517580986023,
+          "expected_action": "execute",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-noisy",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            1,
+            -1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3309.026026725769,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-noisy",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-low-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3316.1616048812866,
+          "expected_action": "execute",
+          "input_vector": [
+            0.35,
+            0.05,
+            -0.1
+          ],
+          "name": "execute-hard-low-positive",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            -1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3509.227363586426,
+          "expected_action": "execute",
+          "input_vector": [
+            0.6,
+            -0.4,
+            0.2
+          ],
+          "name": "execute-hard-conflict",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            -1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3327.57981300354,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.35,
+            -0.05,
+            0.2
+          ],
+          "name": "retry-hard-low-negative",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3402.3103923797607,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.6,
+            0.4,
+            -0.2
+          ],
+          "name": "retry-hard-conflict",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "name": "query-hard-balanced",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.05,
+            0.05,
+            0.1
+          ],
+          "name": "query-hard-weak-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3679.6951942443848,
+          "expected_action": "retry",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train-permuted-as-retry",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 3642.05366897583,
+          "expected_action": "query",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train-permuted-as-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            1
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train-permuted-as-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.18,
+            -0.12,
+            0.08
+          ],
+          "name": "execute-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.12,
+            0.08,
+            -0.12
+          ],
+          "name": "execute-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.18,
+            0.12,
+            -0.08
+          ],
+          "name": "retry-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.12,
+            -0.08,
+            0.12
+          ],
+          "name": "retry-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.18,
+            -0.18,
+            0.0
+          ],
+          "name": "query-stress-positive-negative",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.18,
+            0.18,
+            0.0
+          ],
+          "name": "query-stress-negative-positive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 2894.2505598068237,
+          "expected_action": "query",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-counterfactual-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            1,
+            -1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3174.757140159607,
+          "expected_action": "execute",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-counterfactual-execute",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            -1,
+            1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-counterfactual-retry",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "generation_train_scores": [
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4444444444444444,
+        1.4166666666666667,
+        1.4722222222222223,
+        1.4444444444444444
+      ],
+      "seed_offset": 110,
+      "target_alignment_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.3333333333333333,
+        "holdout": 0.3333333333333333,
+        "overall": 0.5138888888888888,
+        "permuted_control": 0.5555555555555555,
+        "stress_holdout": 0.7777777777777777,
+        "train": 0.6666666666666666
+      },
+      "unique_readouts": 7
+    },
+    {
+      "accuracy_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.5,
+        "holdout": 0.6666666666666666,
+        "overall": 0.4583333333333333,
+        "permuted_control": 0.0,
+        "stress_holdout": 0.3333333333333333,
+        "train": 1.0
+      },
+      "action_distribution": {
+        "execute": 5,
+        "query": 17,
+        "retry": 2
+      },
+      "baseline_accuracy_by_split": {
+        "always_execute": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_query": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        },
+        "always_retry": {
+          "counterfactual_control": 0.3333333333333333,
+          "hard_holdout": 0.3333333333333333,
+          "holdout": 0.3333333333333333,
+          "overall": 0.3333333333333333,
+          "permuted_control": 0.3333333333333333,
+          "stress_holdout": 0.3333333333333333,
+          "train": 0.3333333333333333
+        }
+      },
+      "cases": [
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4847.899541854858,
+          "expected_action": "execute",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4768.446792602539,
+          "expected_action": "retry",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train",
+          "normalized_action": "retry",
+          "outcome": "success",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "train",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3949.7583990097046,
+          "expected_action": "execute",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-noisy",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3810.3502111434937,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-noisy",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            -1,
+            -1
+          ],
+          "split": "holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-low-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3944.351477622986,
+          "expected_action": "execute",
+          "input_vector": [
+            0.35,
+            0.05,
+            -0.1
+          ],
+          "name": "execute-hard-low-positive",
+          "normalized_action": "execute",
+          "outcome": "success",
+          "readout": [
+            1,
+            1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 4804.559162139893,
+          "expected_action": "execute",
+          "input_vector": [
+            0.6,
+            -0.4,
+            0.2
+          ],
+          "name": "execute-hard-conflict",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            1,
+            1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 3942.5786724090576,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.35,
+            -0.05,
+            0.2
+          ],
+          "name": "retry-hard-low-negative",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            -1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 4764.604824066162,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.6,
+            0.4,
+            -0.2
+          ],
+          "name": "retry-hard-conflict",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            -1,
+            -1
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 0.0,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "name": "query-hard-balanced",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.05,
+            0.05,
+            0.1
+          ],
+          "name": "query-hard-weak-drive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "hard_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "execute",
+          "energy": 4848.268093109131,
+          "expected_action": "retry",
+          "input_vector": [
+            1.0,
+            0.25,
+            0.0
+          ],
+          "name": "execute-train-permuted-as-retry",
+          "normalized_action": "execute",
+          "outcome": "failure",
+          "readout": [
+            1,
+            -1,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 1.0,
+          "decoded_action": "retry",
+          "energy": 4772.757162094116,
+          "expected_action": "query",
+          "input_vector": [
+            -1.0,
+            -0.25,
+            0.0
+          ],
+          "name": "retry-train-permuted-as-query",
+          "normalized_action": "retry",
+          "outcome": "failure",
+          "readout": [
+            -1,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "query-train-permuted-as-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "permuted_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.18,
+            -0.12,
+            0.08
+          ],
+          "name": "execute-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "execute",
+          "input_vector": [
+            0.12,
+            0.08,
+            -0.12
+          ],
+          "name": "execute-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.18,
+            0.12,
+            -0.08
+          ],
+          "name": "retry-stress-low-margin",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            -0.12,
+            -0.08,
+            0.12
+          ],
+          "name": "retry-stress-near-neutral",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            0.18,
+            -0.18,
+            0.0
+          ],
+          "name": "query-stress-positive-negative",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "query",
+          "input_vector": [
+            -0.18,
+            0.18,
+            0.0
+          ],
+          "name": "query-stress-negative-positive",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "stress_holdout",
+          "target_alignment": 1.0,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3967.754472732544,
+          "expected_action": "query",
+          "input_vector": [
+            0.8,
+            0.2,
+            0.1
+          ],
+          "name": "execute-holdout-counterfactual-query",
+          "normalized_action": "query",
+          "outcome": "success",
+          "readout": [
+            0,
+            1,
+            1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.3333333333333333,
+          "target_readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 3828.0381746292114,
+          "expected_action": "execute",
+          "input_vector": [
+            -0.8,
+            -0.2,
+            0.1
+          ],
+          "name": "retry-holdout-counterfactual-execute",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            -1,
+            -1
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.0,
+          "target_readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "baseline_actions": {
+            "always_execute": "execute",
+            "always_query": "query",
+            "always_retry": "retry"
+          },
+          "confidence": 0.0,
+          "decoded_action": "query",
+          "energy": 0.0,
+          "expected_action": "retry",
+          "input_vector": [
+            0.05,
+            0.0,
+            -0.05
+          ],
+          "name": "query-holdout-counterfactual-retry",
+          "normalized_action": "query",
+          "outcome": "failure",
+          "readout": [
+            0,
+            0,
+            0
+          ],
+          "split": "counterfactual_control",
+          "target_alignment": 0.6666666666666666,
+          "target_readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "generation_train_scores": [
+        1.4444444444444444,
+        1.4166666666666667,
+        1.4722222222222223,
+        1.4444444444444444,
+        1.4722222222222223,
+        1.4722222222222223,
+        1.4166666666666667,
+        1.5,
+        1.4444444444444444,
+        1.4722222222222223,
+        1.5,
+        1.5,
+        1.5,
+        1.4722222222222223,
+        1.5,
+        1.4444444444444444
+      ],
+      "seed_offset": 111,
+      "target_alignment_by_split": {
+        "counterfactual_control": 0.3333333333333333,
+        "hard_holdout": 0.38888888888888884,
+        "holdout": 0.4444444444444444,
+        "overall": 0.5833333333333333,
+        "permuted_control": 0.5555555555555555,
+        "stress_holdout": 0.7777777777777777,
+        "train": 1.0
+      },
+      "unique_readouts": 8
+    }
+  ],
+  "seed_count": 5,
+  "seed_offsets": [
+    107,
+    108,
+    109,
+    110,
+    111
+  ],
+  "seeds_beating_baseline_by_split": {
+    "counterfactual_control": 0,
+    "hard_holdout": 3,
+    "holdout": 3,
+    "overall": 5,
+    "permuted_control": 0,
+    "stress_holdout": 0,
+    "train": 5
+  },
+  "status": "aigarth target-contract stress audit completed",
+  "strict_expected_actions": [
+    "execute",
+    "query",
+    "retry"
+  ],
+  "train_to_hard_holdout_gap_mean": 0.4666666666666667,
+  "unexpected_action_count": 0,
+  "unexpected_action_rate": 0.0,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}
