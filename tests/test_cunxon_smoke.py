@@ -722,6 +722,8 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon snapshot/pattern probe" in markdown
     assert "cuNxon multi-sphere/action adapter" in markdown
     assert "cuNxon supervised motor-target adapter" in markdown
+    assert "4h run completed with 16 samples/4194304 steps" in markdown
+    assert "resident readout stayed `[0, 0, 0]`" in markdown
     assert "no decision-quality score measured" in markdown
     assert "train-mode flat" in markdown
     assert "flat recall" in markdown
@@ -732,6 +734,10 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "random" in markdown
     assert "always_execute" in markdown
     assert "do not prove intelligence" in markdown
+    assert '"status": "completed 4h run"' in data
+    assert '"sample_count": 16' in data
+    assert '"total_steps": 4194304' in data
+    assert '"unique_readouts": [' in data
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
     assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
