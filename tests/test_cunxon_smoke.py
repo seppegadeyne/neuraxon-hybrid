@@ -46,6 +46,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_hard_holdout_markdown_report,
     render_aigarth_action_markdown_report,
     render_aigarth_action_seed_sweep_markdown_report,
+    render_aigarth_action_strict_label_markdown_report,
     render_aigarth_readout_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
@@ -64,6 +65,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_artifacts,
     write_aigarth_action_hard_holdout_artifacts,
     write_aigarth_action_seed_sweep_artifacts,
+    write_aigarth_action_strict_label_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -654,6 +656,101 @@ def test_aigarth_action_hard_holdout_report_records_leakage_and_strict_labels(
     assert "permuted-control labels are never optimized" in markdown_path.read_text(
         encoding="utf-8"
     )
+
+
+def test_aigarth_action_strict_label_report_records_penalty_and_contract(
+    tmp_path: Path,
+) -> None:
+    shared_case = CunxonAigarthActionCase(
+        name="retry-hard-low-negative",
+        split="hard_holdout",
+        input_vector=[-0.35, -0.05, 0.1],
+        expected_action="retry",
+        target_readout=[-1, 1, 0],
+        readout=[-1, -1, -1],
+        decoded_action="ESCALATE",
+        normalized_action="assertive",
+        confidence=1.0,
+        outcome="failure",
+        target_alignment=0.333333,
+        baseline_actions={"always_execute": "execute", "always_query": "query"},
+        energy=5.0,
+    )
+    result = CunxonAigarthActionHardHoldoutResult(
+        status="aigarth strict-label action audit completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        readout_ids=[35, 36, 37],
+        seed_offsets=[92, 93],
+        strict_expected_actions=["execute", "query", "retry"],
+        runs=[
+            CunxonAigarthActionSeedRun(
+                seed_offset=92,
+                generation_train_scores=[0.25, 0.5],
+                accuracy_by_split={
+                    "hard_holdout": 0.333333,
+                    "holdout": 0.666667,
+                    "overall": 0.5,
+                    "permuted_control": 0.0,
+                    "train": 1.0,
+                },
+                target_alignment_by_split={"hard_holdout": 0.333333, "overall": 0.5},
+                baseline_accuracy_by_split={
+                    "always_query": {"hard_holdout": 0.333333, "overall": 0.333333}
+                },
+                unique_readouts=2,
+                action_distribution={"assertive": 1, "execute": 2, "query": 3},
+                cases=[shared_case],
+            )
+        ],
+        accuracy_summary_by_split={
+            "hard_holdout": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+            "holdout": {"mean": 0.666667, "min": 0.666667, "max": 0.666667},
+            "overall": {"mean": 0.5, "min": 0.5, "max": 0.5},
+            "permuted_control": {"mean": 0.0, "min": 0.0, "max": 0.0},
+            "train": {"mean": 1.0, "min": 1.0, "max": 1.0},
+        },
+        aggregate_action_distribution={"assertive": 1, "execute": 2, "query": 3},
+        seeds_beating_baseline_by_split={
+            "hard_holdout": 0,
+            "holdout": 1,
+            "overall": 1,
+            "permuted_control": 0,
+            "train": 1,
+        },
+        unexpected_action_count=1,
+        unexpected_action_rate=1 / 6,
+        leakage_control_accuracy_mean=0.0,
+        train_to_hard_holdout_gap_mean=0.666667,
+        fitness_variant="strict_label_margin",
+        notes=["strict-label fitness penalizes out-of-contract normalized labels"],
+    )
+
+    markdown = render_aigarth_action_strict_label_markdown_report(result)
+    assert "Aigarth strict-label action audit" in markdown
+    assert "Fitness variant: `strict_label_margin`" in markdown
+    assert "penalizes out-of-contract normalized labels" in markdown
+    assert "Unexpected action rate: 0.166667" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-strict-label.json"
+    markdown_path = tmp_path / "aigarth-action-strict-label.md"
+    write_aigarth_action_strict_label_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"fitness_variant": "strict_label_margin"' in data
+    assert '"unexpected_action_rate": 0.16666666666666666' in data
+    assert "strict-label fitness penalizes" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
@@ -1352,11 +1449,15 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"cunxon_aigarth_action_probe"' in data
     assert '"cunxon_aigarth_action_seed_sweep"' in data
     assert '"cunxon_aigarth_action_hard_holdout_probe"' in data
+    assert '"cunxon_aigarth_action_strict_label_probe"' in data
     assert "cuNxon Aigarth action hard-holdout audit" in markdown
+    assert "cuNxon Aigarth strict-label action audit" in markdown
     assert "hard-holdout mean=0.500000" in markdown
+    assert "strict-label fitness" in markdown
     assert "permuted-control mean=0.000000" in markdown
     assert '"mean_holdout": 0.5333333333333333' in data
     assert '"mean_hard_holdout": 0.5' in data
+    assert '"fitness_variant": "strict_label_margin"' in data
     assert '"leakage_control_accuracy_mean": 0.0' in data
     assert '"holdout": 3' in data
     assert '"unexpected_actions": [' in data
@@ -1428,6 +1529,24 @@ def test_tracked_cunxon_aigarth_action_probe_records_holdout_action_result() -> 
     assert '"generation_train_scores": [' in data
     assert '"holdout": 0.6666666666666666' in data
     assert '"action_distribution": {' in data
+
+
+def test_tracked_cunxon_aigarth_action_strict_label_probe_records_contract_result() -> None:
+    markdown = Path("benchmarks/results/cunxon_aigarth_action_strict_label_probe.md").read_text(
+        encoding="utf-8"
+    )
+    data = Path("benchmarks/results/cunxon_aigarth_action_strict_label_probe.json").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Aigarth strict-label action audit" in markdown
+    assert "Fitness variant: `strict_label_margin`" in markdown
+    assert "Unexpected action rate" in markdown
+    assert "hard_holdout" in markdown
+    assert "not intelligence evidence" in markdown
+    assert '"status": "aigarth strict-label action audit completed"' in data
+    assert '"fitness_variant": "strict_label_margin"' in data
+    assert '"strict_expected_actions": [' in data
 
 
 def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:

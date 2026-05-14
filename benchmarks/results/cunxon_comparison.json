@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route is the only constructive action-quality lead so far: one seed scored 0.666667 train/holdout/overall against 0.333333 constant baselines, the five-seed repeatability sweep partially repeated the signal, and the hard-holdout audit reached hard-holdout mean 0.500000 with permuted-control mean 0.000000. This remains brittle toy evidence: hard-holdout robustness is only partial, train-to-hard-holdout gap is 0.500000, and unexpected normalized labels still appear, so it is not an intelligence/generalization claim.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: strict-label Aigarth fitness improved this run's hard-holdout mean to 0.700000 with 4/5 seeds beating the best constant baseline on the hard split and permuted-control mean 0.000000. This is still brittle toy evidence: out-of-contract assertive labels still appear at 0.066667 rate, two seeds remain weak on holdout/hard-holdout, and no broad intelligence/generalization claim is supported.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -42,6 +42,12 @@
       "lane": "cuNxon Aigarth action hard-holdout audit",
       "metric": "5-seed hard-holdout/permuted-control action accuracy vs trivial baselines",
       "value": "hard-holdout mean=0.500000 (min=0.333333, max=0.833333); holdout mean=0.600000; train=1.000000; permuted-control mean=0.000000; 2/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "lane": "cuNxon Aigarth strict-label action audit",
+      "metric": "5-seed strict-label hard-holdout/permuted-control accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.700000 (min=0.333333, max=1.000000); holdout mean=0.733333; train=1.000000; permuted-control mean=0.000000; 4/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -333,6 +339,74 @@
       "assertive"
     ],
     "verdict": "Aigarth action seed sweep partially repeats the baseline-beating toy signal but remains brittle"
+  },
+  "cunxon_aigarth_action_strict_label_probe": {
+    "accuracy_summary_by_split": {
+      "hard_holdout": {
+        "max": 1.0,
+        "mean": 0.7000000000000001,
+        "min": 0.3333333333333333
+      },
+      "holdout": {
+        "max": 1.0,
+        "mean": 0.7333333333333333,
+        "min": 0.3333333333333333
+      },
+      "overall": {
+        "max": 0.8,
+        "mean": 0.6266666666666666,
+        "min": 0.4
+      },
+      "permuted_control": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0
+      },
+      "train": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0
+      }
+    },
+    "aggregate_action_distribution": {
+      "assertive": 5,
+      "execute": 18,
+      "query": 31,
+      "retry": 21
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed strict-label hard/noisy holdout and permuted-control audit; train-only Aigarth fitness with unexpected-label penalty; no intelligence/generalization claim",
+    "fitness_variant": "strict_label_margin",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.7000000000000001,
+    "mean_holdout": 0.7333333333333333,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      92,
+      93,
+      94,
+      95,
+      96
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 4,
+      "holdout": 3,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth strict-label action audit completed",
+    "train_to_hard_holdout_gap_mean": 0.3,
+    "unexpected_action_rate": 0.06666666666666667,
+    "unexpected_actions": [
+      "assertive"
+    ],
+    "verdict": "strict-label fitness improved hard-holdout robustness but did not eliminate out-of-contract labels or brittleness"
   },
   "cunxon_aigarth_readout_probe": {
     "absolute_output_final_margin": 1.5,

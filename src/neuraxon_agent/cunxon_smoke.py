@@ -364,6 +364,7 @@ class CunxonAigarthActionHardHoldoutResult:
     unexpected_action_rate: float
     leakage_control_accuracy_mean: float
     train_to_hard_holdout_gap_mean: float
+    fitness_variant: str = "success_plus_alignment"
     notes: list[str] = field(default_factory=list)
 
     @property
@@ -1568,6 +1569,7 @@ def render_aigarth_action_hard_holdout_markdown_report(
             f"- Eval steps per case: {result.eval_steps}",
             f"- Readout ids: {', '.join(str(port) for port in result.readout_ids)}",
             f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Fitness variant: `{result.fitness_variant}`",
             f"- Strict expected actions: {expected}",
             f"- Aggregate action distribution: {aggregate_actions or 'none'}",
             f"- Unexpected action count: {result.unexpected_action_count}",
@@ -1614,6 +1616,39 @@ def render_aigarth_action_hard_holdout_markdown_report(
     )
 
 
+def render_aigarth_action_strict_label_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render a strict-label/margin Aigarth action audit report."""
+    return (
+        render_aigarth_action_hard_holdout_markdown_report(result)
+        .replace(
+            "# cuNxon Aigarth action hard-holdout audit",
+            "# cuNxon Aigarth strict-label action audit",
+            1,
+        )
+        .replace(
+            "The Aigarth seed sweep partially repeated a tiny baseline-beating action signal, "
+            "but it also produced unstable class coverage and unexpected normalized labels. "
+            "This audit keeps the train-only Aigarth fitness route but expands evaluation with "
+            "harder/noisier holdouts and a permuted-control leakage/oracle check before treating "
+            "the route as stronger adapter evidence.",
+            "The hard-holdout audit left one out-of-contract normalized label and a large "
+            "train-to-hard-holdout gap. This audit changes the train-only Aigarth fitness "
+            "hypothesis: `strict_label_margin` rewards expected execute/query/retry outcomes "
+            "and penalizes out-of-contract normalized labels such as assertive, while keeping "
+            "holdout, hard-holdout, and permuted-control labels outside the fitness callback.",
+            1,
+        )
+        .replace(
+            "This is a stress audit of a tiny Aigarth/evolutionary adapter route, not ",
+            "This is a strict-label stress audit of a tiny Aigarth/evolutionary adapter "
+            "route, not ",
+            1,
+        )
+    )
+
+
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
     *,
@@ -1628,6 +1663,24 @@ def write_aigarth_action_hard_holdout_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_hard_holdout_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_strict_label_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth strict-label audit artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_strict_label_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -2874,6 +2927,7 @@ def run_ctypes_aigarth_action_probe(
     eval_steps: int = 24,
     seed_offset: int = 82,
     evaluation_specs: Sequence[tuple[str, str, tuple[float, float, float], str]] | None = None,
+    fitness_variant: str = "success_plus_alignment",
     device_id: int = 0,
 ) -> CunxonAigarthActionProbeResult:
     """Evolve a cuNxon readout with Aigarth and score train/holdout actions."""
@@ -2957,7 +3011,17 @@ def run_ctypes_aigarth_action_probe(
                 return 0.0
             success_score = sum(1.0 for case in cases if case.outcome == "success") / len(cases)
             alignment_score = sum(case.target_alignment for case in cases) / len(cases)
-            return float(success_score + 0.25 * alignment_score)
+            if fitness_variant == "success_plus_alignment":
+                return float(success_score + 0.25 * alignment_score)
+            if fitness_variant == "strict_label_margin":
+                strict_actions = {"execute", "query", "retry"}
+                unexpected_rate = (
+                    sum(1.0 for case in cases if case.normalized_action not in strict_actions)
+                    / len(cases)
+                )
+                strict_label_score = success_score + 0.25 * alignment_score - unexpected_rate
+                return float(max(0.0, strict_label_score))
+            raise ValueError(f"Unsupported Aigarth action fitness variant: {fitness_variant}")
 
         def fitness(candidate_net: C.c_void_p, _user_data: C.c_void_p) -> float:
             try:
@@ -3177,6 +3241,97 @@ def run_ctypes_aigarth_action_hard_holdout_probe(
             "strict expected actions are execute/query/retry; assertive/explore/cautious "
             "remain out-of-contract caveats",
             "hard-holdout audit, not intelligence evidence",
+        ],
+    )
+
+
+def run_ctypes_aigarth_action_strict_label_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (92, 93, 94, 95, 96),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "strict_label_margin",
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Run a strict-label Aigarth action fitness audit across fresh cuNxon seeds."""
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    if fitness_variant != "strict_label_margin":
+        raise ValueError("strict-label audit only supports fitness_variant='strict_label_margin'")
+    specs = _aigarth_action_hard_holdout_specs()
+    fitness_variant = "strict_label_margin"
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    runs = [
+        CunxonAigarthActionSeedRun(
+            seed_offset=result.seed_offset,
+            generation_train_scores=result.generation_train_scores,
+            accuracy_by_split=result.accuracy_by_split,
+            target_alignment_by_split=result.target_alignment_by_split,
+            baseline_accuracy_by_split=result.baseline_accuracy_by_split,
+            unique_readouts=result.unique_readouts,
+            action_distribution=result.action_distribution,
+            cases=result.cases,
+        )
+        for result in probe_results
+    ]
+    aggregate_distribution = _seed_sweep_action_distribution(runs)
+    strict_expected_actions = ["execute", "query", "retry"]
+    unexpected_action_count = sum(
+        count
+        for action, count in aggregate_distribution.items()
+        if action not in strict_expected_actions
+    )
+    total_actions = sum(aggregate_distribution.values())
+    accuracy_summary = _seed_sweep_accuracy_summary(runs)
+    train_values = [run.accuracy_by_split.get("train", 0.0) for run in runs]
+    hard_values = [run.accuracy_by_split.get("hard_holdout", 0.0) for run in runs]
+    gaps = [train - hard for train, hard in zip(train_values, hard_values, strict=False)]
+    return CunxonAigarthActionHardHoldoutResult(
+        status="aigarth strict-label action audit completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        readout_ids=probe_results[0].readout_ids,
+        seed_offsets=list(seed_offsets),
+        strict_expected_actions=strict_expected_actions,
+        runs=runs,
+        accuracy_summary_by_split=accuracy_summary,
+        aggregate_action_distribution=aggregate_distribution,
+        seeds_beating_baseline_by_split=_seed_sweep_beating_baseline_counts(runs),
+        unexpected_action_count=unexpected_action_count,
+        unexpected_action_rate=unexpected_action_count / total_actions if total_actions else 0.0,
+        leakage_control_accuracy_mean=accuracy_summary.get("permuted_control", {}).get("mean", 0.0),
+        train_to_hard_holdout_gap_mean=sum(gaps) / len(gaps) if gaps else 0.0,
+        fitness_variant=fitness_variant,
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "strict-label fitness penalizes out-of-contract normalized labels",
+            "fitness callback uses train cases only; holdout, hard-holdout and "
+            "permuted-control labels are never optimized",
+            "strict-label audit, not intelligence evidence",
         ],
     )
 
