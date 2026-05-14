@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionCase,
     CunxonAigarthActionHardHoldoutResult,
     CunxonAigarthActionProbeResult,
+    CunxonAigarthActionRemapAuditResult,
     CunxonAigarthActionSeedRun,
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
@@ -46,6 +48,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_contract_penalty_markdown_report,
     render_aigarth_action_hard_holdout_markdown_report,
     render_aigarth_action_markdown_report,
+    render_aigarth_action_remap_audit_markdown_report,
     render_aigarth_action_seed_sweep_markdown_report,
     render_aigarth_action_strict_label_markdown_report,
     render_aigarth_readout_markdown_report,
@@ -66,6 +69,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_artifacts,
     write_aigarth_action_contract_penalty_artifacts,
     write_aigarth_action_hard_holdout_artifacts,
+    write_aigarth_action_remap_audit_artifacts,
     write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_action_strict_label_artifacts,
     write_aigarth_readout_artifacts,
@@ -1547,11 +1551,15 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"cunxon_aigarth_action_hard_holdout_probe"' in data
     assert '"cunxon_aigarth_action_strict_label_probe"' in data
     assert '"cunxon_aigarth_action_contract_penalty_probe"' in data
+    assert '"cunxon_aigarth_action_remap_audit"' in data
+    assert '"remapped_unexpected_action_count": 0' in data
     assert "cuNxon Aigarth action hard-holdout audit" in markdown
     assert "cuNxon Aigarth strict-label action audit" in markdown
     assert "cuNxon Aigarth contract-penalty action audit" in markdown
+    assert "cuNxon Aigarth action remap audit" in markdown
     assert "hard-holdout mean=0.500000" in markdown
     assert "hard-holdout mean=0.466667" in markdown
+    assert "remap removes assertive labels but does not improve aggregate accuracy" in markdown
     assert "strict-label fitness" in markdown
     assert "heavy contract-penalty" in markdown
     assert "permuted-control mean=0.000000" in markdown
@@ -1667,6 +1675,79 @@ def test_tracked_cunxon_aigarth_action_contract_penalty_probe_records_negative_t
     assert '"fitness_variant": "strict_label_heavy_penalty"' in data
     assert '"unexpected_action_rate": 0.04' in data
     assert '"seed_count": 5' in data
+
+
+def test_aigarth_action_remap_audit_replays_artifacts_without_gpu_claims(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "source.json"
+    source_path.write_text(
+        json.dumps(
+            {
+                "status": "aigarth strict-label action audit completed",
+                "fitness_variant": "strict_label_margin",
+                "runs": [
+                    {
+                        "seed_offset": 1,
+                        "cases": [
+                            {
+                                "name": "assertive-execute",
+                                "split": "holdout",
+                                "expected_action": "execute",
+                                "readout": [1, 1, 0],
+                                "normalized_action": "assertive",
+                            },
+                            {
+                                "name": "query-neutral",
+                                "split": "holdout",
+                                "expected_action": "query",
+                                "readout": [0, 0, 0],
+                                "normalized_action": "query",
+                            },
+                            {
+                                "name": "retry-negative",
+                                "split": "train",
+                                "expected_action": "retry",
+                                "readout": [-1, 1, 0],
+                                "normalized_action": "retry",
+                            },
+                        ],
+                    }
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = CunxonAigarthActionRemapAuditResult.from_artifact_paths([source_path])
+
+    assert result.status == "aigarth action remap audit completed"
+    assert result.source_count == 1
+    assert result.case_count == 3
+    assert result.original_unexpected_action_count == 1
+    assert result.remapped_unexpected_action_count == 0
+    assert result.original_accuracy_by_split["holdout"] == 0.5
+    assert result.remapped_accuracy_by_split["holdout"] == 1.0
+    assert result.remapped_action_distribution == {"execute": 1, "query": 1, "retry": 1}
+
+    markdown = render_aigarth_action_remap_audit_markdown_report(result)
+    assert "Aigarth action remap audit" in markdown
+    assert "post-hoc diagnostic" in markdown
+    assert "does not create new cuNxon learning evidence" in markdown
+    assert "signed-first-lane" in markdown
+
+    json_path = tmp_path / "remap.json"
+    markdown_path = tmp_path / "remap.md"
+    write_aigarth_action_remap_audit_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"remapped_unexpected_action_count": 0' in data
+    assert "post-hoc diagnostic" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:

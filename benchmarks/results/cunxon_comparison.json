@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far, but the new heavy contract-penalty variant is negative versus the prior strict-label result: hard-holdout mean fell to 0.466667 and only 2/5 seeds beat the best constant baseline on the hard split, although unexpected assertive labels dropped to 0.040000 and permuted-control mean stayed 0.000000. This is brittle toy/evolution evidence only; no broad intelligence/generalization claim is supported.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far, but the new heavy contract-penalty variant is negative versus the prior strict-label result: hard-holdout mean fell to 0.466667 and only 2/5 seeds beat the best constant baseline on the hard split, although unexpected assertive labels dropped to 0.040000 and permuted-control mean stayed 0.000000. A post-hoc signed-first-lane remap removes assertive labels entirely (0 unexpected labels across 255 replayed cases), but aggregate accuracy changes from 0.549020 to 0.537255 and therefore isolates a decoder-contract issue without improving decision quality. This is brittle toy/evolution evidence only; no broad intelligence/generalization claim is supported.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -54,6 +54,12 @@
       "lane": "cuNxon Aigarth contract-penalty action audit",
       "metric": "5-seed heavy-penalty hard-holdout/permuted-control accuracy vs trivial baselines",
       "value": "hard-holdout mean=0.466667 (min=0.333333, max=0.833333); holdout mean=0.466667; train=1.000000; permuted-control mean=0.000000; 2/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive at 0.040000 rate"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_remap_audit.json",
+      "lane": "cuNxon Aigarth action remap audit",
+      "metric": "post-hoc signed-first-lane replay over existing Aigarth action artifacts",
+      "value": "remap removes assertive labels but does not improve aggregate accuracy: original overall=0.549020, remapped overall=0.537255; original unexpected=13, remapped unexpected=0"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -333,6 +339,36 @@
     },
     "unique_readouts": 4,
     "verdict": "Aigarth action probe beats constant-action baselines on this small train/holdout set, but remains a toy evidence slice"
+  },
+  "cunxon_aigarth_action_remap_audit": {
+    "case_count": 255,
+    "decision_quality_measured": false,
+    "evidence_boundary": "post-hoc replay over existing live cuNxon Aigarth artifacts; no new GPU learning run; isolates decoder vocabulary/remap effects only",
+    "original_accuracy_by_split": {
+      "hard_holdout": 0.5555555555555556,
+      "holdout": 0.5833333333333334,
+      "overall": 0.5490196078431373,
+      "permuted_control": 0.0,
+      "train": 0.9166666666666666
+    },
+    "original_unexpected_action_count": 13,
+    "remap_strategy": "signed-first-lane",
+    "remapped_accuracy_by_split": {
+      "hard_holdout": 0.5444444444444444,
+      "holdout": 0.6,
+      "overall": 0.5372549019607843,
+      "permuted_control": 0.06666666666666667,
+      "train": 0.8166666666666667
+    },
+    "remapped_unexpected_action_count": 0,
+    "source_count": 4,
+    "status": "aigarth action remap audit completed",
+    "strict_expected_actions": [
+      "execute",
+      "query",
+      "retry"
+    ],
+    "verdict": "signed-first-lane remap removes out-of-contract assertive labels, but remapped aggregate accuracy is slightly lower than the original decoder replay; decoder vocabulary was not the only bottleneck"
   },
   "cunxon_aigarth_action_seed_sweep": {
     "accuracy_summary_by_split": {

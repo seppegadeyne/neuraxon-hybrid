@@ -384,6 +384,189 @@ class CunxonAigarthActionHardHoldoutResult:
 
 
 @dataclass(frozen=True)
+class CunxonAigarthActionRemapCase:
+    """One Aigarth action case replayed through a strict motor-lane remap."""
+
+    source_path: str
+    seed_offset: int
+    name: str
+    split: str
+    expected_action: str
+    readout: list[int]
+    original_normalized_action: str
+    remapped_action: str
+    original_outcome: str
+    remapped_outcome: str
+
+
+@dataclass(frozen=True)
+class CunxonAigarthActionRemapSourceSummary:
+    """Per-source summary for a post-hoc Aigarth action remap audit."""
+
+    source_path: str
+    status: str
+    fitness_variant: str
+    case_count: int
+    original_accuracy_by_split: dict[str, float]
+    remapped_accuracy_by_split: dict[str, float]
+    original_action_distribution: dict[str, int]
+    remapped_action_distribution: dict[str, int]
+    original_unexpected_action_count: int
+    remapped_unexpected_action_count: int
+
+
+@dataclass(frozen=True)
+class CunxonAigarthActionRemapAuditResult:
+    """Post-hoc decoder/remap audit for existing Aigarth action artifacts."""
+
+    status: str
+    source_paths: list[str]
+    remap_strategy: str
+    strict_expected_actions: list[str]
+    source_summaries: list[CunxonAigarthActionRemapSourceSummary]
+    cases: list[CunxonAigarthActionRemapCase]
+    original_accuracy_by_split: dict[str, float]
+    remapped_accuracy_by_split: dict[str, float]
+    original_action_distribution: dict[str, int]
+    remapped_action_distribution: dict[str, int]
+    original_unexpected_action_count: int
+    remapped_unexpected_action_count: int
+    remap_accuracy_delta_by_split: dict[str, float]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def source_count(self) -> int:
+        """Return the number of source artifacts replayed."""
+        return len(self.source_paths)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of Aigarth action cases replayed."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["source_count"] = self.source_count
+        data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+    @classmethod
+    def from_artifact_paths(
+        cls,
+        artifact_paths: Sequence[str | Path],
+    ) -> "CunxonAigarthActionRemapAuditResult":
+        """Build a post-hoc remap audit from tracked Aigarth action JSON artifacts."""
+        if not artifact_paths:
+            raise ValueError("artifact_paths must contain at least one path")
+        strict_actions = ["execute", "query", "retry"]
+        strict_set = set(strict_actions)
+        source_summaries: list[CunxonAigarthActionRemapSourceSummary] = []
+        all_cases: list[CunxonAigarthActionRemapCase] = []
+        normalized_paths = [str(Path(path)) for path in artifact_paths]
+        for artifact_path in artifact_paths:
+            path = Path(artifact_path)
+            data = json.loads(path.read_text(encoding="utf-8"))
+            status = str(data.get("status", "unknown"))
+            fitness_variant = str(data.get("fitness_variant", "unknown"))
+            source_cases: list[CunxonAigarthActionRemapCase] = []
+            for run in data.get("runs", []):
+                if not isinstance(run, dict):
+                    continue
+                seed_offset = int(run.get("seed_offset", -1))
+                for raw_case in run.get("cases", []):
+                    if not isinstance(raw_case, dict):
+                        continue
+                    readout = [int(value) for value in raw_case.get("readout", [])]
+                    original_action = str(raw_case.get("normalized_action", "unknown"))
+                    expected_action = str(raw_case.get("expected_action", "unknown"))
+                    remapped_action = remap_aigarth_action_readout(readout)
+                    replayed = CunxonAigarthActionRemapCase(
+                        source_path=str(path),
+                        seed_offset=seed_offset,
+                        name=str(raw_case.get("name", "unknown")),
+                        split=str(raw_case.get("split", "unknown")),
+                        expected_action=expected_action,
+                        readout=readout,
+                        original_normalized_action=original_action,
+                        remapped_action=remapped_action,
+                        original_outcome=(
+                            "success" if original_action == expected_action else "failure"
+                        ),
+                        remapped_outcome=(
+                            "success" if remapped_action == expected_action else "failure"
+                        ),
+                    )
+                    source_cases.append(replayed)
+                    all_cases.append(replayed)
+            source_summaries.append(
+                CunxonAigarthActionRemapSourceSummary(
+                    source_path=str(path),
+                    status=status,
+                    fitness_variant=fitness_variant,
+                    case_count=len(source_cases),
+                    original_accuracy_by_split=_remap_case_accuracy_by_split(
+                        source_cases, remapped=False
+                    ),
+                    remapped_accuracy_by_split=_remap_case_accuracy_by_split(
+                        source_cases, remapped=True
+                    ),
+                    original_action_distribution=_remap_case_action_distribution(
+                        source_cases, remapped=False
+                    ),
+                    remapped_action_distribution=_remap_case_action_distribution(
+                        source_cases, remapped=True
+                    ),
+                    original_unexpected_action_count=sum(
+                        1
+                        for case in source_cases
+                        if case.original_normalized_action not in strict_set
+                    ),
+                    remapped_unexpected_action_count=sum(
+                        1 for case in source_cases if case.remapped_action not in strict_set
+                    ),
+                )
+            )
+
+        original_accuracy = _remap_case_accuracy_by_split(all_cases, remapped=False)
+        remapped_accuracy = _remap_case_accuracy_by_split(all_cases, remapped=True)
+        split_keys = set(original_accuracy) | set(remapped_accuracy)
+        return cls(
+            status="aigarth action remap audit completed",
+            source_paths=normalized_paths,
+            remap_strategy="signed-first-lane",
+            strict_expected_actions=strict_actions,
+            source_summaries=source_summaries,
+            cases=all_cases,
+            original_accuracy_by_split=original_accuracy,
+            remapped_accuracy_by_split=remapped_accuracy,
+            original_action_distribution=_remap_case_action_distribution(all_cases, remapped=False),
+            remapped_action_distribution=_remap_case_action_distribution(all_cases, remapped=True),
+            original_unexpected_action_count=sum(
+                1 for case in all_cases if case.original_normalized_action not in strict_set
+            ),
+            remapped_unexpected_action_count=sum(
+                1 for case in all_cases if case.remapped_action not in strict_set
+            ),
+            remap_accuracy_delta_by_split={
+                split: remapped_accuracy.get(split, 0.0) - original_accuracy.get(split, 0.0)
+                for split in sorted(split_keys)
+            },
+            notes=[
+                "post-hoc diagnostic over existing live cuNxon Aigarth artifacts",
+                "signed-first-lane remap follows the project target_readout contract: "
+                "+ first lane=execute, - first lane=retry, neutral=query",
+                "does not create new cuNxon learning evidence; it only isolates decoder "
+                "vocabulary effects",
+            ],
+        )
+
+
+@dataclass(frozen=True)
 class CunxonLongSweepSample:
     """One long-horizon/mode/seed/stimulus sample decoded through the action contract."""
 
@@ -1732,6 +1915,117 @@ def write_aigarth_action_contract_penalty_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_contract_penalty_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def render_aigarth_action_remap_audit_markdown_report(
+    result: CunxonAigarthActionRemapAuditResult,
+) -> str:
+    """Render a post-hoc Aigarth action decoder/remap audit report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    source_rows = [
+        (
+            "| Source | Fitness variant | Cases | Original overall | Remapped overall | "
+            "Original unexpected | Remapped unexpected |"
+        ),
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for summary in result.source_summaries:
+        source_rows.append(
+            "| "
+            f"{summary.source_path} | {summary.fitness_variant} | {summary.case_count} | "
+            f"{summary.original_accuracy_by_split.get('overall', 0.0):.6f} | "
+            f"{summary.remapped_accuracy_by_split.get('overall', 0.0):.6f} | "
+            f"{summary.original_unexpected_action_count} | "
+            f"{summary.remapped_unexpected_action_count} |"
+        )
+    split_rows = [
+        "| Split | Original accuracy | Remapped accuracy | Delta |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    split_names = sorted(
+        set(result.original_accuracy_by_split) | set(result.remapped_accuracy_by_split)
+    )
+    for split in split_names:
+        split_rows.append(
+            "| "
+            f"{split} | {result.original_accuracy_by_split.get(split, 0.0):.6f} | "
+            f"{result.remapped_accuracy_by_split.get(split, 0.0):.6f} | "
+            f"{result.remap_accuracy_delta_by_split.get(split, 0.0):+.6f} |"
+        )
+    original_distribution = ", ".join(
+        f"{action}={count}" for action, count in result.original_action_distribution.items()
+    )
+    remapped_distribution = ", ".join(
+        f"{action}={count}" for action, count in result.remapped_action_distribution.items()
+    )
+    return "\n".join(
+        [
+            "# cuNxon Aigarth action remap audit",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Scope",
+            "",
+            "This is a post-hoc diagnostic over existing live cuNxon Aigarth action "
+            "artifacts. It does not start a new GPU evolution run and does not create "
+            "new cuNxon learning evidence. Its purpose is to isolate whether the "
+            "out-of-contract `assertive` labels came from the generic `ActionDecoder` "
+            "vocabulary rather than the evolved readout itself.",
+            "",
+            "## Remap strategy",
+            "",
+            f"- Strategy: `{result.remap_strategy}`",
+            "- `readout[0] > 0` -> `execute`",
+            "- `readout[0] < 0` -> `retry`",
+            "- `readout[0] == 0` -> `query`",
+            "- Expected actions remain `execute`, `query`, `retry`.",
+            "",
+            "## Source summary",
+            "",
+            *source_rows,
+            "",
+            "## Aggregate action distribution",
+            "",
+            f"- Original: {original_distribution or 'none'}",
+            f"- Remapped: {remapped_distribution or 'none'}",
+            f"- Original unexpected action count: {result.original_unexpected_action_count}",
+            f"- Remapped unexpected action count: {result.remapped_unexpected_action_count}",
+            "",
+            "## Accuracy replay",
+            "",
+            *split_rows,
+            "",
+            "## Interpretation boundary",
+            "",
+            "Eliminating out-of-contract labels by remapping is not automatically an "
+            "adapter improvement. If accuracy falls on train/holdout/hard-holdout splits, "
+            "the generic decoder was not the only bottleneck. This remains decoder-contract "
+            "diagnostics, not intelligence, broad generalization, or useful-learning evidence.",
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_remap_audit_artifacts(
+    result: CunxonAigarthActionRemapAuditResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth action remap audit artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_remap_audit_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -5318,6 +5612,53 @@ def _aigarth_action_distribution(
     distribution: dict[str, int] = {}
     for case in cases:
         distribution[case.normalized_action] = distribution.get(case.normalized_action, 0) + 1
+    return dict(sorted(distribution.items()))
+
+
+def remap_aigarth_action_readout(readout: Sequence[int]) -> str:
+    """Map a three-lane cuNxon action readout through the target-readout contract."""
+    first_lane = readout[0] if readout else 0
+    if first_lane > 0:
+        return "execute"
+    if first_lane < 0:
+        return "retry"
+    return "query"
+
+
+def _remap_case_accuracy_by_split(
+    cases: Sequence[CunxonAigarthActionRemapCase],
+    *,
+    remapped: bool,
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonAigarthActionRemapCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(
+            1
+            for case in split_cases
+            if (
+                case.remapped_outcome == "success"
+                if remapped
+                else case.original_outcome == "success"
+            )
+        )
+        / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _remap_case_action_distribution(
+    cases: Sequence[CunxonAigarthActionRemapCase],
+    *,
+    remapped: bool,
+) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for case in cases:
+        action = case.remapped_action if remapped else case.original_normalized_action
+        distribution[action] = distribution.get(action, 0) + 1
     return dict(sorted(distribution.items()))
 
 

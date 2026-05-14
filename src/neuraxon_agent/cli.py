@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, cast
 
 from neuraxon_agent.cunxon_smoke import (
+    CunxonAigarthActionRemapAuditResult,
     CunxonVramResidentResult,
     ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
@@ -35,6 +36,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_artifacts,
     write_aigarth_action_contract_penalty_artifacts,
     write_aigarth_action_hard_holdout_artifacts,
+    write_aigarth_action_remap_audit_artifacts,
     write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_action_strict_label_artifacts,
     write_aigarth_readout_artifacts,
@@ -650,6 +652,31 @@ def cmd_cunxon_aigarth_action_contract_penalty_probe(args: argparse.Namespace) -
             f"Error: {e}\n\n"
             "Evidence boundary: a failed Aigarth/action contract-penalty audit does not "
             "support any GPU-backed label-contract, holdout, or action-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_aigarth_action_remap_audit(args: argparse.Namespace) -> int:
+    try:
+        source_artifacts = [
+            part.strip() for part in args.source_artifacts.split(",") if part.strip()
+        ]
+        result = CunxonAigarthActionRemapAuditResult.from_artifact_paths(source_artifacts)
+        write_aigarth_action_remap_audit_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon Aigarth action remap audit\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed remap audit does not support any GPU-backed "
+            "decoder-contract, holdout, action-quality, or learning claim.\n",
             encoding="utf-8",
         )
         return 1
@@ -1353,6 +1380,32 @@ def main(argv: list[str] | None = None) -> int:
     p_cunxon_aigarth_contract_penalty.set_defaults(
         func=cmd_cunxon_aigarth_action_contract_penalty_probe
     )
+
+    p_cunxon_aigarth_remap = sub.add_parser(
+        "cunxon-aigarth-action-remap-audit",
+        help="Replay Aigarth action artifacts through an explicit strict motor-lane remap",
+        description=(
+            "Post-hoc decoder-contract diagnostic: replay existing live cuNxon Aigarth "
+            "action JSON artifacts through a signed-first-lane remap to separate generic "
+            "ActionDecoder vocabulary effects from evolved readout evidence."
+        ),
+    )
+    p_cunxon_aigarth_remap.add_argument(
+        "--source-artifacts",
+        required=True,
+        help="Comma-separated Aigarth action JSON artifacts to replay",
+    )
+    p_cunxon_aigarth_remap.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_aigarth_action_remap_audit.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_aigarth_remap.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_aigarth_action_remap_audit.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_aigarth_remap.set_defaults(func=cmd_cunxon_aigarth_action_remap_audit)
 
     p_cunxon_sensitivity = sub.add_parser(
         "cunxon-sensitivity-probe",

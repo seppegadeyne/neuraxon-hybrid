@@ -1275,5 +1275,52 @@ def test_cli_cunxon_aigarth_action_contract_penalty_probe_writes_artifacts(
     )
 
 
+def test_cli_cunxon_aigarth_action_remap_audit_writes_artifacts(tmp_path: Path) -> None:
+    source_path = tmp_path / "source.json"
+    source_path.write_text(
+        json.dumps(
+            {
+                "status": "aigarth strict-label action audit completed",
+                "fitness_variant": "strict_label_margin",
+                "runs": [
+                    {
+                        "seed_offset": 1,
+                        "cases": [
+                            {
+                                "name": "execute-assertive",
+                                "split": "holdout",
+                                "expected_action": "execute",
+                                "readout": [1, 1, 0],
+                                "normalized_action": "assertive",
+                            }
+                        ],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    json_path = tmp_path / "remap.json"
+    markdown_path = tmp_path / "remap.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-remap-audit",
+            "--source-artifacts",
+            str(source_path),
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "aigarth action remap audit completed"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "post-hoc diagnostic" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_cli_no_command() -> None:
     assert main([]) == 2
