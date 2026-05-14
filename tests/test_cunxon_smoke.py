@@ -9,6 +9,8 @@ import pytest
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonAigarthActionCase,
+    CunxonAigarthActionProbeResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
     CunxonExternalDriveWindowProbeResult,
@@ -38,6 +40,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_aigarth_action_markdown_report,
     render_aigarth_readout_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
@@ -53,6 +56,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_vram_resident_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
+    write_aigarth_action_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -376,6 +380,84 @@ def test_aigarth_readout_report_separates_relative_demo_from_absolute_output(
 
     assert '"mapping": "absolute-output-readout"' in json_path.read_text(encoding="utf-8")
     assert "Aigarth readout semantics" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_aigarth_action_report_scores_holdout_against_trivial_baselines(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAigarthActionProbeResult(
+        status="aigarth action probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        readout_ids=[35, 36, 37],
+        generation_train_scores=[0.333333, 0.666667, 1.0],
+        cases=[
+            CunxonAigarthActionCase(
+                name="execute-train",
+                split="train",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                target_readout=[1, 0, 0],
+                readout=[1, 0, 0],
+                decoded_action="proceed",
+                normalized_action="execute",
+                confidence=1.0,
+                outcome="success",
+                target_alignment=1.0,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=12.5,
+            ),
+            CunxonAigarthActionCase(
+                name="retry-holdout-noisy",
+                split="holdout",
+                input_vector=[-0.8, -0.2, 0.1],
+                expected_action="retry",
+                target_readout=[-1, 0, 0],
+                readout=[0, 0, 0],
+                decoded_action="query",
+                normalized_action="query",
+                confidence=0.0,
+                outcome="failure",
+                target_alignment=0.666667,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=20.0,
+            ),
+        ],
+        accuracy_by_split={"holdout": 0.0, "overall": 0.5, "train": 1.0},
+        target_alignment_by_split={"holdout": 0.666667, "overall": 0.8333335, "train": 1.0},
+        baseline_accuracy_by_split={
+            "always_execute": {"holdout": 0.0, "overall": 0.5, "train": 1.0},
+            "always_query": {"holdout": 0.0, "overall": 0.0, "train": 0.0},
+        },
+        unique_readouts=2,
+        action_distribution={"execute": 1, "query": 1},
+        notes=["fitness callback uses train cases only; holdout is evaluated after evolution"],
+    )
+
+    markdown = render_aigarth_action_markdown_report(result)
+    assert "Aigarth holdout action probe" in markdown
+    assert "train cases only" in markdown
+    assert "Accuracy by split" in markdown
+    assert "Trivial baselines" in markdown
+    assert "Unique readouts: 2" in markdown
+    assert "does not prove intelligence" in markdown
+
+    json_path = tmp_path / "aigarth-action.json"
+    markdown_path = tmp_path / "aigarth-action.md"
+    write_aigarth_action_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"case_count": 2' in data
+    assert '"generation_train_scores": [' in data
+    assert "holdout accuracy must beat trivial baselines" in markdown_path.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
@@ -1014,7 +1096,9 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon supervised motor-target adapter" in markdown
     assert "cuNxon resident task-coupled action probe" in markdown
     assert "cuNxon Aigarth readout semantics probe" in markdown
+    assert "cuNxon Aigarth holdout/action probe" in markdown
     assert "absolute output readout margin improved 0.625000→1.500000" in markdown
+    assert "holdout=0.666667; overall=0.666667; beats constant-action baselines" in markdown
     assert "12 epochs / 72 scored cases" in markdown
     assert "4h run completed with 16 samples/4194304 steps" in markdown
     assert "resident readout stayed `[0, 0, 0]`" in markdown
@@ -1060,6 +1144,14 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
         'task, but this is not holdout/action evidence"'
         in data
     )
+    assert (
+        '"verdict": "Aigarth action probe beats constant-action baselines on this small '
+        'train/holdout set, but remains a toy evidence slice"'
+        in data
+    )
+    assert '"cunxon_aigarth_action_probe"' in data
+    assert '"holdout": 0.6666666666666666' in data
+    assert '"unique_readouts": 4' in data
     assert '"absolute_output_improvement": 0.875' in data
     assert '"relative_demo_improvement": 0.5' in data
     assert '"case_count": 72' in data
@@ -1085,6 +1177,27 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"decision_quality_measured": false' in data
     assert '"decision_quality_measured": true' in data
+
+
+def test_tracked_cunxon_aigarth_action_probe_records_holdout_action_result() -> None:
+    markdown = Path("benchmarks/results/cunxon_aigarth_action_probe.md").read_text(
+        encoding="utf-8"
+    )
+    data = Path("benchmarks/results/cunxon_aigarth_action_probe.json").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Aigarth holdout action probe" in markdown
+    assert "train cases only" in markdown
+    assert "Accuracy by split" in markdown
+    assert "Trivial baselines" in markdown
+    assert "Unique readouts: 4" in markdown
+    assert "does not prove intelligence" in markdown
+    assert '"status": "aigarth action probe viable"' in data
+    assert '"case_count": 6' in data
+    assert '"generation_train_scores": [' in data
+    assert '"holdout": 0.6666666666666666' in data
+    assert '"action_distribution": {' in data
 
 
 def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:

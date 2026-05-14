@@ -231,6 +231,64 @@ class CunxonAigarthReadoutProbeResult:
 
 
 @dataclass(frozen=True)
+class CunxonAigarthActionCase:
+    """One train/holdout case from an Aigarth-evolved action readout probe."""
+
+    name: str
+    split: str
+    input_vector: list[float]
+    expected_action: str
+    target_readout: list[int]
+    readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    target_alignment: float
+    baseline_actions: dict[str, str]
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonAigarthActionProbeResult:
+    """Aigarth evolution result scored through the production action decoder."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    readout_ids: list[int]
+    generation_train_scores: list[float]
+    cases: list[CunxonAigarthActionCase]
+    accuracy_by_split: dict[str, float]
+    target_alignment_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    unique_readouts: int
+    action_distribution: dict[str, int]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of scored train/holdout cases."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonLongSweepSample:
     """One long-horizon/mode/seed/stimulus sample decoded through the action contract."""
 
@@ -1121,6 +1179,115 @@ def write_aigarth_readout_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_aigarth_readout_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_aigarth_action_markdown_report(result: CunxonAigarthActionProbeResult) -> str:
+    """Render an Aigarth-evolved holdout/action probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    split_rows = ["| Split | Accuracy | Target alignment |", "| --- | ---: | ---: |"]
+    for split, accuracy in sorted(result.accuracy_by_split.items()):
+        alignment = result.target_alignment_by_split.get(split, 0.0)
+        split_rows.append(f"| {split} | {accuracy:.6f} | {alignment:.6f} |")
+    baseline_rows = ["| Baseline | Split | Accuracy |", "| --- | --- | ---: |"]
+    for baseline, by_split in sorted(result.baseline_accuracy_by_split.items()):
+        for split, accuracy in sorted(by_split.items()):
+            baseline_rows.append(f"| {baseline} | {split} | {accuracy:.6f} |")
+    generation_scores = ", ".join(f"{score:.6f}" for score in result.generation_train_scores)
+    action_distribution = ", ".join(
+        f"{action}={count}" for action, count in sorted(result.action_distribution.items())
+    )
+    case_rows = [
+        "| Case | Split | Expected | Target | Readout | Decoded | Outcome | Alignment | Energy |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | ---: |",
+    ]
+    for case in result.cases:
+        target = ", ".join(_format_trinary(value) for value in case.target_readout)
+        readout = ", ".join(_format_trinary(value) for value in case.readout)
+        case_rows.append(
+            "| "
+            f"{case.name} | {case.split} | {case.expected_action} | [{target}] | "
+            f"[{readout}] | {case.decoded_action} ({case.normalized_action}, "
+            f"{case.confidence:.4f}) | {case.outcome} | {case.target_alignment:.6f} | "
+            f"{case.energy:.6g} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon Aigarth holdout action probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Generations: {result.generations}",
+            f"- Population size: {result.population_size}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Readout ids: {', '.join(str(port) for port in result.readout_ids)}",
+            f"- Cases: {result.case_count}",
+            f"- Unique readouts: {result.unique_readouts}",
+            f"- Action distribution: {action_distribution or 'none'}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The earlier Aigarth readout-semantics probe showed that the public "
+            "`cunxonNetworkAigarthStep` evolutionary surface can improve an absolute-output "
+            "two-pattern margin. This probe makes that route task-coupled: the fitness "
+            "callback uses train cases only, then the evolved network is evaluated on both "
+            "train and holdout cases through the existing `ActionDecoder` action contract.",
+            "",
+            "## Fitness trajectory",
+            "",
+            f"- Train-only generation scores: {generation_scores or 'none'}",
+            "",
+            "## Accuracy by split",
+            "",
+            *split_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Cases",
+            "",
+            *case_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is Aigarth/evolutionary action-readout evidence, not an intelligence claim. "
+            "A train fitness improvement, callable GPU evolution loop, or isolated train success "
+            "does not prove intelligence, useful learning, or generalization. The holdout "
+            "accuracy must beat trivial baselines before this route can be treated as useful "
+            "adapter evidence.",
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_artifacts(
+    result: CunxonAigarthActionProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth action probe artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_aigarth_action_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -2352,6 +2519,161 @@ def run_ctypes_aigarth_readout_probe(
             ],
         )
     finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_aigarth_action_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    device_id: int = 0,
+) -> CunxonAigarthActionProbeResult:
+    """Evolve a cuNxon readout with Aigarth and score train/holdout actions."""
+    if generations <= 0:
+        raise ValueError("generations must be positive")
+    if population_size <= 0:
+        raise ValueError("population_size must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    callback_errors: list[Exception] = []
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xA164A27E, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(ctx, C.byref(net), b"neuraxon_hybrid_cunxon_aigarth_action"),
+        )
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 32
+        params.num_output_neurons = 3
+        params.random_seed_offset = 82
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"AIGARTH_ACTION", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_start = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = [readout_start, readout_start + 1, readout_start + 2]
+        readout_ids_array = (C.c_int * len(readout_ids))(*readout_ids)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids_array,
+                len(readout_ids),
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        specs = _default_supervised_motor_specs()
+        train_specs = [spec for spec in specs if spec[1] == "train"]
+
+        def train_score(candidate_net: C.c_void_p) -> float:
+            cases = _evaluate_aigarth_action_cases(
+                lib=lib,
+                net=candidate_net,
+                sphere_id=sphere_id.value,
+                specs=train_specs,
+                eval_steps=eval_steps,
+                decoder=decoder,
+            )
+            if not cases:
+                return 0.0
+            success_score = sum(1.0 for case in cases if case.outcome == "success") / len(cases)
+            alignment_score = sum(case.target_alignment for case in cases) / len(cases)
+            return float(success_score + 0.25 * alignment_score)
+
+        def fitness(candidate_net: C.c_void_p, _user_data: C.c_void_p) -> float:
+            try:
+                return train_score(candidate_net)
+            except Exception as exc:  # pragma: no cover - ctypes callback safety net
+                callback_errors.append(exc)
+                return 0.0
+
+        callback = _CUNXON_FITNESS_FN(fitness)
+        generation_train_scores: list[float] = []
+        for generation_index in range(generations):
+            fraction = generation_index / max(1, generations - 1)
+            mutation_fast = 0.18 * (1.0 - 0.6 * fraction)
+            mutation_slow = 0.08 * (1.0 - 0.6 * fraction)
+            mutation_meta = 0.04 * (1.0 - 0.6 * fraction)
+            _check(
+                lib,
+                lib.cunxonNetworkAigarthConfig(
+                    net,
+                    population_size,
+                    C.c_float(mutation_fast),
+                    C.c_float(mutation_slow),
+                    C.c_float(mutation_meta),
+                ),
+            )
+            _check(lib, lib.cunxonNetworkAigarthStep(net, callback, None))
+            if callback_errors:
+                raise callback_errors[0]
+            generation_train_scores.append(train_score(net))
+
+        cases = _evaluate_aigarth_action_cases(
+            lib=lib,
+            net=net,
+            sphere_id=sphere_id.value,
+            specs=specs,
+            eval_steps=eval_steps,
+            decoder=decoder,
+        )
+        return CunxonAigarthActionProbeResult(
+            status="aigarth action probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            readout_ids=readout_ids,
+            generation_train_scores=generation_train_scores,
+            cases=cases,
+            accuracy_by_split=_aigarth_action_accuracy_by_split(cases),
+            target_alignment_by_split=_aigarth_action_target_alignment_by_split(cases),
+            baseline_accuracy_by_split=_aigarth_action_baseline_accuracy_by_split(cases),
+            unique_readouts=len({tuple(case.readout) for case in cases}),
+            action_distribution=_aigarth_action_distribution(cases),
+            notes=[
+                "Aigarth fitness callback uses train cases only; holdout labels are not optimized",
+                "final train and holdout readouts are decoded through the existing ActionDecoder",
+                "holdout accuracy must beat trivial baselines before any adapter claim",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
 
@@ -4137,6 +4459,107 @@ def _aigarth_mean_for_input(
     readout = _capture_readout(lib, net, sphere_id)
     return sum(readout) / len(readout), readout
 
+
+def _evaluate_aigarth_action_cases(
+    *,
+    lib: C.CDLL,
+    net: C.c_void_p,
+    sphere_id: int,
+    specs: Sequence[tuple[str, str, tuple[float, float, float], str]],
+    eval_steps: int,
+    decoder: ActionDecoder,
+) -> list[CunxonAigarthActionCase]:
+    cases: list[CunxonAigarthActionCase] = []
+    for index, (name, split, input_vector, expected_action) in enumerate(specs):
+        _check(lib, lib.cunxonNetworkReset(net))
+        input_buffer = (C.c_float * len(input_vector))(*input_vector)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        for _ in range(eval_steps):
+            _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+        readout = _capture_readout(lib, net, sphere_id)
+        decoded = decoder.decode(readout)
+        normalized_action = normalize_benchmark_action(decoded.actie_type)
+        target = _target_readout_for_action(expected_action)
+        cases.append(
+            CunxonAigarthActionCase(
+                name=name,
+                split=split,
+                input_vector=list(input_vector),
+                expected_action=expected_action,
+                target_readout=list(target),
+                readout=readout,
+                decoded_action=decoded.actie_type,
+                normalized_action=normalized_action,
+                confidence=decoded.confidence,
+                outcome="success" if normalized_action == expected_action else "failure",
+                target_alignment=_target_alignment(readout, target),
+                baseline_actions=_baseline_actions_for_case(index),
+                energy=_capture_energy(lib, net),
+            )
+        )
+    return cases
+
+
+def _aigarth_action_accuracy_by_split(
+    cases: Sequence[CunxonAigarthActionCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonAigarthActionCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(1 for case in split_cases if case.outcome == "success") / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _aigarth_action_target_alignment_by_split(
+    cases: Sequence[CunxonAigarthActionCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonAigarthActionCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(case.target_alignment for case in split_cases) / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _aigarth_action_baseline_accuracy_by_split(
+    cases: Sequence[CunxonAigarthActionCase],
+) -> dict[str, dict[str, float]]:
+    baseline_names = sorted({name for case in cases for name in case.baseline_actions})
+    result: dict[str, dict[str, float]] = {}
+    for baseline_name in baseline_names:
+        split_scores: dict[str, float] = {}
+        for split in sorted({case.split for case in cases} | {"overall"}):
+            split_cases = (
+                list(cases)
+                if split == "overall"
+                else [case for case in cases if case.split == split]
+            )
+            if not split_cases:
+                continue
+            split_scores[split] = sum(
+                1
+                for case in split_cases
+                if case.baseline_actions[baseline_name] == case.expected_action
+            ) / len(split_cases)
+        result[baseline_name] = split_scores
+    return result
+
+
+def _aigarth_action_distribution(
+    cases: Sequence[CunxonAigarthActionCase],
+) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for case in cases:
+        distribution[case.normalized_action] = distribution.get(case.normalized_action, 0) + 1
+    return dict(sorted(distribution.items()))
 
 
 def _default_multisphere_action_specs() -> list[

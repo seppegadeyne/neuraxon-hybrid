@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The external-drive port-window probe confirms the sharper boundary: identical external values drive input-class windows in infer/train, while hidden/output windows stay zero in this controlled 4/4/4 setup, so those windows should not be treated as desired-output channels. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only. The task-coupled resident action probe adds explicit scoring but still does not beat trivial baselines. The new Aigarth readout semantics probe shows a different lower-level surface: relative demo readout margin improved 1.000000->1.500000, while absolute output readout margin improved 0.625000->1.500000 on the same two-pattern fitness task. This is positive interface/evolution evidence, but not holdout/action evidence and not a Neuraxon-Hybrid decision-quality win.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The external-drive port-window probe confirms the sharper boundary: identical external values drive input-class windows in infer/train, while hidden/output windows stay zero in this controlled 4/4/4 setup, so those windows should not be treated as desired-output channels. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only. The task-coupled resident action probe adds explicit scoring but still does not beat trivial baselines. The new Aigarth readout semantics probe shows a different lower-level surface: relative demo readout margin improved 1.000000->1.500000, while absolute output readout margin improved 0.625000->1.500000 on the same two-pattern fitness task. This is positive interface/evolution evidence, but not holdout/action evidence and not a Neuraxon-Hybrid decision-quality win. The Aigarth holdout/action probe is the first cuNxon action lane in this stack to beat constant-action baselines on a tiny balanced train/holdout set (0.666667 holdout/overall), but it remains toy Aigarth/evolution evidence rather than broad learning, intelligence, or production-readiness evidence.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -20,10 +20,16 @@
       "value": "12 epochs / 72 scored cases; every epoch/split accuracy=0.333333; motor readouts flat query; equals constant-action baselines"
     },
     {
+      "evidence": "benchmarks/results/cunxon_aigarth_readout_probe.json",
       "lane": "cuNxon Aigarth readout semantics probe",
       "metric": "two-pattern classification margin, relative demo vs absolute output ports",
-      "value": "relative demo margin improved 1.000000->1.500000; absolute output readout margin improved 0.625000->1.500000; no holdout/action score measured",
-      "evidence": "benchmarks/results/cunxon_aigarth_readout_probe.json"
+      "value": "relative demo margin improved 1.000000->1.500000; absolute output readout margin improved 0.625000->1.500000; no holdout/action score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_probe.json",
+      "lane": "cuNxon Aigarth holdout/action probe",
+      "metric": "train/holdout action accuracy vs trivial baselines",
+      "value": "holdout=0.666667; overall=0.666667; beats constant-action baselines on this toy train/holdout set; unique_readouts=4; actions={'execute': 2, 'query': 4}"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -131,13 +137,16 @@
     "trial_steps": 32,
     "verdict": "task-coupled but not above baselines"
   },
-  "cunxon_resident_action_probe": {
+  "cunxon_aigarth_action_probe": {
     "accuracy_by_split": {
-      "holdout": 0.3333333333333333,
-      "overall": 0.3333333333333333,
-      "train": 0.3333333333333333
+      "holdout": 0.6666666666666666,
+      "overall": 0.6666666666666666,
+      "train": 0.6666666666666666
     },
-    "all_epoch_accuracy": 0.3333333333333333,
+    "action_distribution": {
+      "execute": 2,
+      "query": 4
+    },
     "baseline_accuracy_by_split": {
       "always_execute": {
         "holdout": 0.3333333333333333,
@@ -155,21 +164,59 @@
         "train": 0.3333333333333333
       }
     },
-    "case_count": 72,
+    "case_count": 6,
     "decision_quality_measured": true,
-    "eval_steps": 64,
-    "motor_readouts": [
-      [
-        0,
-        0,
-        0
-      ]
+    "eval_steps": 24,
+    "evidence_boundary": "small toy train/holdout Aigarth action slice; no broad intelligence/generalization claim",
+    "generation_train_scores": [
+      0.861111111111111,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.25,
+      1.25,
+      1.25,
+      1.1944444444444444,
+      0.5277777777777777,
+      1.2222222222222223,
+      0.861111111111111,
+      1.2222222222222223,
+      1.1388888888888888,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.1388888888888888,
+      1.1666666666666667,
+      1.1944444444444444
     ],
-    "status": "resident action probe viable",
-    "train_epochs": 12,
-    "train_steps_per_case": 128,
-    "unique_motor_readouts": 1,
-    "verdict": "resident task-coupled action loop remains flat query and does not beat trivial baselines"
+    "generations": 18,
+    "holdout_measured": true,
+    "population_size": 36,
+    "readout_ids": [
+      35,
+      36,
+      37
+    ],
+    "status": "aigarth action probe viable",
+    "target_alignment_by_split": {
+      "holdout": 0.5555555555555555,
+      "overall": 0.5555555555555555,
+      "train": 0.5555555555555555
+    },
+    "unique_readouts": 4,
+    "verdict": "Aigarth action probe beats constant-action baselines on this small train/holdout set, but remains a toy evidence slice"
+  },
+  "cunxon_aigarth_readout_probe": {
+    "absolute_output_final_margin": 1.5,
+    "absolute_output_improvement": 0.875,
+    "decision_quality_measured": false,
+    "eval_steps": 25,
+    "generations": 12,
+    "holdout_measured": false,
+    "population_size": 24,
+    "relative_demo_final_margin": 1.5,
+    "relative_demo_improvement": 0.5,
+    "status": "aigarth readout semantics probe viable",
+    "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
   },
   "cunxon_external_drive_window_probe": {
     "decision_quality_measured": false,
@@ -578,6 +625,46 @@
     "status": "multi-sphere action probe viable",
     "verdict": "three-sphere adapter runs but is flat query and does not beat trivial baselines"
   },
+  "cunxon_resident_action_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "all_epoch_accuracy": 0.3333333333333333,
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 72,
+    "decision_quality_measured": true,
+    "eval_steps": 64,
+    "motor_readouts": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "status": "resident action probe viable",
+    "train_epochs": 12,
+    "train_steps_per_case": 128,
+    "unique_motor_readouts": 1,
+    "verdict": "resident task-coupled action loop remains flat query and does not beat trivial baselines"
+  },
   "cunxon_sensitivity_probe": {
     "action_change_count_by_stimulus": {
       "execute-positive-drive": 1,
@@ -770,6 +857,10 @@
     ],
     "verdict": "four-hour resident process completed without observed GPU resource failure, but readout stayed flat zero and no decision-quality score was measured"
   },
+  "observed_files": [
+    "benchmarks/results/cunxon_aigarth_action_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_probe.md"
+  ],
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_resident_action_probe.json",
@@ -786,18 +877,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "source semantics audit: output-port teacher forcing unsupported; input-proxy target drive observable but motor readout baseline-level; external-drive window probe keeps hidden/output drive non-teacher-forcing; VRAM-resident 4h run flat; resident task-coupled action probe still baseline-level",
-  "cunxon_aigarth_readout_probe": {
-    "status": "aigarth readout semantics probe viable",
-    "generations": 12,
-    "population_size": 24,
-    "eval_steps": 25,
-    "relative_demo_improvement": 0.5,
-    "relative_demo_final_margin": 1.5,
-    "absolute_output_improvement": 0.875,
-    "absolute_output_final_margin": 1.5,
-    "decision_quality_measured": false,
-    "holdout_measured": false,
-    "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
-  }
+  "verdict": "Aigarth action probe beats trivial baselines on a small train/holdout set, while prior StepTrain/resident/input-proxy routes remain baseline-level; treat as promising toy evidence only"
 }
