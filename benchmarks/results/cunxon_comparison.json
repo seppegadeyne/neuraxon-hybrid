@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far, but the new heavy contract-penalty variant is negative versus the prior strict-label result: hard-holdout mean fell to 0.466667 and only 2/5 seeds beat the best constant baseline on the hard split, although unexpected assertive labels dropped to 0.040000 and permuted-control mean stayed 0.000000. A post-hoc signed-first-lane remap removes assertive labels entirely (0 unexpected labels across 255 replayed cases), but aggregate accuracy changes from 0.549020 to 0.537255 and therefore isolates a decoder-contract issue without improving decision quality. This is brittle toy/evolution evidence only; no broad intelligence/generalization claim is supported.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: a post-hoc signed-first-lane remap removed assertive labels but slightly lowered aggregate accuracy, while the new target-contract fitness moves that decoder contract into train-only Aigarth optimization and reaches holdout mean 0.866667, hard-holdout mean 0.666667, 0 unexpected labels, and permuted-control mean 0.000000. This is constructive but still brittle toy/evolution evidence: one seed remains baseline-level on hard-holdout, the task is tiny, and no broad intelligence/generalization claim is supported.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -60,6 +60,12 @@
       "lane": "cuNxon Aigarth action remap audit",
       "metric": "post-hoc signed-first-lane replay over existing Aigarth action artifacts",
       "value": "remap removes assertive labels but does not improve aggregate accuracy: original overall=0.549020, remapped overall=0.537255; original unexpected=13, remapped unexpected=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_probe.json",
+      "lane": "cuNxon Aigarth target-contract action audit",
+      "metric": "5-seed target-contract hard-holdout/permuted-control accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.666667 (min=0.333333, max=1.000000); holdout mean=0.866667; train=1.000000; permuted-control mean=0.000000; 4/5 seeds beat the best constant baseline on hard_holdout; unexpected labels=0"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -487,6 +493,45 @@
       "assertive"
     ],
     "verdict": "strict-label fitness improved hard-holdout robustness but did not eliminate out-of-contract labels or brittleness"
+  },
+  "cunxon_aigarth_action_target_contract_probe": {
+    "aggregate_action_distribution": {
+      "execute": 20,
+      "query": 35,
+      "retry": 20
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed target-contract Aigarth fitness audit; signed-first-lane decoder used during train-only fitness; hard-holdout/permuted-control labels never optimized; no intelligence/generalization claim",
+    "fitness_variant": "target_contract_margin",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.6666666666666666,
+    "mean_holdout": 0.8666666666666666,
+    "mean_overall": 0.6399999999999999,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      102,
+      103,
+      104,
+      105,
+      106
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 4,
+      "holdout": 4,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth target-contract action audit completed",
+    "train_to_hard_holdout_gap_mean": 0.33333333333333337,
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0,
+    "verdict": "target-contract fitness removes out-of-contract labels and improves holdout versus the post-hoc remap/heavy-penalty lanes, but remains brittle tiny Aigarth toy evidence with one hard-holdout baseline-level seed"
   },
   "cunxon_aigarth_readout_probe": {
     "absolute_output_final_margin": 1.5,
@@ -1163,5 +1208,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "Aigarth action probes remain the only cuNxon route above trivial baselines in tiny toy tasks, but hard-holdout and label-coverage audits keep the evidence brittle; prior StepTrain/resident/input-proxy routes remain baseline-level"
+  "verdict": "target-contract Aigarth fitness is the strongest strict-contract cuNxon action lane so far, but still only brittle toy/evolution evidence"
 }

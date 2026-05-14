@@ -1864,6 +1864,39 @@ def render_aigarth_action_contract_penalty_markdown_report(
     )
 
 
+def render_aigarth_action_target_contract_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render a target-contract Aigarth action audit report."""
+    return (
+        render_aigarth_action_hard_holdout_markdown_report(result)
+        .replace(
+            "# cuNxon Aigarth action hard-holdout audit",
+            "# cuNxon Aigarth target-contract action audit",
+            1,
+        )
+        .replace(
+            "The Aigarth seed sweep partially repeated a tiny baseline-beating action signal, "
+            "but it also produced unstable class coverage and unexpected normalized labels. "
+            "This audit keeps the train-only Aigarth fitness route but expands evaluation with "
+            "harder/noisier holdouts and a permuted-control leakage/oracle check before treating "
+            "the route as stronger adapter evidence.",
+            "The remap audit showed that a signed-first-lane decoder removes out-of-contract "
+            "labels but does not improve accuracy when applied only post hoc. This audit "
+            "moves that decoder contract into the train-only Aigarth fitness itself: "
+            "`target_contract_margin` decodes with the signed-first-lane project contract "
+            "and rewards target-readout margin while keeping holdout, hard-holdout, and "
+            "permuted-control labels outside the fitness callback.",
+            1,
+        )
+        .replace(
+            "This is a stress audit of a tiny Aigarth/evolutionary adapter route, not ",
+            "This is a target-contract stress audit of a tiny Aigarth/evolutionary adapter "
+            "route, not ",
+            1,
+        )
+    )
+
 
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
@@ -1915,6 +1948,24 @@ def write_aigarth_action_contract_penalty_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_contract_penalty_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_target_contract_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth target-contract audit artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -3345,6 +3396,11 @@ def run_ctypes_aigarth_action_probe(
             raise ValueError("evaluation_specs must include at least one train case")
 
         def train_score(candidate_net: C.c_void_p) -> float:
+            decoder_strategy = (
+                "target_contract"
+                if fitness_variant == "target_contract_margin"
+                else "action_decoder"
+            )
             cases = _evaluate_aigarth_action_cases(
                 lib=lib,
                 net=candidate_net,
@@ -3352,6 +3408,7 @@ def run_ctypes_aigarth_action_probe(
                 specs=train_specs,
                 eval_steps=eval_steps,
                 decoder=decoder,
+                decoder_strategy=decoder_strategy,
             )
             if not cases:
                 return 0.0
@@ -3359,6 +3416,9 @@ def run_ctypes_aigarth_action_probe(
             alignment_score = sum(case.target_alignment for case in cases) / len(cases)
             if fitness_variant == "success_plus_alignment":
                 return float(success_score + 0.25 * alignment_score)
+            if fitness_variant == "target_contract_margin":
+                margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
+                return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
             if fitness_variant in {"strict_label_margin", "strict_label_heavy_penalty"}:
                 strict_actions = {"execute", "query", "retry"}
                 unexpected_rate = (
@@ -3408,6 +3468,11 @@ def run_ctypes_aigarth_action_probe(
             specs=specs,
             eval_steps=eval_steps,
             decoder=decoder,
+            decoder_strategy=(
+                "target_contract"
+                if fitness_variant == "target_contract_margin"
+                else "action_decoder"
+            ),
         )
         return CunxonAigarthActionProbeResult(
             status="aigarth action probe viable",
@@ -3609,10 +3674,14 @@ def run_ctypes_aigarth_action_strict_label_probe(
     """Run a strict-label Aigarth action fitness audit across fresh cuNxon seeds."""
     if not seed_offsets:
         raise ValueError("seed_offsets must contain at least one value")
-    if fitness_variant not in {"strict_label_margin", "strict_label_heavy_penalty"}:
+    if fitness_variant not in {
+        "strict_label_margin",
+        "strict_label_heavy_penalty",
+        "target_contract_margin",
+    }:
         raise ValueError(
-            "strict-label audit only supports fitness_variant='strict_label_margin' "
-            "or 'strict_label_heavy_penalty'"
+            "strict-label audit only supports fitness_variant='strict_label_margin', "
+            "'strict_label_heavy_penalty', or 'target_contract_margin'"
         )
     specs = _aigarth_action_hard_holdout_specs()
     probe_results = [
@@ -3656,11 +3725,16 @@ def run_ctypes_aigarth_action_strict_label_probe(
     hard_values = [run.accuracy_by_split.get("hard_holdout", 0.0) for run in runs]
     gaps = [train - hard for train, hard in zip(train_values, hard_values, strict=False)]
     heavy_penalty = fitness_variant == "strict_label_heavy_penalty"
+    target_contract = fitness_variant == "target_contract_margin"
     return CunxonAigarthActionHardHoldoutResult(
         status=(
             "aigarth contract-penalty action audit completed"
             if heavy_penalty
-            else "aigarth strict-label action audit completed"
+            else (
+                "aigarth target-contract action audit completed"
+                if target_contract
+                else "aigarth strict-label action audit completed"
+            )
         ),
         upstream_commit=upstream_commit,
         cunxon_commit=cunxon_commit,
@@ -3687,14 +3761,22 @@ def run_ctypes_aigarth_action_strict_label_probe(
             (
                 "heavy contract penalty subtracts three times the unexpected-label rate"
                 if heavy_penalty
-                else "strict-label fitness penalizes out-of-contract normalized labels"
+                else (
+                    "target-contract fitness decodes with the signed-first-lane project contract"
+                    if target_contract
+                    else "strict-label fitness penalizes out-of-contract normalized labels"
+                )
             ),
             "fitness callback uses train cases only; holdout, hard-holdout and "
             "permuted-control labels are never optimized",
             (
                 "contract-penalty audit, not intelligence evidence"
                 if heavy_penalty
-                else "strict-label audit, not intelligence evidence"
+                else (
+                    "target-contract audit, not intelligence evidence"
+                    if target_contract
+                    else "strict-label audit, not intelligence evidence"
+                )
             ),
         ],
     )
@@ -3717,6 +3799,36 @@ def run_ctypes_aigarth_action_contract_penalty_probe(
         raise ValueError(
             "contract-penalty audit only supports "
             "fitness_variant='strict_label_heavy_penalty'"
+        )
+    return run_ctypes_aigarth_action_strict_label_probe(
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        seed_offsets=seed_offsets,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        device_id=device_id,
+    )
+
+
+def run_ctypes_aigarth_action_target_contract_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (102, 103, 104, 105, 106),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_margin",
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Run a target-contract/margin Aigarth action audit across fresh cuNxon seeds."""
+    if fitness_variant != "target_contract_margin":
+        raise ValueError(
+            "target-contract audit only supports fitness_variant='target_contract_margin'"
         )
     return run_ctypes_aigarth_action_strict_label_probe(
         library_path=library_path,
@@ -5521,6 +5633,7 @@ def _evaluate_aigarth_action_cases(
     specs: Sequence[tuple[str, str, tuple[float, float, float], str]],
     eval_steps: int,
     decoder: ActionDecoder,
+    decoder_strategy: str = "action_decoder",
 ) -> list[CunxonAigarthActionCase]:
     cases: list[CunxonAigarthActionCase] = []
     for index, (name, split, input_vector, expected_action) in enumerate(specs):
@@ -5531,8 +5644,15 @@ def _evaluate_aigarth_action_cases(
         for _ in range(eval_steps):
             _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
         readout = _capture_readout(lib, net, sphere_id)
-        decoded = decoder.decode(readout)
-        normalized_action = normalize_benchmark_action(decoded.actie_type)
+        if decoder_strategy == "target_contract":
+            normalized_action = remap_aigarth_action_readout(readout)
+            decoded_action = normalized_action
+            confidence = 1.0 if readout and readout[0] != 0 else 0.0
+        else:
+            decoded = decoder.decode(readout)
+            decoded_action = decoded.actie_type
+            normalized_action = normalize_benchmark_action(decoded.actie_type)
+            confidence = decoded.confidence
         target = _target_readout_for_action(expected_action)
         cases.append(
             CunxonAigarthActionCase(
@@ -5542,9 +5662,9 @@ def _evaluate_aigarth_action_cases(
                 expected_action=expected_action,
                 target_readout=list(target),
                 readout=readout,
-                decoded_action=decoded.actie_type,
+                decoded_action=decoded_action,
                 normalized_action=normalized_action,
-                confidence=decoded.confidence,
+                confidence=confidence,
                 outcome="success" if normalized_action == expected_action else "failure",
                 target_alignment=_target_alignment(readout, target),
                 baseline_actions=_baseline_actions_for_case(index),
@@ -6160,6 +6280,16 @@ def _target_alignment(readout: Sequence[int], target: Sequence[int]) -> float:
         return 0.0
     matches = sum(1 for actual, expected in zip(readout, target) if actual == expected)
     return matches / len(target)
+
+
+def _target_contract_margin(case: CunxonAigarthActionCase) -> float:
+    """Score how strongly the first readout lane supports the expected action."""
+    first_lane = case.readout[0] if case.readout else 0
+    if case.expected_action == "execute":
+        return max(0.0, float(first_lane))
+    if case.expected_action == "retry":
+        return max(0.0, float(-first_lane))
+    return 1.0 if first_lane == 0 else 0.0
 
 
 def _pack_supervised_motor_inputs(

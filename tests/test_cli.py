@@ -1275,6 +1275,93 @@ def test_cli_cunxon_aigarth_action_contract_penalty_probe_writes_artifacts(
     )
 
 
+def test_cli_cunxon_aigarth_action_target_contract_probe_writes_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthActionHardHoldoutResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        assert isinstance(raw_seed_offsets, list)
+        assert kwargs["fitness_variant"] == "target_contract_margin"
+        return CunxonAigarthActionHardHoldoutResult(
+            status="aigarth target-contract action audit completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            readout_ids=[35, 36, 37],
+            seed_offsets=raw_seed_offsets,
+            strict_expected_actions=["execute", "query", "retry"],
+            runs=[
+                CunxonAigarthActionSeedRun(
+                    seed_offset=102,
+                    generation_train_scores=[0.0, 0.5],
+                    accuracy_by_split={"hard_holdout": 0.666667, "overall": 0.666667},
+                    target_alignment_by_split={"hard_holdout": 0.666667, "overall": 0.666667},
+                    baseline_accuracy_by_split={
+                        "always_query": {"hard_holdout": 0.333333, "overall": 0.333333}
+                    },
+                    unique_readouts=2,
+                    action_distribution={"execute": 2, "query": 2, "retry": 2},
+                    cases=[],
+                )
+            ],
+            accuracy_summary_by_split={
+                "hard_holdout": {"mean": 0.666667, "min": 0.666667, "max": 0.666667},
+                "overall": {"mean": 0.666667, "min": 0.666667, "max": 0.666667},
+            },
+            aggregate_action_distribution={"execute": 2, "query": 2, "retry": 2},
+            seeds_beating_baseline_by_split={"hard_holdout": 1, "overall": 1},
+            unexpected_action_count=0,
+            unexpected_action_rate=0.0,
+            leakage_control_accuracy_mean=0.0,
+            train_to_hard_holdout_gap_mean=0.333333,
+            fitness_variant=str(kwargs["fitness_variant"]),
+            notes=["fake target-contract audit"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_target_contract_probe", fake_probe
+    )
+    json_path = tmp_path / "aigarth-action-target-contract.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-target-contract-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "102,103",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "aigarth target-contract action audit completed"' in data
+    assert '"fitness_variant": "target_contract_margin"' in data
+    assert "Aigarth target-contract action audit" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
 def test_cli_cunxon_aigarth_action_remap_audit_writes_artifacts(tmp_path: Path) -> None:
     source_path = tmp_path / "source.json"
     source_path.write_text(
