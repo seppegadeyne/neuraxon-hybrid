@@ -443,6 +443,72 @@ class CunxonBranchingRegimeScanResult:
 
 
 @dataclass(frozen=True)
+class CunxonAvalancheWindowSample:
+    """One full-sphere snapshot window for a cuNxon stimulus/action case."""
+
+    mode: str
+    seed_offset: int
+    stimulus: str
+    input_vector: list[float]
+    expected_action: str
+    active_state_sequence: list[int]
+    activation_event_sequence: list[int]
+    deactivation_event_sequence: list[int]
+    branching_ratio_estimate: float
+    active_count_ratio_mean: float
+    neutral_occupancy: float
+    transition_entropy_bits: float
+    avalanche_event_count: int
+    mean_avalanche_size: float
+    max_avalanche_size: int
+    final_readout: list[int]
+    normalized_action: str
+    outcome: str
+    energy_delta: float
+    elapsed_ms: float
+    gpu_memory_used_mb: int | None = None
+    gpu_utilization_percent: int | None = None
+    gpu_temperature_c: int | None = None
+
+
+@dataclass(frozen=True)
+class CunxonAvalancheWindowProbeResult:
+    """Snapshot-level avalanche/branching diagnostic coupled to action baselines."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    modes: list[str]
+    seed_offsets: list[int]
+    steps: int
+    sample_interval: int
+    samples: list[CunxonAvalancheWindowSample]
+    accuracy_by_mode: dict[str, float]
+    baseline_accuracy: dict[str, float]
+    correlation_summary: dict[str, float]
+    verdict: str
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of mode/seed/stimulus windows in the probe."""
+        return len(self.samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonAigarthActionRemapCase:
     """One Aigarth action case replayed through a strict motor-lane remap."""
 
@@ -2133,6 +2199,113 @@ def write_aigarth_action_target_contract_augmented_train_artifacts(
         render_aigarth_action_target_contract_augmented_train_markdown_report(result),
         encoding="utf-8",
     )
+    return json_output, markdown_output
+
+
+def render_avalanche_window_markdown_report(
+    result: CunxonAvalancheWindowProbeResult,
+) -> str:
+    """Render a snapshot-level avalanche/branching diagnostic report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    sample_rows = [
+        (
+            "| Mode | Seed | Stimulus | Branching-ratio estimate | Active-ratio mean | "
+            "Neutral occupancy | Avalanche events | Mean/max avalanche | Final action | Outcome |"
+        ),
+        "| --- | ---: | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
+    ]
+    for sample in result.samples:
+        sample_rows.append(
+            f"| {sample.mode} | {sample.seed_offset} | {sample.stimulus} | "
+            f"{sample.branching_ratio_estimate:.6f} | {sample.active_count_ratio_mean:.6f} | "
+            f"{sample.neutral_occupancy:.6f} | {sample.avalanche_event_count} | "
+            f"{sample.mean_avalanche_size:.6f}/{sample.max_avalanche_size} | "
+            f"{sample.normalized_action} | {sample.outcome} |"
+        )
+    accuracy_lines = [
+        f"- {mode}: {value:.6f}" for mode, value in sorted(result.accuracy_by_mode.items())
+    ] or ["- none"]
+    baseline_lines = [
+        f"- {name}: {value:.6f}" for name, value in sorted(result.baseline_accuracy.items())
+    ] or ["- none"]
+    correlation_lines = [
+        f"- {name}: {value:.6f}" for name, value in sorted(result.correlation_summary.items())
+    ] or ["- none"]
+    return "\n".join(
+        [
+            "# cuNxon avalanche-window snapshot probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Modes: {', '.join(result.modes)}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Steps per window: {result.steps}",
+            f"- Snapshot sample interval: {result.sample_interval}",
+            "",
+            "## Why this probe exists",
+            "",
+            "Qubic NIA Vol. 8 frames branching ratio as an operational criticality "
+            "indicator. This probe uses full-sphere snapshot windows rather than only "
+            "final action readouts, then compares the branching-ratio estimate with "
+            "action-contract accuracy and trivial baselines.",
+            "",
+            "## Snapshot window metrics",
+            "",
+            *sample_rows,
+            "",
+            "## Accuracy by mode",
+            "",
+            *accuracy_lines,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_lines,
+            "",
+            "## Correlation summary",
+            "",
+            *correlation_lines,
+            "",
+            "## Verdict",
+            "",
+            result.verdict,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is a full-sphere snapshot-level branching/avalanche diagnostic. A "
+            "branching-ratio estimate or visible avalanche activity is not intelligence "
+            "evidence unless task quality beats baselines on held-out/control cases.",
+            "",
+        ]
+    )
+
+
+def write_avalanche_window_artifacts(
+    result: CunxonAvalancheWindowProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown avalanche-window probe artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_avalanche_window_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -4430,6 +4603,226 @@ def run_ctypes_branching_regime_scan_probe(
             "regime metrics are diagnostics only and must be interpreted beside task baselines",
         ],
     )
+
+
+def run_ctypes_avalanche_window_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    modes: Sequence[str] = ("infer", "train"),
+    seed_offsets: Sequence[int] = (122, 123, 124),
+    steps: int = 256,
+    sample_interval: int = 16,
+    device_id: int = 0,
+) -> CunxonAvalancheWindowProbeResult:
+    """Run full-sphere snapshot windows to estimate avalanche/branching dynamics."""
+    if not modes:
+        raise ValueError("modes must contain at least one mode")
+    invalid_modes = [mode for mode in modes if mode not in {"infer", "train"}]
+    if invalid_modes:
+        raise ValueError(f"unsupported avalanche-window modes: {', '.join(invalid_modes)}")
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    if steps <= 0:
+        raise ValueError("steps must be positive")
+    if sample_interval <= 0:
+        raise ValueError("sample_interval must be positive")
+    if sample_interval > steps:
+        raise ValueError("sample_interval must be <= steps")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xB4A9C0DE, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        gpu_sample = _query_nvidia_smi_sample(device_id)
+        samples = [
+            _run_avalanche_window_sample(
+                lib=lib,
+                ctx=ctx,
+                mode=mode,
+                seed_offset=seed_offset,
+                stimulus=stimulus,
+                input_vector=input_vector,
+                expected_action=expected_action,
+                steps=steps,
+                sample_interval=sample_interval,
+                decoder=decoder,
+                gpu_memory_used_mb=gpu_sample["memory_used_mb"],
+                gpu_utilization_percent=gpu_sample["utilization_percent"],
+                gpu_temperature_c=gpu_sample["temperature_c"],
+            )
+            for mode in modes
+            for seed_offset in seed_offsets
+            for stimulus, input_vector, expected_action in _default_action_probe_specs()
+        ]
+        return CunxonAvalancheWindowProbeResult(
+            status="avalanche-window probe completed",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            modes=list(modes),
+            seed_offsets=list(seed_offsets),
+            steps=steps,
+            sample_interval=sample_interval,
+            samples=samples,
+            accuracy_by_mode=_avalanche_accuracy_by_mode(samples),
+            baseline_accuracy=_avalanche_baseline_accuracy(samples),
+            correlation_summary=_avalanche_correlation_summary(samples),
+            verdict=_avalanche_window_verdict(samples),
+            notes=[
+                "captures full-sphere state snapshots at bounded step intervals",
+                "branching-ratio estimate uses new activations divided by previous active states",
+                "action score uses the existing project action contract and trivial baselines",
+                "snapshot criticality diagnostics are not intelligence evidence by themselves",
+            ],
+        )
+    finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def _run_avalanche_window_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mode: str,
+    seed_offset: int,
+    stimulus: str,
+    input_vector: tuple[float, float, float],
+    expected_action: str,
+    steps: int,
+    sample_interval: int,
+    decoder: ActionDecoder,
+    gpu_memory_used_mb: int | None,
+    gpu_utilization_percent: int | None,
+    gpu_temperature_c: int | None,
+) -> CunxonAvalancheWindowSample:
+    net = C.c_void_p()
+    start = time.perf_counter()
+    try:
+        name = f"neuraxon_hybrid_cunxon_avalanche_{mode}_{seed_offset}_{stimulus}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 3
+        params.num_hidden_neurons = 32
+        params.num_output_neurons = 3
+        params.random_seed_offset = seed_offset
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net, b"AVALANCHE_WINDOW", CUNXON_SPHERE_SENSORY, C.byref(params), C.byref(sphere_id)
+            ),
+        )
+        sensory_ids = (C.c_int * 3)(0, 1, 2)
+        readout_start = params.num_input_neurons + params.num_hidden_neurons
+        readout_ids = (C.c_int * 3)(readout_start, readout_start + 1, readout_start + 2)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_ids,
+                3,
+                None,
+                0,
+                None,
+                0,
+                readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        input_buffer = (C.c_float * len(input_vector))(*input_vector)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        previous_states = _capture_snapshot_states(lib, net, sphere_id.value)
+        initial_energy = _capture_energy(lib, net)
+        active_state_sequence: list[int] = []
+        activation_event_sequence: list[int] = []
+        deactivation_event_sequence: list[int] = []
+        all_state_values: list[int] = []
+        sampled_readouts: set[tuple[int, ...]] = set()
+        step_fn = lib.cunxonNetworkStepTrain if mode == "train" else lib.cunxonNetworkStepInfer
+        for step_index in range(1, steps + 1):
+            _check(lib, step_fn(net, ext_inputs, C.c_float(1.0)))
+            if mode == "train":
+                _inject_expected_action_modulator(lib, net, expected_action)
+            if step_index % sample_interval == 0 or step_index == steps:
+                _check(lib, lib.cunxonContextSync(ctx))
+                states = _capture_snapshot_states(lib, net, sphere_id.value)
+                readout = _capture_readout(lib, net, sphere_id.value)
+                sampled_readouts.add(tuple(readout))
+                active_state_sequence.append(sum(1 for value in states if value != 0))
+                transitions = zip(previous_states, states, strict=False)
+                activation_event_sequence.append(
+                    sum(
+                        1
+                        for previous, current in transitions
+                        if previous == 0 and current != 0
+                    )
+                )
+                transitions = zip(previous_states, states, strict=False)
+                deactivation_event_sequence.append(
+                    sum(
+                        1
+                        for previous, current in transitions
+                        if previous != 0 and current == 0
+                    )
+                )
+                all_state_values.extend(states)
+                previous_states = states
+        final_readout = _capture_readout(lib, net, sphere_id.value)
+        decoded = decoder.decode(final_readout)
+        normalized_action = normalize_benchmark_action(decoded.actie_type)
+        energy_delta = _capture_energy(lib, net) - initial_energy
+        branching_ratio = _activation_branching_ratio(
+            activation_event_sequence, active_state_sequence
+        )
+        return CunxonAvalancheWindowSample(
+            mode=mode,
+            seed_offset=seed_offset,
+            stimulus=stimulus,
+            input_vector=list(input_vector),
+            expected_action=expected_action,
+            active_state_sequence=active_state_sequence,
+            activation_event_sequence=activation_event_sequence,
+            deactivation_event_sequence=deactivation_event_sequence,
+            branching_ratio_estimate=branching_ratio,
+            active_count_ratio_mean=_branching_activity_ratio_proxy(active_state_sequence),
+            neutral_occupancy=(
+                sum(1 for value in all_state_values if value == 0) / len(all_state_values)
+                if all_state_values
+                else 1.0
+            ),
+            transition_entropy_bits=_transition_entropy_bits(active_state_sequence),
+            avalanche_event_count=sum(1 for value in activation_event_sequence if value > 0),
+            mean_avalanche_size=_mean_sequence(activation_event_sequence),
+            max_avalanche_size=max(activation_event_sequence) if activation_event_sequence else 0,
+            final_readout=final_readout,
+            normalized_action=normalized_action,
+            outcome="success" if normalized_action == expected_action else "failure",
+            energy_delta=energy_delta,
+            elapsed_ms=(time.perf_counter() - start) * 1000.0,
+            gpu_memory_used_mb=gpu_memory_used_mb,
+            gpu_utilization_percent=gpu_utilization_percent,
+            gpu_temperature_c=gpu_temperature_c,
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
 
 
 def run_ctypes_supervised_motor_probe(
@@ -6965,6 +7358,86 @@ def _branching_regime_verdict(runs: Sequence[CunxonBranchingRegimeRun]) -> str:
     return (
         "This scan did not observe a near-critical proxy bucket; regime instrumentation is useful, "
         "but no criticality/action-quality conclusion is supported."
+    )
+
+
+def _activation_branching_ratio(
+    activation_events: Sequence[int], active_state_sequence: Sequence[int]
+) -> float:
+    """Estimate descendant activations per previously active state across sampled windows."""
+    if not activation_events:
+        return 0.0
+    denominators = [max(1, active) for active in active_state_sequence]
+    paired = list(zip(activation_events, denominators, strict=False))
+    if not paired:
+        return 0.0
+    return sum(events / previous_active for events, previous_active in paired) / len(paired)
+
+
+def _avalanche_accuracy_by_mode(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, float]:
+    by_mode: dict[str, list[CunxonAvalancheWindowSample]] = {}
+    for sample in samples:
+        by_mode.setdefault(sample.mode, []).append(sample)
+    return {
+        mode: sum(1 for sample in mode_samples if sample.outcome == "success") / len(mode_samples)
+        for mode, mode_samples in sorted(by_mode.items())
+        if mode_samples
+    }
+
+
+def _avalanche_baseline_accuracy(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, float]:
+    baselines = {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry",
+    }
+    if not samples:
+        return {name: 0.0 for name in baselines}
+    return {
+        name: sum(1 for sample in samples if action == sample.expected_action) / len(samples)
+        for name, action in sorted(baselines.items())
+    }
+
+
+def _avalanche_correlation_summary(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, float]:
+    ratios = [sample.branching_ratio_estimate for sample in samples]
+    active_ratios = [sample.active_count_ratio_mean for sample in samples]
+    outcomes = [1.0 if sample.outcome == "success" else 0.0 for sample in samples]
+    neutral = [sample.neutral_occupancy for sample in samples]
+    return {
+        "accuracy_vs_branching_ratio_estimate": _pearson_correlation(ratios, outcomes),
+        "accuracy_vs_active_count_ratio_mean": _pearson_correlation(active_ratios, outcomes),
+        "accuracy_vs_neutral_occupancy": _pearson_correlation(neutral, outcomes),
+    }
+
+
+def _avalanche_window_verdict(samples: Sequence[CunxonAvalancheWindowSample]) -> str:
+    if not samples:
+        return (
+            "No snapshot windows were captured; no avalanche, regime, or action-quality claim "
+            "is supported."
+        )
+    accuracy_by_mode = _avalanche_accuracy_by_mode(samples)
+    baselines = _avalanche_baseline_accuracy(samples)
+    best_baseline = max(baselines.values()) if baselines else 0.0
+    beats = [value > best_baseline for value in accuracy_by_mode.values()]
+    mean_branching = _mean_sequence(sample.branching_ratio_estimate for sample in samples)
+    if beats and all(beats):
+        return (
+            "Snapshot-level avalanche metrics were captured and every mode beat the best "
+            "constant baseline, but this remains a tiny diagnostic probe rather than "
+            "intelligence evidence."
+        )
+    return (
+        f"Snapshot-level avalanche metrics were captured (mean branching-ratio estimate "
+        f"{mean_branching:.6f}), but action quality did not beat the best constant baseline "
+        "for every mode; criticality remains instrumentation, not sufficient evidence."
     )
 
 

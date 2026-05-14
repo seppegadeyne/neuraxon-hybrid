@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAvalancheWindowProbeResult,
+    CunxonAvalancheWindowSample,
     CunxonBranchingRegimeRun,
     CunxonBranchingRegimeScanResult,
     CunxonExternalDriveWindowProbeResult,
@@ -57,6 +59,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_target_contract_markdown_report,
     render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_readout_markdown_report,
+    render_avalanche_window_markdown_report,
     render_branching_regime_scan_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
@@ -82,6 +85,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_augmented_train_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
+    write_avalanche_window_artifacts,
     write_branching_regime_scan_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -1860,6 +1864,12 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     markdown = Path("benchmarks/results/cunxon_comparison.md").read_text(encoding="utf-8")
     data = Path("benchmarks/results/cunxon_comparison.json").read_text(encoding="utf-8")
 
+    assert "cuNxon avalanche-window snapshot probe" in markdown
+    assert "mean branching-ratio estimate 0.154496" in markdown
+    assert "action quality did not beat the best constant baseline" in markdown
+    assert '"cunxon_avalanche_window_probe"' in data
+    assert '"sample_count": 18' in data
+    assert '"accuracy_by_mode"' in data
     assert "cuNxon raw CUDA smoke" in markdown
     assert "cuNxon source semantics audit" in markdown
     assert "cuNxon long-horizon raw dynamics" in markdown
@@ -2186,6 +2196,69 @@ def test_aigarth_action_remap_audit_replays_artifacts_without_gpu_claims(
     data = json_path.read_text(encoding="utf-8")
     assert '"remapped_unexpected_action_count": 0' in data
     assert "post-hoc diagnostic" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_avalanche_window_report_records_snapshot_estimator_and_baselines(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAvalancheWindowProbeResult(
+        status="avalanche-window probe completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        modes=["infer", "train"],
+        seed_offsets=[122],
+        steps=32,
+        sample_interval=8,
+        samples=[
+            CunxonAvalancheWindowSample(
+                mode="infer",
+                seed_offset=122,
+                stimulus="execute-positive-drive",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                active_state_sequence=[2, 4, 3, 4],
+                activation_event_sequence=[2, 3, 1, 2],
+                deactivation_event_sequence=[0, 1, 2, 1],
+                branching_ratio_estimate=1.0,
+                active_count_ratio_mean=1.25,
+                neutral_occupancy=0.75,
+                transition_entropy_bits=1.5,
+                avalanche_event_count=4,
+                mean_avalanche_size=2.0,
+                max_avalanche_size=3,
+                final_readout=[1, 0, 0],
+                normalized_action="execute",
+                outcome="success",
+                energy_delta=12.5,
+                elapsed_ms=2.0,
+            )
+        ],
+        accuracy_by_mode={"infer": 1.0},
+        baseline_accuracy={"always_execute": 1.0, "always_query": 0.0, "always_retry": 0.0},
+        correlation_summary={"accuracy_vs_branching_ratio_estimate": 0.0},
+        verdict="Snapshot-level avalanche metrics are instrumentation, not intelligence evidence.",
+        notes=["captures full-sphere snapshots at bounded step intervals"],
+    )
+
+    markdown = render_avalanche_window_markdown_report(result)
+    assert "cuNxon avalanche-window snapshot probe" in markdown
+    assert "full-sphere snapshot" in markdown
+    assert "branching-ratio estimate" in markdown
+    assert "Trivial baselines" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "avalanche-window.json"
+    markdown_path = tmp_path / "avalanche-window.md"
+    write_avalanche_window_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '\"status\": \"avalanche-window probe completed\"' in data
+    assert '\"sample_count\": 1' in data
+    assert '\"branching_ratio_estimate\": 1.0' in data
+    assert "full-sphere snapshot" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:

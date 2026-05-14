@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAvalancheWindowProbeResult,
+    CunxonAvalancheWindowSample,
     CunxonBranchingRegimeRun,
     CunxonBranchingRegimeScanResult,
     CunxonInputProxyTargetCase,
@@ -1649,6 +1651,92 @@ def test_cli_cunxon_branching_regime_scan_writes_artifacts(
     assert '"status": "branching-regime scan completed"' in data
     assert '"branching_activity_ratio_proxy": 1.25' in data
     assert "cuNxon branching-ratio regime scan" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
+def test_cli_cunxon_avalanche_window_probe_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAvalancheWindowProbeResult:
+        assert kwargs["modes"] == ["infer", "train"]
+        assert kwargs["seed_offsets"] == [122, 123]
+        return CunxonAvalancheWindowProbeResult(
+            status="avalanche-window probe completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            modes=list(kwargs["modes"]),
+            seed_offsets=list(kwargs["seed_offsets"]),
+            steps=int(str(kwargs["steps"])),
+            sample_interval=int(str(kwargs["sample_interval"])),
+            samples=[
+                CunxonAvalancheWindowSample(
+                    mode="infer",
+                    seed_offset=122,
+                    stimulus="execute-positive-drive",
+                    input_vector=[1.0, 0.25, 0.0],
+                    expected_action="execute",
+                    active_state_sequence=[1, 2],
+                    activation_event_sequence=[1, 1],
+                    deactivation_event_sequence=[0, 0],
+                    branching_ratio_estimate=1.0,
+                    active_count_ratio_mean=2.0,
+                    neutral_occupancy=0.8,
+                    transition_entropy_bits=1.0,
+                    avalanche_event_count=2,
+                    mean_avalanche_size=1.0,
+                    max_avalanche_size=1,
+                    final_readout=[1, 0, 0],
+                    normalized_action="execute",
+                    outcome="success",
+                    energy_delta=1.0,
+                    elapsed_ms=1.0,
+                )
+            ],
+            accuracy_by_mode={"infer": 1.0},
+            baseline_accuracy={"always_execute": 1.0, "always_query": 0.0, "always_retry": 0.0},
+            correlation_summary={"accuracy_vs_branching_ratio_estimate": 0.0},
+            verdict="Snapshot-level metrics are diagnostic only.",
+            notes=["fake avalanche window probe"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_avalanche_window_probe", fake_probe)
+    json_path = tmp_path / "avalanche-window.json"
+    markdown_path = tmp_path / "avalanche-window.md"
+
+    rc = main(
+        [
+            "cunxon-avalanche-window-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--modes",
+            "infer,train",
+            "--seed-offsets",
+            "122,123",
+            "--steps",
+            "32",
+            "--sample-interval",
+            "8",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '\"status\": \"avalanche-window probe completed\"' in data
+    assert '\"branching_ratio_estimate\": 1.0' in data
+    assert "cuNxon avalanche-window snapshot probe" in markdown_path.read_text(
         encoding="utf-8"
     )
 

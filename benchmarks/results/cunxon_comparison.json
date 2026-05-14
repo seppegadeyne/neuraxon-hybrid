@@ -14,6 +14,12 @@
       "value": "5/5 seeds bucketed as reverberating/near-critical proxy; mean branching proxy=0.997701; holdout=1.000000; stress_holdout=0.333333; 0/5 beat best constant stress baseline"
     },
     {
+      "evidence": "benchmarks/results/cunxon_avalanche_window_probe.json",
+      "lane": "cuNxon avalanche-window snapshot probe",
+      "metric": "snapshot-level branching estimate vs action quality",
+      "value": "3 seeds / 18 action samples; mean branching-ratio estimate 0.154496, active-count ratio mean=0.994343, neutral occupancy mean=0.908077; infer/train accuracy=0.333333, equal to constant baselines"
+    },
+    {
       "evidence": "benchmarks/results/cunxon_smoke.json",
       "lane": "cuNxon raw CUDA smoke",
       "metric": "decision-quality score",
@@ -679,6 +685,37 @@
     ],
     "source_probe": "target_contract_augmented_train",
     "status": "branching-regime scan completed"
+  },
+  "cunxon_avalanche_window_probe": {
+    "accuracy_by_mode": {
+      "infer": 0.333333,
+      "train": 0.333333
+    },
+    "active_count_ratio_mean": 0.994343,
+    "baseline_accuracy": {
+      "always_execute": 0.333333,
+      "always_query": 0.333333,
+      "always_retry": 0.333333
+    },
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.168834,
+      "accuracy_vs_branching_ratio_estimate": -0.663921,
+      "accuracy_vs_neutral_occupancy": 0.697874
+    },
+    "evidence_boundary": "snapshot-level avalanche metrics from full-sphere states; diagnostics only because action accuracy remains at constant-action baselines",
+    "mean_branching_ratio_estimate": 0.154496,
+    "mean_neutral_occupancy": 0.908077,
+    "sample_count": 18,
+    "sample_interval": 16,
+    "seed_count": 3,
+    "seed_offsets": [
+      122,
+      123,
+      124
+    ],
+    "status": "avalanche-window probe completed",
+    "steps": 256,
+    "verdict": "Snapshot-level avalanche metrics are measurable, but neither infer nor train mode beats trivial baselines; criticality remains instrumentation rather than sufficient evidence."
   },
   "cunxon_external_drive_window_probe": {
     "decision_quality_measured": false,

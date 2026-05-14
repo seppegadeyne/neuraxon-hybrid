@@ -23,6 +23,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_aigarth_action_target_contract_probe,
     run_ctypes_aigarth_action_target_contract_stress_probe,
     run_ctypes_aigarth_readout_probe,
+    run_ctypes_avalanche_window_probe,
     run_ctypes_branching_regime_scan_probe,
     run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
@@ -47,6 +48,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_augmented_train_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
+    write_avalanche_window_artifacts,
     write_branching_regime_scan_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -790,6 +792,37 @@ def cmd_cunxon_branching_regime_scan(args: argparse.Namespace) -> int:
             "Status: `unusable`\n\n"
             f"Error: {e}\n\n"
             "Evidence boundary: a failed branching-regime scan does not support any "
+            "GPU-backed criticality, action-quality, or intelligence claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_avalanche_window_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_avalanche_window_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            modes=_parse_modes(args.modes),
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            steps=args.steps,
+            sample_interval=args.sample_interval,
+            device_id=args.device,
+        )
+        write_avalanche_window_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon avalanche-window snapshot probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed snapshot/avalanche probe does not support any "
             "GPU-backed criticality, action-quality, or intelligence claim.\n",
             encoding="utf-8",
         )
@@ -1758,6 +1791,61 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_branching_regime.set_defaults(func=cmd_cunxon_branching_regime_scan)
+
+    p_cunxon_avalanche = sub.add_parser(
+        "cunxon-avalanche-window-probe",
+        help="Capture full-sphere snapshot windows for avalanche/branching diagnostics",
+        description=(
+            "Run bounded infer/train cuNxon snapshot windows for action stimuli, estimate "
+            "activation-event branching ratios from full-sphere state transitions, and compare "
+            "the diagnostics with action-contract accuracy and trivial baselines."
+        ),
+    )
+    p_cunxon_avalanche.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_avalanche.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_avalanche.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_avalanche.add_argument(
+        "--modes",
+        default="infer,train",
+        help="Comma-separated modes to sample: infer,train",
+    )
+    p_cunxon_avalanche.add_argument(
+        "--seed-offsets",
+        default="122,123,124",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_avalanche.add_argument(
+        "--steps",
+        type=int,
+        default=256,
+        help="Steps per stimulus window",
+    )
+    p_cunxon_avalanche.add_argument(
+        "--sample-interval",
+        type=int,
+        default=16,
+        help="Capture full-sphere snapshots every N steps",
+    )
+    p_cunxon_avalanche.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_avalanche.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_avalanche_window_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_avalanche.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_avalanche_window_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_avalanche.set_defaults(func=cmd_cunxon_avalanche_window_probe)
 
     p_cunxon_aigarth_remap = sub.add_parser(
         "cunxon-aigarth-action-remap-audit",
