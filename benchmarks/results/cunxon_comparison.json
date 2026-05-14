@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route is the only constructive action-quality lead so far: one seed scored 0.666667 train/holdout/overall against 0.333333 constant baselines, and the five-seed repeatability sweep partially repeats the signal with holdout mean 0.533333, min 0.333333, max 0.666667, 3/5 seeds beating the best constant baseline on holdout and 5/5 overall. This remains brittle toy evidence: two seeds are baseline-level on holdout and unexpected normalized labels appear, so it is not an intelligence/generalization claim.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route is the only constructive action-quality lead so far: one seed scored 0.666667 train/holdout/overall against 0.333333 constant baselines, the five-seed repeatability sweep partially repeated the signal, and the hard-holdout audit reached hard-holdout mean 0.500000 with permuted-control mean 0.000000. This remains brittle toy evidence: hard-holdout robustness is only partial, train-to-hard-holdout gap is 0.500000, and unexpected normalized labels still appear, so it is not an intelligence/generalization claim.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -36,6 +36,12 @@
       "lane": "cuNxon Aigarth action seed sweep",
       "metric": "5-seed train/holdout action accuracy vs trivial baselines",
       "value": "holdout mean=0.533333 (min=0.333333, max=0.666667); 3/5 seeds beat the best constant baseline on holdout; 5/5 beat it overall; unexpected normalized labels: assertive"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "lane": "cuNxon Aigarth action hard-holdout audit",
+      "metric": "5-seed hard-holdout/permuted-control action accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.500000 (min=0.333333, max=0.833333); holdout mean=0.600000; train=1.000000; permuted-control mean=0.000000; 2/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -142,6 +148,73 @@
     "trial_count": 3,
     "trial_steps": 32,
     "verdict": "task-coupled but not above baselines"
+  },
+  "cunxon_aigarth_action_hard_holdout_probe": {
+    "accuracy_summary_by_split": {
+      "hard_holdout": {
+        "max": 0.8333333333333334,
+        "mean": 0.5,
+        "min": 0.3333333333333333
+      },
+      "holdout": {
+        "max": 1.0,
+        "mean": 0.6,
+        "min": 0.3333333333333333
+      },
+      "overall": {
+        "max": 0.7333333333333333,
+        "mean": 0.52,
+        "min": 0.4
+      },
+      "permuted_control": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0
+      },
+      "train": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0
+      }
+    },
+    "aggregate_action_distribution": {
+      "assertive": 1,
+      "execute": 22,
+      "query": 32,
+      "retry": 20
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed hard/noisy holdout and permuted-control audit; train-only Aigarth fitness; no intelligence/generalization claim",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.5,
+    "mean_holdout": 0.6,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      87,
+      88,
+      89,
+      90,
+      91
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 2,
+      "holdout": 2,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth hard-holdout audit completed",
+    "train_to_hard_holdout_gap_mean": 0.5,
+    "unexpected_action_rate": 0.013333333333333334,
+    "unexpected_actions": [
+      "assertive"
+    ],
+    "verdict": "hard-holdout audit keeps the Aigarth route promising but shows a large train-to-hard-holdout gap and only partial seed-level robustness"
   },
   "cunxon_aigarth_action_probe": {
     "accuracy_by_split": {
@@ -915,12 +988,15 @@
   },
   "observed_files": [
     "benchmarks/results/cunxon_aigarth_action_probe.json",
-    "benchmarks/results/cunxon_aigarth_action_probe.md"
+    "benchmarks/results/cunxon_aigarth_action_probe.md",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md"
   ],
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_resident_action_probe.json",
     "benchmarks/results/cunxon_source_semantics_audit.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
     "benchmarks/results/cunxon_input_proxy_target_probe.json",
     "benchmarks/results/cunxon_long_horizon.json",
     "benchmarks/results/cunxon_long_sweep.json",
@@ -933,5 +1009,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "Aigarth action probe beats trivial baselines on a small train/holdout set, while prior StepTrain/resident/input-proxy routes remain baseline-level; treat as promising toy evidence only"
+  "verdict": "Aigarth action probes remain the only cuNxon route above trivial baselines in tiny toy tasks, but hard-holdout and label-coverage audits keep the evidence brittle; prior StepTrain/resident/input-proxy routes remain baseline-level"
 }

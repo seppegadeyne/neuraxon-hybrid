@@ -10,6 +10,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
     CunxonAigarthActionCase,
+    CunxonAigarthActionHardHoldoutResult,
     CunxonAigarthActionProbeResult,
     CunxonAigarthActionSeedRun,
     CunxonAigarthActionSeedSweepResult,
@@ -42,6 +43,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_aigarth_action_hard_holdout_markdown_report,
     render_aigarth_action_markdown_report,
     render_aigarth_action_seed_sweep_markdown_report,
     render_aigarth_readout_markdown_report,
@@ -60,6 +62,7 @@ from neuraxon_agent.cunxon_smoke import (
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_aigarth_action_artifacts,
+    write_aigarth_action_hard_holdout_artifacts,
     write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
@@ -553,6 +556,102 @@ def test_aigarth_action_seed_sweep_report_records_repeatability_and_coverage(
     assert '"seed_count": 2' in data
     assert '"seed_offsets": [' in data
     assert "fresh cuNxon network/context per seed" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
+def test_aigarth_action_hard_holdout_report_records_leakage_and_strict_labels(
+    tmp_path: Path,
+) -> None:
+    shared_case = CunxonAigarthActionCase(
+        name="execute-hard-low-positive",
+        split="hard_holdout",
+        input_vector=[0.35, 0.05, -0.1],
+        expected_action="execute",
+        target_readout=[1, 0, 0],
+        readout=[-1, -1, -1],
+        decoded_action="ESCALATE",
+        normalized_action="assertive",
+        confidence=1.0,
+        outcome="failure",
+        target_alignment=0.0,
+        baseline_actions={"always_execute": "execute", "always_query": "query"},
+        energy=4.0,
+    )
+    result = CunxonAigarthActionHardHoldoutResult(
+        status="aigarth hard-holdout audit completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        readout_ids=[35, 36, 37],
+        seed_offsets=[87, 88],
+        strict_expected_actions=["execute", "query", "retry"],
+        runs=[
+            CunxonAigarthActionSeedRun(
+                seed_offset=87,
+                generation_train_scores=[0.5, 0.75],
+                accuracy_by_split={
+                    "hard_holdout": 0.333333,
+                    "holdout": 0.666667,
+                    "overall": 0.5,
+                    "permuted_control": 0.0,
+                    "train": 0.666667,
+                },
+                target_alignment_by_split={"hard_holdout": 0.25, "overall": 0.5},
+                baseline_accuracy_by_split={
+                    "always_query": {"hard_holdout": 0.333333, "overall": 0.333333}
+                },
+                unique_readouts=2,
+                action_distribution={"assertive": 1, "query": 5},
+                cases=[shared_case],
+            )
+        ],
+        accuracy_summary_by_split={
+            "hard_holdout": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+            "holdout": {"mean": 0.666667, "min": 0.666667, "max": 0.666667},
+            "overall": {"mean": 0.5, "min": 0.5, "max": 0.5},
+            "permuted_control": {"mean": 0.0, "min": 0.0, "max": 0.0},
+            "train": {"mean": 0.666667, "min": 0.666667, "max": 0.666667},
+        },
+        aggregate_action_distribution={"assertive": 1, "query": 5},
+        seeds_beating_baseline_by_split={
+            "hard_holdout": 0,
+            "holdout": 1,
+            "overall": 1,
+            "permuted_control": 0,
+            "train": 1,
+        },
+        unexpected_action_count=1,
+        unexpected_action_rate=1 / 6,
+        leakage_control_accuracy_mean=0.0,
+        train_to_hard_holdout_gap_mean=0.333334,
+        notes=["permuted-control labels are never optimized"],
+    )
+
+    markdown = render_aigarth_action_hard_holdout_markdown_report(result)
+    assert "Aigarth action hard-holdout audit" in markdown
+    assert "hard_holdout | 0.333333" in markdown
+    assert "permuted-control leakage/oracle check" in markdown
+    assert "Unexpected action rate: 0.166667" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-hard-holdout.json"
+    markdown_path = tmp_path / "aigarth-action-hard-holdout.md"
+    write_aigarth_action_hard_holdout_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"unexpected_action_count": 1' in data
+    assert '"leakage_control_accuracy_mean": 0.0' in data
+    assert "permuted-control labels are never optimized" in markdown_path.read_text(
         encoding="utf-8"
     )
 
@@ -1252,7 +1351,13 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"cunxon_aigarth_action_probe"' in data
     assert '"cunxon_aigarth_action_seed_sweep"' in data
+    assert '"cunxon_aigarth_action_hard_holdout_probe"' in data
+    assert "cuNxon Aigarth action hard-holdout audit" in markdown
+    assert "hard-holdout mean=0.500000" in markdown
+    assert "permuted-control mean=0.000000" in markdown
     assert '"mean_holdout": 0.5333333333333333' in data
+    assert '"mean_hard_holdout": 0.5' in data
+    assert '"leakage_control_accuracy_mean": 0.0' in data
     assert '"holdout": 3' in data
     assert '"unexpected_actions": [' in data
     assert '"holdout": 0.6666666666666666' in data

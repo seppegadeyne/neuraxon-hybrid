@@ -341,6 +341,48 @@ class CunxonAigarthActionSeedSweepResult:
 
 
 @dataclass(frozen=True)
+class CunxonAigarthActionHardHoldoutResult:
+    """Hard-holdout/leakage audit for Aigarth action evidence."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    readout_ids: list[int]
+    seed_offsets: list[int]
+    strict_expected_actions: list[str]
+    runs: list[CunxonAigarthActionSeedRun]
+    accuracy_summary_by_split: dict[str, dict[str, float]]
+    aggregate_action_distribution: dict[str, int]
+    seeds_beating_baseline_by_split: dict[str, int]
+    unexpected_action_count: int
+    unexpected_action_rate: float
+    leakage_control_accuracy_mean: float
+    train_to_hard_holdout_gap_mean: float
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def seed_count(self) -> int:
+        """Return the number of seed offsets evaluated."""
+        return len(self.runs)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["seed_count"] = self.seed_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonLongSweepSample:
     """One long-horizon/mode/seed/stimulus sample decoded through the action contract."""
 
@@ -1461,6 +1503,131 @@ def write_aigarth_action_seed_sweep_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_seed_sweep_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def render_aigarth_action_hard_holdout_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render a hard-holdout and leakage/oracle audit for Aigarth action evidence."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    summary_rows = [
+        "| Split | Mean accuracy | Min | Max | Seeds > best constant baseline |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for split, summary in sorted(result.accuracy_summary_by_split.items()):
+        beating = result.seeds_beating_baseline_by_split.get(split, 0)
+        summary_rows.append(
+            f"| {split} | {summary.get('mean', 0.0):.6f} | "
+            f"{summary.get('min', 0.0):.6f} | {summary.get('max', 0.0):.6f} | "
+            f"{beating}/{result.seed_count} |"
+        )
+    run_rows = [
+        "| Seed | Train | Holdout | Hard holdout | Permuted control | Overall | Actions |",
+        "| ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for run in result.runs:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(run.action_distribution.items())
+        )
+        run_rows.append(
+            f"| {run.seed_offset} | {run.accuracy_by_split.get('train', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('holdout', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('hard_holdout', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('permuted_control', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('overall', 0.0):.6f} | {actions or 'none'} |"
+        )
+    aggregate_actions = ", ".join(
+        f"{action}={count}"
+        for action, count in sorted(result.aggregate_action_distribution.items())
+    )
+    expected = ", ".join(result.strict_expected_actions)
+    unexpected_actions = sorted(
+        set(result.aggregate_action_distribution) - set(result.strict_expected_actions)
+    )
+    unexpected_note = ", ".join(unexpected_actions) if unexpected_actions else "none"
+    return "\n".join(
+        [
+            "# cuNxon Aigarth action hard-holdout audit",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Generations per seed: {result.generations}",
+            f"- Population size: {result.population_size}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Readout ids: {', '.join(str(port) for port in result.readout_ids)}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Strict expected actions: {expected}",
+            f"- Aggregate action distribution: {aggregate_actions or 'none'}",
+            f"- Unexpected action count: {result.unexpected_action_count}",
+            f"- Unexpected action rate: {result.unexpected_action_rate:.6f}",
+            f"- Unexpected normalized labels: {unexpected_note}",
+            f"- Train→hard-holdout gap mean: {result.train_to_hard_holdout_gap_mean:.6f}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The Aigarth seed sweep partially repeated a tiny baseline-beating action signal, "
+            "but it also produced unstable class coverage and unexpected normalized labels. "
+            "This audit keeps the train-only Aigarth fitness route but expands evaluation with "
+            "harder/noisier holdouts and a permuted-control leakage/oracle check before treating "
+            "the route as stronger adapter evidence.",
+            "",
+            "## Accuracy by split",
+            "",
+            *summary_rows,
+            "",
+            "## Per-seed runs",
+            "",
+            *run_rows,
+            "",
+            "## Permuted-control leakage/oracle check",
+            "",
+            "The `permuted_control` split reuses train-like inputs with rotated expected "
+            "labels. It is not optimized by the fitness callback. High accuracy here would "
+            "be suspicious for label/oracle leakage; low accuracy is a sanity check, not "
+            "positive intelligence evidence.",
+            f"Mean permuted-control accuracy: {result.leakage_control_accuracy_mean:.6f}.",
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is a stress audit of a tiny Aigarth/evolutionary adapter route, not "
+            "intelligence evidence. Hard-holdout accuracy, strict action-label coverage, "
+            "and leakage controls must remain separate from claims about broad "
+            "generalization, useful learning, or production readiness.",
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_hard_holdout_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth hard-holdout audit artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_hard_holdout_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -2706,6 +2873,7 @@ def run_ctypes_aigarth_action_probe(
     population_size: int = 32,
     eval_steps: int = 24,
     seed_offset: int = 82,
+    evaluation_specs: Sequence[tuple[str, str, tuple[float, float, float], str]] | None = None,
     device_id: int = 0,
 ) -> CunxonAigarthActionProbeResult:
     """Evolve a cuNxon readout with Aigarth and score train/holdout actions."""
@@ -2767,8 +2935,14 @@ def run_ctypes_aigarth_action_probe(
         )
         _check(lib, lib.cunxonNetworkFinalize(net))
 
-        specs = _default_supervised_motor_specs()
+        specs = (
+            list(evaluation_specs)
+            if evaluation_specs is not None
+            else _default_supervised_motor_specs()
+        )
         train_specs = [spec for spec in specs if spec[1] == "train"]
+        if not train_specs:
+            raise ValueError("evaluation_specs must include at least one train case")
 
         def train_score(candidate_net: C.c_void_p) -> float:
             cases = _evaluate_aigarth_action_cases(
@@ -2863,6 +3037,7 @@ def run_ctypes_aigarth_action_seed_sweep_probe(
     generations: int = 16,
     population_size: int = 32,
     eval_steps: int = 24,
+    evaluation_specs: Sequence[tuple[str, str, tuple[float, float, float], str]] | None = None,
     device_id: int = 0,
 ) -> CunxonAigarthActionSeedSweepResult:
     """Run the Aigarth action probe across fresh cuNxon seeds."""
@@ -2878,6 +3053,7 @@ def run_ctypes_aigarth_action_seed_sweep_probe(
             population_size=population_size,
             eval_steps=eval_steps,
             seed_offset=seed_offset,
+            evaluation_specs=evaluation_specs,
             device_id=device_id,
         )
         for seed_offset in seed_offsets
@@ -2915,6 +3091,92 @@ def run_ctypes_aigarth_action_seed_sweep_probe(
             "fresh cuNxon network/context per seed",
             "fitness callback still uses train cases only; holdout labels are never optimized",
             "repeatability audit, not intelligence evidence",
+        ],
+    )
+
+
+def run_ctypes_aigarth_action_hard_holdout_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (87, 88, 89, 90, 91),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Stress the Aigarth action route with hard holdouts and leakage controls."""
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    specs = _aigarth_action_hard_holdout_specs()
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    runs = [
+        CunxonAigarthActionSeedRun(
+            seed_offset=result.seed_offset,
+            generation_train_scores=result.generation_train_scores,
+            accuracy_by_split=result.accuracy_by_split,
+            target_alignment_by_split=result.target_alignment_by_split,
+            baseline_accuracy_by_split=result.baseline_accuracy_by_split,
+            unique_readouts=result.unique_readouts,
+            action_distribution=result.action_distribution,
+            cases=result.cases,
+        )
+        for result in probe_results
+    ]
+    aggregate_distribution = _seed_sweep_action_distribution(runs)
+    strict_expected_actions = ["execute", "query", "retry"]
+    unexpected_action_count = sum(
+        count
+        for action, count in aggregate_distribution.items()
+        if action not in strict_expected_actions
+    )
+    total_actions = sum(aggregate_distribution.values())
+    accuracy_summary = _seed_sweep_accuracy_summary(runs)
+    train_values = [run.accuracy_by_split.get("train", 0.0) for run in runs]
+    hard_values = [run.accuracy_by_split.get("hard_holdout", 0.0) for run in runs]
+    gaps = [train - hard for train, hard in zip(train_values, hard_values, strict=False)]
+    return CunxonAigarthActionHardHoldoutResult(
+        status="aigarth hard-holdout audit completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        readout_ids=probe_results[0].readout_ids,
+        seed_offsets=list(seed_offsets),
+        strict_expected_actions=strict_expected_actions,
+        runs=runs,
+        accuracy_summary_by_split=accuracy_summary,
+        aggregate_action_distribution=aggregate_distribution,
+        seeds_beating_baseline_by_split=_seed_sweep_beating_baseline_counts(runs),
+        unexpected_action_count=unexpected_action_count,
+        unexpected_action_rate=unexpected_action_count / total_actions if total_actions else 0.0,
+        leakage_control_accuracy_mean=accuracy_summary.get("permuted_control", {}).get("mean", 0.0),
+        train_to_hard_holdout_gap_mean=sum(gaps) / len(gaps) if gaps else 0.0,
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "fitness callback still uses train cases only; hard holdout and "
+            "permuted-control labels are never optimized",
+            "strict expected actions are execute/query/retry; assertive/explore/cautious "
+            "remain out-of-contract caveats",
+            "hard-holdout audit, not intelligence evidence",
         ],
     )
 
@@ -5267,6 +5529,24 @@ def _default_supervised_motor_specs() -> list[
         ("execute-holdout-noisy", "holdout", (0.8, 0.2, 0.1), "execute"),
         ("retry-holdout-noisy", "holdout", (-0.8, -0.2, 0.1), "retry"),
         ("query-holdout-low-drive", "holdout", (0.05, 0.0, -0.05), "query"),
+    ]
+
+
+def _aigarth_action_hard_holdout_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return train/holdout/hard/control cases for Aigarth action audits."""
+    return [
+        *_default_supervised_motor_specs(),
+        ("execute-hard-low-positive", "hard_holdout", (0.35, 0.05, -0.1), "execute"),
+        ("execute-hard-conflict", "hard_holdout", (0.6, -0.4, 0.2), "execute"),
+        ("retry-hard-low-negative", "hard_holdout", (-0.35, -0.05, 0.2), "retry"),
+        ("retry-hard-conflict", "hard_holdout", (-0.6, 0.4, -0.2), "retry"),
+        ("query-hard-balanced", "hard_holdout", (0.1, -0.1, 0.05), "query"),
+        ("query-hard-weak-drive", "hard_holdout", (-0.05, 0.05, 0.1), "query"),
+        ("execute-train-permuted-as-retry", "permuted_control", (1.0, 0.25, 0.0), "retry"),
+        ("retry-train-permuted-as-query", "permuted_control", (-1.0, -0.25, 0.0), "query"),
+        ("query-train-permuted-as-execute", "permuted_control", (0.0, 0.0, 0.0), "execute"),
     ]
 
 
