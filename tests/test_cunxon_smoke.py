@@ -9,6 +9,8 @@ import pytest
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonExternalDriveWindowProbeResult,
+    CunxonExternalDriveWindowSample,
     CunxonInputProxyTargetCase,
     CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
@@ -32,6 +34,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
     render_interface_semantics_markdown_report,
     render_long_horizon_markdown_report,
@@ -44,6 +47,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_vram_resident_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
+    write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
@@ -300,6 +304,68 @@ def test_input_proxy_target_report_separates_supported_input_drive_from_decision
     )
     assert '"case_count": 2' in json_path.read_text(encoding="utf-8")
     assert "supported input-class external drive" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_external_drive_window_report_compares_input_hidden_and_output_ports(
+    tmp_path: Path,
+) -> None:
+    result = CunxonExternalDriveWindowProbeResult(
+        status="external-drive window probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        steps=5,
+        input_vector=[1.0, -1.0, 0.5, -0.5],
+        samples=[
+            CunxonExternalDriveWindowSample(
+                mode="infer",
+                driven_port_class="input",
+                sensory_port_ids=[0, 1, 2, 3],
+                readout_port_ids=[0, 1, 2, 3],
+                readout=[1, -1, 1, -1],
+                snapshot_slice=[1, -1, 1, -1],
+                matches_snapshot_slice=True,
+                active_state_count=4,
+                signed_sum=0,
+                energy=4.0,
+            ),
+            CunxonExternalDriveWindowSample(
+                mode="train",
+                driven_port_class="output",
+                sensory_port_ids=[8, 9, 10, 11],
+                readout_port_ids=[8, 9, 10, 11],
+                readout=[0, 0, 0, 0],
+                snapshot_slice=[0, 0, 0, 0],
+                matches_snapshot_slice=True,
+                active_state_count=0,
+                signed_sum=0,
+                energy=1.0,
+            ),
+        ],
+        notes=["fake external-drive window probe"],
+    )
+
+    markdown = render_external_drive_window_markdown_report(result)
+    assert "external-drive window probe" in markdown
+    assert "input-class direct drive" in markdown
+    assert "hidden/output sensory-id windows" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "not a desired-output/error-channel" in markdown
+
+    json_path = tmp_path / "external_drive.json"
+    markdown_path = tmp_path / "external_drive.md"
+    write_external_drive_window_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "external-drive window probe viable"' in data
+    assert '"sample_count": 2' in data
+    assert "input-class direct drive" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_long_sweep_report_scores_longer_modes_horizons_and_baselines(tmp_path: Path) -> None:
@@ -823,8 +889,15 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"target_proxy_alignment_by_split"' in data
     assert "cuNxon input-proxy target route" in markdown
+    assert "cuNxon external-drive port-window probe" in markdown
     assert "target proxy train alignment=1.000000" in markdown
+    assert "output-window drive remains non-teacher-forcing" in markdown
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
+    assert (
+        '"verdict": "input-class direct drive observable; hidden/output windows are not '
+        'desired-output channels"'
+        in data
+    )
     assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
     assert '"verdict": "sensitivity diagnostic train-mode flat"' in data

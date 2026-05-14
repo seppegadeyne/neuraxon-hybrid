@@ -1,0 +1,215 @@
+{
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "input_vector": [
+    1.0,
+    -1.0,
+    0.5,
+    -0.5
+  ],
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "single 4/4/4 sphere per sample with identical external vector and changed sensory ids",
+    "readouts are compared against full-sphere snapshot slices to validate port mapping",
+    "runtime/interface evidence only; not a desired-output or decision-quality claim"
+  ],
+  "sample_count": 6,
+  "samples": [
+    {
+      "active_state_count": 4,
+      "driven_port_class": "input",
+      "energy": 63.93302011489868,
+      "matches_snapshot_slice": true,
+      "mode": "infer",
+      "readout": [
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "readout_port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sensory_port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        1,
+        -1,
+        1,
+        -1
+      ]
+    },
+    {
+      "active_state_count": 0,
+      "driven_port_class": "hidden",
+      "energy": 0.0,
+      "matches_snapshot_slice": true,
+      "mode": "infer",
+      "readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "readout_port_ids": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "sensory_port_ids": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "active_state_count": 0,
+      "driven_port_class": "output",
+      "energy": 0.0,
+      "matches_snapshot_slice": true,
+      "mode": "infer",
+      "readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "readout_port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "sensory_port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "active_state_count": 4,
+      "driven_port_class": "input",
+      "energy": 16.807759523391724,
+      "matches_snapshot_slice": true,
+      "mode": "train",
+      "readout": [
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "readout_port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sensory_port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        1,
+        -1,
+        1,
+        -1
+      ]
+    },
+    {
+      "active_state_count": 0,
+      "driven_port_class": "hidden",
+      "energy": 0.0,
+      "matches_snapshot_slice": true,
+      "mode": "train",
+      "readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "readout_port_ids": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "sensory_port_ids": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "active_state_count": 0,
+      "driven_port_class": "output",
+      "energy": 0.0,
+      "matches_snapshot_slice": true,
+      "mode": "train",
+      "readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "readout_port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "sensory_port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "status": "external-drive window probe viable",
+  "steps": 5,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

@@ -13,6 +13,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentResult,
     ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
+    run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
     run_ctypes_interface_semantics_probe,
     run_ctypes_long_horizon_probe,
@@ -24,6 +25,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_supervised_motor_probe,
     run_ctypes_vram_resident_probe,
     write_action_probe_artifacts,
+    write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
@@ -479,6 +481,34 @@ def cmd_cunxon_interface_semantics_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_external_drive_window_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_external_drive_window_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            steps=args.steps,
+            device_id=args.device,
+        )
+        write_external_drive_window_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon external-drive window probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed port-window probe does not support any GPU-backed "
+            "learning, desired-output, action-quality, or interface-semantics claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def cmd_cunxon_supervised_motor_probe(args: argparse.Namespace) -> int:
     try:
         result = run_ctypes_supervised_motor_probe(
@@ -918,6 +948,44 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_interface.set_defaults(func=cmd_cunxon_interface_semantics_probe)
+
+    p_cunxon_external_drive = sub.add_parser(
+        "cunxon-external-drive-window-probe",
+        help="Probe cuNxon input/hidden/output sensory-id drive semantics",
+        description=(
+            "Drive identical values through input, hidden, and output sensory-id windows "
+            "to test whether non-input windows behave like desired-output channels."
+        ),
+    )
+    p_cunxon_external_drive.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_external_drive.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_external_drive.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_external_drive.add_argument(
+        "--steps",
+        type=int,
+        default=5,
+        help="Infer/train steps for each port-window sample",
+    )
+    p_cunxon_external_drive.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_external_drive.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_external_drive_window_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_external_drive.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_external_drive_window_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_external_drive.set_defaults(func=cmd_cunxon_external_drive_window_probe)
 
     p_cunxon_supervised = sub.add_parser(
         "cunxon-supervised-motor-probe",

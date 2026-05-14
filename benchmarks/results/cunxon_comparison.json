@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only; it is not decision-quality evidence unless later task-coupled resident probes beat trivial baselines.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, and the supervised motor-target adapter also stays at constant-query baseline accuracy. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy target probe confirms expected targets can be observed on supported input-class proxy ports during training, but evaluation motor readout still remains flat query/baseline-level. The external-drive port-window probe confirms the sharper boundary: identical external values drive input-class windows in infer/train, while hidden/output sensory-id windows stay zero in this controlled 4/4/4 setup, so those windows should not be treated as desired-output channels. The completed four-hour VRAM-resident run adds process-residence/state-file evidence and flat infer-only dynamics evidence only; it is not decision-quality evidence unless later task-coupled resident probes beat trivial baselines.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -24,6 +24,12 @@
       "lane": "cuNxon input-proxy target route",
       "metric": "target-proxy alignment and holdout success_rate vs trivial baselines",
       "value": "target proxy train alignment=1.000000; holdout=0.333333; overall=0.333333; motor readouts flat query"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_external_drive_window_probe.json",
+      "lane": "cuNxon external-drive port-window probe",
+      "metric": "input/hidden/output sensory-id drive response",
+      "value": "input-class windows active in infer/train; hidden/output windows stayed zero; output-window drive remains non-teacher-forcing"
     },
     {
       "evidence": "benchmarks/results/cunxon_long_horizon.json",
@@ -112,6 +118,95 @@
     "trial_count": 3,
     "trial_steps": 32,
     "verdict": "task-coupled but not above baselines"
+  },
+  "cunxon_external_drive_window_probe": {
+    "decision_quality_measured": false,
+    "hidden_output_window_total_active": 0,
+    "input_samples": [
+      {
+        "energy": 63.93302011489868,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          1,
+          -1,
+          1,
+          -1
+        ]
+      },
+      {
+        "energy": 16.807759523391724,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          1,
+          -1,
+          1,
+          -1
+        ]
+      }
+    ],
+    "input_vector": [
+      1.0,
+      -1.0,
+      0.5,
+      -0.5
+    ],
+    "input_window_total_active": 8,
+    "non_input_samples": [
+      {
+        "driven_port_class": "hidden",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "output",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "hidden",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "output",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "sample_count": 6,
+    "status": "external-drive window probe viable",
+    "steps": 5,
+    "verdict": "input-class direct drive observable; hidden/output windows are not desired-output channels"
   },
   "cunxon_input_proxy_target_probe": {
     "accuracy_by_split": {

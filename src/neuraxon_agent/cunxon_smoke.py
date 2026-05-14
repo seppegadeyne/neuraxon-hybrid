@@ -580,6 +580,53 @@ class CunxonInputProxyTargetCase:
 
 
 @dataclass(frozen=True)
+class CunxonExternalDriveWindowSample:
+    """One sample comparing sensory-id drive against a neuron-class window."""
+
+    mode: str
+    driven_port_class: str
+    sensory_port_ids: list[int]
+    readout_port_ids: list[int]
+    readout: list[int]
+    snapshot_slice: list[int]
+    matches_snapshot_slice: bool
+    active_state_count: int
+    signed_sum: int
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonExternalDriveWindowProbeResult:
+    """Probe result for input/hidden/output external-drive window semantics."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    steps: int
+    input_vector: list[float]
+    samples: list[CunxonExternalDriveWindowSample]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the number of port-window samples."""
+        return len(self.samples)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonInputProxyTargetProbeResult:
     """Probe result for supported input-class target-proxy semantics."""
 
@@ -1687,6 +1734,166 @@ def write_input_proxy_target_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_input_proxy_target_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
+
+
+def render_external_drive_window_markdown_report(
+    result: CunxonExternalDriveWindowProbeResult,
+) -> str:
+    """Render an external-drive port-window semantics report."""
+    input_vector = ", ".join(f"{value:.3g}" for value in result.input_vector)
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    rows = [
+        (
+            "| Mode | Driven class | Sensory IDs | Readout IDs | Readout | "
+            "Snapshot slice | Matches snapshot | Active | Signed sum | Energy |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | ---: | ---: |",
+    ]
+    for sample in result.samples:
+        readout = ", ".join(_format_trinary(value) for value in sample.readout)
+        snapshot = ", ".join(_format_trinary(value) for value in sample.snapshot_slice)
+        rows.append(
+            "| "
+            f"{sample.mode} | {sample.driven_port_class} | {sample.sensory_port_ids} | "
+            f"{sample.readout_port_ids} | [{readout}] | [{snapshot}] | "
+            f"{sample.matches_snapshot_slice} | {sample.active_state_count} | "
+            f"{sample.signed_sum} | {sample.energy:.6g} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon external-drive window probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Steps per sample: {result.steps}",
+            f"- Input vector: [{input_vector}]",
+            f"- Samples: {result.sample_count}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The source-semantics audit and input-proxy target probe suggest that the public "
+            "step-input path is an input-class direct drive, not a desired-output/error-channel. "
+            "This controlled ctypes probe drives identical values through input, hidden, and "
+            "output sensory-id windows in both `StepInfer` and `StepTrain`, then compares the "
+            "configured readout to the full-sphere snapshot slice.",
+            "",
+            "## Port-window samples",
+            "",
+            *rows,
+            "",
+            "## Interpretation boundary",
+            "",
+            "input-class direct drive is useful for observing external stimulation, but "
+            "hidden/output sensory-id windows are not a supported desired-output/error-channel "
+            "unless they produce target-free motor accuracy above trivial baselines in a later "
+            "task-coupled probe.",
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This probe only checks port-window drive and readout semantics. It does not "
+            "prove intelligence, task learning, useful recall, action quality, or "
+            "generalization.",
+            "",
+        ]
+    )
+
+
+def write_external_drive_window_artifacts(
+    result: CunxonExternalDriveWindowProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown external-drive window artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_external_drive_window_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def run_ctypes_external_drive_window_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    steps: int = 5,
+    device_id: int = 0,
+) -> CunxonExternalDriveWindowProbeResult:
+    """Compare input/hidden/output sensory-id windows with identical external drive."""
+    if steps <= 0:
+        raise ValueError("steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    input_vector = [1.0, -1.0, 0.5, -0.5]
+    windows = [
+        ("input", [0, 1, 2, 3]),
+        ("hidden", [4, 5, 6, 7]),
+        ("output", [8, 9, 10, 11]),
+    ]
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        samples = [
+            _run_external_drive_window_sample(
+                lib=lib,
+                ctx=ctx,
+                mode=mode,
+                driven_port_class=driven_class,
+                sensory_port_ids=port_ids,
+                readout_port_ids=port_ids,
+                input_vector=input_vector,
+                steps=steps,
+            )
+            for mode in ("infer", "train")
+            for driven_class, port_ids in windows
+        ]
+        return CunxonExternalDriveWindowProbeResult(
+            status="external-drive window probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            steps=steps,
+            input_vector=input_vector,
+            samples=samples,
+            notes=[
+                (
+                    "single 4/4/4 sphere per sample with identical external vector "
+                    "and changed sensory ids"
+                ),
+                (
+                    "readouts are compared against full-sphere snapshot slices "
+                    "to validate port mapping"
+                ),
+                "runtime/interface evidence only; not a desired-output or decision-quality claim",
+            ],
+        )
+    finally:
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
 
 
 def run_ctypes_interface_semantics_probe(
@@ -3741,6 +3948,58 @@ def _input_proxy_baseline_accuracy_by_split(
             ) / len(split_cases)
         result[baseline_name] = split_scores
     return result
+
+
+def _run_external_drive_window_sample(
+    *,
+    lib: C.CDLL,
+    ctx: C.c_void_p,
+    mode: str,
+    driven_port_class: str,
+    sensory_port_ids: Sequence[int],
+    readout_port_ids: Sequence[int],
+    input_vector: Sequence[float],
+    steps: int,
+) -> CunxonExternalDriveWindowSample:
+    net = C.c_void_p()
+    try:
+        name = f"neuraxon_hybrid_cunxon_external_drive_{mode}_{driven_port_class}"
+        _check(lib, lib.cunxonNetworkCreate(ctx, C.byref(net), name.encode("utf-8")))
+        sphere_id = _add_interface_probe_sphere(
+            lib,
+            net,
+            sphere_name=b"EXTDRV",
+            sensory_ids=sensory_port_ids,
+            readout_ids=readout_port_ids,
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+        input_buffer = (C.c_float * len(input_vector))(*input_vector)
+        input_pointer = C.cast(input_buffer, C.POINTER(C.c_float))
+        ext_inputs = (C.POINTER(C.c_float) * 1)(input_pointer)
+        step_function = (
+            lib.cunxonNetworkStepTrain if mode == "train" else lib.cunxonNetworkStepInfer
+        )
+        for _ in range(steps):
+            _check(lib, step_function(net, ext_inputs, C.c_float(1.0)))
+        _check(lib, lib.cunxonContextSync(ctx))
+        readout = _capture_readout(lib, net, sphere_id)
+        states = _capture_snapshot_states(lib, net, sphere_id)
+        snapshot_slice = [states[index] for index in readout_port_ids]
+        return CunxonExternalDriveWindowSample(
+            mode=mode,
+            driven_port_class=driven_port_class,
+            sensory_port_ids=list(sensory_port_ids),
+            readout_port_ids=list(readout_port_ids),
+            readout=readout,
+            snapshot_slice=snapshot_slice,
+            matches_snapshot_slice=readout == snapshot_slice,
+            active_state_count=sum(1 for value in readout if value != 0),
+            signed_sum=sum(readout),
+            energy=_capture_energy(lib, net),
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
 
 
 def _run_interface_readout_sample(
