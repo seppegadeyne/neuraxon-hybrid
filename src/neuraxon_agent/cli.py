@@ -13,6 +13,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentResult,
     ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
+    run_ctypes_input_proxy_target_probe,
     run_ctypes_interface_semantics_probe,
     run_ctypes_long_horizon_probe,
     run_ctypes_long_sweep_probe,
@@ -23,6 +24,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_supervised_motor_probe,
     run_ctypes_vram_resident_probe,
     write_action_probe_artifacts,
+    write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
     write_long_sweep_artifacts,
@@ -507,6 +509,36 @@ def cmd_cunxon_supervised_motor_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_input_proxy_target_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_input_proxy_target_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            train_epochs=args.train_epochs,
+            train_steps_per_case=args.train_steps_per_case,
+            eval_steps=args.eval_steps,
+            device_id=args.device,
+        )
+        write_input_proxy_target_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon input-port proxy target probe\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed input-proxy target probe does not support "
+            "any GPU-backed learning, holdout, or action-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="neuraxon-agent", description="Neuraxon Agent CLI")
     sub = parser.add_subparsers(dest="command")
@@ -932,6 +964,52 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_supervised.set_defaults(func=cmd_cunxon_supervised_motor_probe)
+
+    p_cunxon_input_proxy = sub.add_parser(
+        "cunxon-input-proxy-target-probe",
+        help="Probe supported input-class target proxies against motor readout/baselines",
+        description=(
+            "Train a small cuNxon sphere with sensory inputs plus input-class target "
+            "proxy ports, then evaluate motor readout without target-proxy drive."
+        ),
+    )
+    p_cunxon_input_proxy.add_argument("--library", required=True, help="Path to built libcunxon.so")
+    p_cunxon_input_proxy.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_input_proxy.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
+    p_cunxon_input_proxy.add_argument(
+        "--train-epochs",
+        type=int,
+        default=8,
+        help="Number of passes over train cases with target-proxy drive",
+    )
+    p_cunxon_input_proxy.add_argument(
+        "--train-steps-per-case",
+        type=int,
+        default=16,
+        help="StepTrain calls per train case per epoch",
+    )
+    p_cunxon_input_proxy.add_argument(
+        "--eval-steps",
+        type=int,
+        default=16,
+        help="StepInfer calls per train/holdout evaluation case without target-proxy drive",
+    )
+    p_cunxon_input_proxy.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_input_proxy.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_input_proxy_target_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_input_proxy.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_input_proxy_target_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_input_proxy.set_defaults(func=cmd_cunxon_input_proxy_target_probe)
 
     try:
         args = parser.parse_args(argv)

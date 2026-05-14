@@ -560,6 +560,62 @@ class CunxonSupervisedMotorProbeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonInputProxyTargetCase:
+    """One train/holdout case from an input-neuron proxy-target probe."""
+
+    name: str
+    split: str
+    input_vector: list[float]
+    expected_action: str
+    target_proxy_readout: list[int]
+    motor_readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    target_proxy_alignment: float
+    baseline_actions: dict[str, str]
+    energy: float
+
+
+@dataclass(frozen=True)
+class CunxonInputProxyTargetProbeResult:
+    """Probe result for supported input-class target-proxy semantics."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    train_epochs: int
+    train_steps_per_case: int
+    eval_steps: int
+    target_proxy_port_ids: list[int]
+    motor_readout_port_ids: list[int]
+    cases: list[CunxonInputProxyTargetCase]
+    accuracy_by_split: dict[str, float]
+    target_proxy_alignment_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of scored input-proxy target cases."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -1526,6 +1582,113 @@ def write_supervised_motor_artifacts(
     return json_output, markdown_output
 
 
+def render_input_proxy_target_markdown_report(result: CunxonInputProxyTargetProbeResult) -> str:
+    """Render an input-class target-proxy semantics probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    accuracy_rows = [
+        "| Split | Accuracy | Mean target-proxy alignment |",
+        "| --- | ---: | ---: |",
+    ]
+    for split, accuracy in result.accuracy_by_split.items():
+        alignment = result.target_proxy_alignment_by_split.get(split, 0.0)
+        accuracy_rows.append(f"| {split} | {accuracy:.6f} | {alignment:.6f} |")
+    baseline_rows = ["| Baseline | Split | Accuracy |", "| --- | --- | ---: |"]
+    for baseline_name, split_scores in sorted(result.baseline_accuracy_by_split.items()):
+        for split, score in split_scores.items():
+            baseline_rows.append(f"| {baseline_name} | {split} | {score:.6f} |")
+    case_rows = [
+        (
+            "| Case | Split | Expected | Target proxy | Motor readout | Decoded | Outcome | "
+            "Proxy alignment | Energy |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | ---: |",
+    ]
+    for case in result.cases:
+        target_proxy = ", ".join(_format_trinary(value) for value in case.target_proxy_readout)
+        motor = ", ".join(_format_trinary(value) for value in case.motor_readout)
+        case_rows.append(
+            "| "
+            f"{case.name} | {case.split} | {case.expected_action} | [{target_proxy}] | "
+            f"[{motor}] | {case.decoded_action} ({case.normalized_action}, "
+            f"{case.confidence:.4f}) | {case.outcome} | "
+            f"{case.target_proxy_alignment:.6f} | {case.energy:.6g} |"
+        )
+    target_ports = ", ".join(str(port) for port in result.target_proxy_port_ids)
+    motor_ports = ", ".join(str(port) for port in result.motor_readout_port_ids)
+    return "\n".join(
+        [
+            "# cuNxon input-port proxy target probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Train epochs: {result.train_epochs}",
+            f"- Train steps per case: {result.train_steps_per_case}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Cases: {result.case_count}",
+            f"- Target-proxy input ports: [{target_ports}]",
+            f"- Motor readout ports: [{motor_ports}]",
+            "",
+            "## Why this probe exists",
+            "",
+            "The source-semantics audit found that output-neuron teacher forcing is not "
+            "supported by the public cuNxon step-input path. This probe moves the target "
+            "drive to supported input-class external drive ports, then separately reads "
+            "the motor output ports without target drive during evaluation.",
+            "",
+            "## Accuracy and proxy alignment",
+            "",
+            *accuracy_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Cases",
+            "",
+            *case_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is an interface/adapter diagnostic and not a desired-output/error-channel "
+            "claim. Seeing a target value on input-class proxy neurons only proves that "
+            "the supported external-drive route is observable; useful learning would still "
+            "require motor-output accuracy to beat trivial baselines on holdout cases. This "
+            "probe does not prove intelligence, generalization, or useful learning by itself.",
+            "",
+        ]
+    )
+
+
+def write_input_proxy_target_artifacts(
+    result: CunxonInputProxyTargetProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown input-proxy target artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_input_proxy_target_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
 def run_ctypes_interface_semantics_probe(
     *,
     library_path: str | Path,
@@ -1747,6 +1910,167 @@ def run_ctypes_supervised_motor_probe(
                 (
                     "holdout accuracy must beat trivial baselines before this becomes "
                     "useful adapter evidence"
+                ),
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_input_proxy_target_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    train_epochs: int = 8,
+    train_steps_per_case: int = 16,
+    eval_steps: int = 16,
+    device_id: int = 0,
+) -> CunxonInputProxyTargetProbeResult:
+    """Test supported input-class target proxies against motor readouts and baselines."""
+    if train_epochs <= 0:
+        raise ValueError("train_epochs must be positive")
+    if train_steps_per_case <= 0:
+        raise ValueError("train_steps_per_case must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(
+                ctx, C.byref(net), b"neuraxon_hybrid_cunxon_input_proxy_target"
+            ),
+        )
+
+        params = _NetworkParameters()
+        _check(lib, lib.cunxonGetDefaultParameters(C.byref(params)))
+        params.num_input_neurons = 6
+        params.num_hidden_neurons = 5
+        params.num_output_neurons = 3
+        params.random_seed_offset = 223
+        params.synapse_death_prob = 0.0
+        params.synapse_formation_prob = 0.0
+
+        sphere_id = C.c_int(-1)
+        _check(
+            lib,
+            lib.cunxonNetworkAddSphere(
+                net,
+                b"INPUT_PROXY_TARGET",
+                CUNXON_SPHERE_MOTOR,
+                C.byref(params),
+                C.byref(sphere_id),
+            ),
+        )
+        target_proxy_port_ids = [3, 4, 5]
+        motor_readout_base = params.num_input_neurons + params.num_hidden_neurons
+        motor_readout_port_ids = [
+            motor_readout_base,
+            motor_readout_base + 1,
+            motor_readout_base + 2,
+        ]
+        sensory_and_proxy_ids = (C.c_int * 6)(0, 1, 2, *target_proxy_port_ids)
+        motor_readout_ids = (C.c_int * 3)(*motor_readout_port_ids)
+        _check(
+            lib,
+            lib.cunxonNetworkSetSphereInterface(
+                net,
+                sphere_id.value,
+                sensory_and_proxy_ids,
+                6,
+                None,
+                0,
+                None,
+                0,
+                motor_readout_ids,
+                3,
+            ),
+        )
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        train_proxy_readouts: dict[str, list[int]] = {}
+        for _epoch in range(train_epochs):
+            for name, split, input_vector, expected_action in _default_supervised_motor_specs():
+                if split != "train":
+                    continue
+                target = _target_readout_for_action(expected_action)
+                ext_inputs = _pack_supervised_motor_inputs(input_vector, target)
+                for _ in range(train_steps_per_case):
+                    _check(lib, lib.cunxonNetworkStepTrain(net, ext_inputs, C.c_float(1.0)))
+                    _inject_expected_action_modulator(lib, net, expected_action)
+                _check(lib, lib.cunxonContextSync(ctx))
+                states = _capture_snapshot_states(lib, net, sphere_id.value)
+                train_proxy_readouts[name] = [states[index] for index in target_proxy_port_ids]
+
+        cases: list[CunxonInputProxyTargetCase] = []
+        for index, (name, split, input_vector, expected_action) in enumerate(
+            _default_supervised_motor_specs()
+        ):
+            target = _target_readout_for_action(expected_action)
+            ext_inputs = _pack_supervised_motor_inputs(input_vector, (0.0, 0.0, 0.0))
+            for _ in range(eval_steps):
+                _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+            _check(lib, lib.cunxonContextSync(ctx))
+            motor_readout = _capture_readout(lib, net, sphere_id.value)
+            decoded = decoder.decode(motor_readout)
+            normalized_action = normalize_benchmark_action(decoded.actie_type)
+            proxy_readout = train_proxy_readouts.get(name, [])
+            cases.append(
+                CunxonInputProxyTargetCase(
+                    name=name,
+                    split=split,
+                    input_vector=list(input_vector),
+                    expected_action=expected_action,
+                    target_proxy_readout=proxy_readout,
+                    motor_readout=motor_readout,
+                    decoded_action=decoded.actie_type,
+                    normalized_action=normalized_action,
+                    confidence=decoded.confidence,
+                    outcome="success" if normalized_action == expected_action else "failure",
+                    target_proxy_alignment=(
+                        _target_alignment(proxy_readout, target) if proxy_readout else 0.0
+                    ),
+                    baseline_actions=_baseline_actions_for_case(index),
+                    energy=_capture_energy(lib, net),
+                )
+            )
+        return CunxonInputProxyTargetProbeResult(
+            status="input-proxy target probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            train_epochs=train_epochs,
+            train_steps_per_case=train_steps_per_case,
+            eval_steps=eval_steps,
+            target_proxy_port_ids=target_proxy_port_ids,
+            motor_readout_port_ids=motor_readout_port_ids,
+            cases=cases,
+            accuracy_by_split=_input_proxy_accuracy_by_split(cases),
+            target_proxy_alignment_by_split=_input_proxy_target_alignment_by_split(cases),
+            baseline_accuracy_by_split=_input_proxy_baseline_accuracy_by_split(cases),
+            notes=[
+                "single sphere with sensory inputs plus input-class target proxy ports",
+                (
+                    "training uses StepTrain and expected-action neuromodulator pulses; "
+                    "evaluation uses StepInfer without target-proxy drive"
+                ),
+                (
+                    "proxy alignment only tests observable supported input drive; motor "
+                    "holdout accuracy must beat baselines before any adapter claim"
                 ),
             ],
         )
@@ -3349,6 +3673,56 @@ def _supervised_target_alignment_by_split(
 
 def _supervised_baseline_accuracy_by_split(
     cases: Sequence[CunxonSupervisedMotorCase],
+) -> dict[str, dict[str, float]]:
+    baseline_names = sorted({name for case in cases for name in case.baseline_actions})
+    result: dict[str, dict[str, float]] = {}
+    for baseline_name in baseline_names:
+        split_scores: dict[str, float] = {}
+        for split in sorted({case.split for case in cases} | {"overall"}):
+            split_cases = (
+                cases if split == "overall" else [case for case in cases if case.split == split]
+            )
+            if not split_cases:
+                continue
+            split_scores[split] = sum(
+                1
+                for case in split_cases
+                if case.baseline_actions[baseline_name] == case.expected_action
+            ) / len(split_cases)
+        result[baseline_name] = split_scores
+    return result
+
+
+def _input_proxy_accuracy_by_split(
+    cases: Sequence[CunxonInputProxyTargetCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonInputProxyTargetCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(1 for case in split_cases if case.outcome == "success") / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _input_proxy_target_alignment_by_split(
+    cases: Sequence[CunxonInputProxyTargetCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonInputProxyTargetCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: sum(case.target_proxy_alignment for case in split_cases) / len(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _input_proxy_baseline_accuracy_by_split(
+    cases: Sequence[CunxonInputProxyTargetCase],
 ) -> dict[str, dict[str, float]]:
     baseline_names = sorted({name for case in cases for name in case.baseline_actions})
     result: dict[str, dict[str, float]] = {}

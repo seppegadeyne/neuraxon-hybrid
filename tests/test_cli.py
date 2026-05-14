@@ -11,6 +11,8 @@ from neuraxon_agent.cli import main
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonInputProxyTargetCase,
+    CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
     CunxonInterfaceRelaySample,
     CunxonInterfaceSemanticsProbeResult,
@@ -640,6 +642,81 @@ def test_cli_cunxon_interface_semantics_probe_writes_json_and_markdown(
         encoding="utf-8"
     )
     assert "absolute neuron indices" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_input_proxy_target_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**_: object) -> CunxonInputProxyTargetProbeResult:
+        return CunxonInputProxyTargetProbeResult(
+            status="input-proxy target probe viable",
+            upstream_commit="upstream",
+            cunxon_commit="cunxon",
+            library_path="/tmp/libcunxon.so",
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            train_epochs=2,
+            train_steps_per_case=4,
+            eval_steps=4,
+            target_proxy_port_ids=[3, 4, 5],
+            motor_readout_port_ids=[11, 12, 13],
+            cases=[
+                CunxonInputProxyTargetCase(
+                    name="execute-train",
+                    split="train",
+                    input_vector=[1.0, 0.25, 0.0],
+                    expected_action="execute",
+                    target_proxy_readout=[1, -1, -1],
+                    motor_readout=[0, 0, 0],
+                    decoded_action="query",
+                    normalized_action="query",
+                    confidence=0.0,
+                    outcome="failure",
+                    target_proxy_alignment=1.0,
+                    baseline_actions={"always_execute": "execute", "always_query": "query"},
+                    energy=4.0,
+                )
+            ],
+            accuracy_by_split={"overall": 0.0, "train": 0.0},
+            target_proxy_alignment_by_split={"overall": 1.0, "train": 1.0},
+            baseline_accuracy_by_split={
+                "always_execute": {"overall": 1.0, "train": 1.0},
+                "always_query": {"overall": 0.0, "train": 0.0},
+            },
+            notes=["fake input proxy target"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_input_proxy_target_probe", fake_probe)
+    json_path = tmp_path / "input-proxy.json"
+    markdown_path = tmp_path / "input-proxy.md"
+
+    rc = main(
+        [
+            "cunxon-input-proxy-target-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--train-epochs",
+            "2",
+            "--train-steps-per-case",
+            "4",
+            "--eval-steps",
+            "4",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "input-proxy target probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "input-port proxy target probe" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:

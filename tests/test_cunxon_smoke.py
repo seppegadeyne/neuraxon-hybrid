@@ -9,6 +9,8 @@ import pytest
 from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeResult,
     CunxonActionProbeTrial,
+    CunxonInputProxyTargetCase,
+    CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
     CunxonInterfaceRelaySample,
     CunxonInterfaceSemanticsProbeResult,
@@ -30,6 +32,7 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonVramResidentSample,
     classify_cunxon_status,
     render_action_probe_markdown_report,
+    render_input_proxy_target_markdown_report,
     render_interface_semantics_markdown_report,
     render_long_horizon_markdown_report,
     render_long_sweep_markdown_report,
@@ -41,6 +44,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_vram_resident_markdown_report,
     validate_trinary_readout,
     write_action_probe_artifacts,
+    write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
     write_long_horizon_artifacts,
     write_long_sweep_artifacts,
@@ -222,6 +226,80 @@ def test_vram_resident_report_writes_progress_and_durable_state(tmp_path: Path) 
     assert '"pid": 12345' in state
     assert "resident.json" in state
     assert "runtime/dynamics evidence only" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
+    tmp_path: Path,
+) -> None:
+    result = CunxonInputProxyTargetProbeResult(
+        status="input-proxy target probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        train_epochs=3,
+        train_steps_per_case=8,
+        eval_steps=8,
+        target_proxy_port_ids=[3, 4, 5],
+        motor_readout_port_ids=[11, 12, 13],
+        cases=[
+            CunxonInputProxyTargetCase(
+                name="execute-train",
+                split="train",
+                input_vector=[1.0, 0.25, 0.0],
+                expected_action="execute",
+                target_proxy_readout=[1, -1, -1],
+                motor_readout=[0, 0, 0],
+                decoded_action="query",
+                normalized_action="query",
+                confidence=0.0,
+                outcome="failure",
+                target_proxy_alignment=1.0,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=12.5,
+            ),
+            CunxonInputProxyTargetCase(
+                name="query-holdout",
+                split="holdout",
+                input_vector=[0.0, 0.0, 0.0],
+                expected_action="query",
+                target_proxy_readout=[0, 0, 0],
+                motor_readout=[0, 0, 0],
+                decoded_action="query",
+                normalized_action="query",
+                confidence=0.0,
+                outcome="success",
+                target_proxy_alignment=0.0,
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=18.0,
+            ),
+        ],
+        accuracy_by_split={"holdout": 1.0, "overall": 0.5, "train": 0.0},
+        target_proxy_alignment_by_split={"holdout": 0.0, "overall": 0.5, "train": 1.0},
+        baseline_accuracy_by_split={
+            "always_execute": {"holdout": 0.0, "overall": 0.5, "train": 1.0},
+            "always_query": {"holdout": 1.0, "overall": 0.5, "train": 0.0},
+        },
+        notes=["target proxy inputs are input-class neurons"],
+    )
+
+    markdown = render_input_proxy_target_markdown_report(result)
+    assert "input-port proxy target probe" in markdown
+    assert "supported input-class external drive" in markdown
+    assert "not a desired-output/error-channel claim" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "holdout" in markdown
+
+    json_path = tmp_path / "input_proxy.json"
+    markdown_path = tmp_path / "input_proxy.md"
+    write_input_proxy_target_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    assert '"status": "input-proxy target probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert '"case_count": 2' in json_path.read_text(encoding="utf-8")
+    assert "supported input-class external drive" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_long_sweep_report_scores_longer_modes_horizons_and_baselines(tmp_path: Path) -> None:
@@ -738,6 +816,14 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"sample_count": 16' in data
     assert '"total_steps": 4194304' in data
     assert '"unique_readouts": [' in data
+    assert (
+        '"verdict": "input-proxy route confirms target drive but motor readout remains '
+        'baseline-level"'
+        in data
+    )
+    assert '"target_proxy_alignment_by_split"' in data
+    assert "cuNxon input-proxy target route" in markdown
+    assert "target proxy train alignment=1.000000" in markdown
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
     assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
