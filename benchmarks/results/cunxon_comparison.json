@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels, but the new stress audit drops stress_holdout to 0.333333 with 0/5 seeds beating constant baselines and counterfactual_control rises to 0.266667. This is useful brittleness evidence, not broad intelligence/generalization evidence.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels. The stress audit exposed baseline-level low-margin stress_holdout behavior, and the augmented-train follow-up improved hard_holdout/holdout while stress_holdout stayed at 0.333333 and counterfactual_control stayed non-zero at 0.066667. This is useful objective-shaping/brittleness evidence, not broad intelligence/generalization evidence.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -72,6 +72,12 @@
       "lane": "cuNxon Aigarth target-contract stress audit",
       "metric": "5-seed target-contract stress/control accuracy vs trivial baselines",
       "value": "stress-holdout mean=0.333333 (all 5 seeds at constant-baseline level); hard-holdout mean=0.533333; holdout mean=0.666667; counterfactual-control mean=0.266667; permuted-control mean=0.000000; unexpected labels=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_augmented_train_probe.json",
+      "lane": "cuNxon Aigarth target-contract augmented-train audit",
+      "metric": "5-seed augmented-train target-contract stress/control accuracy vs trivial baselines",
+      "value": "augmented_train mean=1.000000; holdout mean=1.000000; hard-holdout mean=0.866667; stress-holdout mean=0.333333; counterfactual-control mean=0.066667; permuted-control mean=0.000000; unexpected labels=0"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -499,6 +505,50 @@
       "assertive"
     ],
     "verdict": "strict-label fitness improved hard-holdout robustness but did not eliminate out-of-contract labels or brittleness"
+  },
+  "cunxon_aigarth_action_target_contract_augmented_train_probe": {
+    "aggregate_action_distribution": {
+      "execute": 40,
+      "query": 73,
+      "retry": 37
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed augmented-train target-contract stress audit; train plus augmented_train Aigarth fitness only; hard/stress/control labels never optimized; no intelligence/generalization claim",
+    "fitness_variant": "target_contract_augmented_train",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_augmented_train": 1.0,
+    "mean_counterfactual_control": 0.06666666666666667,
+    "mean_hard_holdout": 0.8666666666666668,
+    "mean_holdout": 1.0,
+    "mean_overall": 0.64,
+    "mean_stress_holdout": 0.3333333333333333,
+    "mean_train": 0.9333333333333332,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      112,
+      113,
+      114,
+      115,
+      116
+    ],
+    "seeds_beating_baseline_by_split": {
+      "augmented_train": 5,
+      "counterfactual_control": 0,
+      "hard_holdout": 5,
+      "holdout": 5,
+      "overall": 5,
+      "permuted_control": 0,
+      "stress_holdout": 0,
+      "train": 5
+    },
+    "status": "aigarth target-contract augmented-train audit completed",
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0,
+    "verdict": "augmented low-margin training improves holdout/hard-holdout but stress-holdout remains baseline-level, so the target-contract route is still brittle"
   },
   "cunxon_aigarth_action_target_contract_probe": {
     "aggregate_action_distribution": {
@@ -1258,5 +1308,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "Target-contract Aigarth fitness remains the strongest strict-contract cuNxon action lane, but the stress audit exposes baseline-level low-margin stress holdout behavior"
+  "verdict": "Target-contract Aigarth fitness remains the strongest strict-contract cuNxon action lane; augmented low-margin training improves hard/standard holdout but still fails stress holdout"
 }

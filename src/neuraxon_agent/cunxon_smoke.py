@@ -1933,6 +1933,41 @@ def render_aigarth_action_target_contract_stress_markdown_report(
     )
 
 
+def render_aigarth_action_target_contract_augmented_train_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render an augmented-train target-contract Aigarth action audit report."""
+    return (
+        render_aigarth_action_target_contract_stress_markdown_report(result)
+        .replace(
+            "# cuNxon Aigarth target-contract stress audit",
+            "# cuNxon Aigarth target-contract augmented-train audit",
+            1,
+        )
+        .replace(
+            "The target-contract audit is the strongest cuNxon action lane so far, but the "
+            "task is tiny and one seed stayed baseline-level on hard-holdout. This audit "
+            "keeps the same train-only `target_contract_margin` objective and adds "
+            "harder/noisier and counterfactual splits (`stress_holdout` and "
+            "`counterfactual_control`) before treating the route as stronger adapter evidence.",
+            "The target-contract stress audit exposed baseline-level low-margin stress "
+            "holdout behavior. This follow-up keeps the signed-first-lane contract but "
+            "tests a train-only objective with additional low-margin training cases: "
+            "`target_contract_augmented_train` optimizes `train` plus `augmented_train` "
+            "cases, while `stress_holdout`, hard holdout, and control labels stay outside "
+            "the fitness callback.",
+            1,
+        )
+        .replace(
+            "This is a harder target-contract stress audit of a tiny Aigarth/evolutionary "
+            "adapter route, not ",
+            "This is an augmented-train target-contract stress audit of a tiny "
+            "Aigarth/evolutionary adapter route, not ",
+            1,
+        )
+    )
+
+
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
     *,
@@ -2019,6 +2054,25 @@ def write_aigarth_action_target_contract_stress_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_target_contract_stress_markdown_report(result), encoding="utf-8"
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_target_contract_augmented_train_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth target-contract augmented-train artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_augmented_train_markdown_report(result),
+        encoding="utf-8",
     )
     return json_output, markdown_output
 
@@ -3444,14 +3498,19 @@ def run_ctypes_aigarth_action_probe(
             if evaluation_specs is not None
             else _default_supervised_motor_specs()
         )
-        train_specs = [spec for spec in specs if spec[1] == "train"]
+        train_splits = (
+            {"train", "augmented_train"}
+            if fitness_variant == "target_contract_augmented_train"
+            else {"train"}
+        )
+        train_specs = [spec for spec in specs if spec[1] in train_splits]
         if not train_specs:
             raise ValueError("evaluation_specs must include at least one train case")
 
         def train_score(candidate_net: C.c_void_p) -> float:
             decoder_strategy = (
                 "target_contract"
-                if fitness_variant == "target_contract_margin"
+                if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}
                 else "action_decoder"
             )
             cases = _evaluate_aigarth_action_cases(
@@ -3469,7 +3528,7 @@ def run_ctypes_aigarth_action_probe(
             alignment_score = sum(case.target_alignment for case in cases) / len(cases)
             if fitness_variant == "success_plus_alignment":
                 return float(success_score + 0.25 * alignment_score)
-            if fitness_variant == "target_contract_margin":
+            if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}:
                 margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
                 return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
             if fitness_variant in {"strict_label_margin", "strict_label_heavy_penalty"}:
@@ -3523,7 +3582,7 @@ def run_ctypes_aigarth_action_probe(
             decoder=decoder,
             decoder_strategy=(
                 "target_contract"
-                if fitness_variant == "target_contract_margin"
+                if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}
                 else "action_decoder"
             ),
         )
@@ -3987,6 +4046,135 @@ def run_ctypes_aigarth_action_target_contract_stress_probe(
                 "are never optimized"
             ),
             "target-contract stress audit, not intelligence evidence",
+        ],
+    )
+
+
+def _summarize_aigarth_action_runs(
+    *,
+    probe_results: Sequence[CunxonAigarthActionProbeResult],
+    seed_offsets: Sequence[int],
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    generations: int,
+    population_size: int,
+    eval_steps: int,
+    fitness_variant: str,
+    status: str,
+    notes: Sequence[str],
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Summarize multi-seed Aigarth action probes with strict-contract diagnostics."""
+    runs = [
+        CunxonAigarthActionSeedRun(
+            seed_offset=result.seed_offset,
+            generation_train_scores=result.generation_train_scores,
+            accuracy_by_split=result.accuracy_by_split,
+            target_alignment_by_split=result.target_alignment_by_split,
+            baseline_accuracy_by_split=result.baseline_accuracy_by_split,
+            unique_readouts=result.unique_readouts,
+            action_distribution=result.action_distribution,
+            cases=result.cases,
+        )
+        for result in probe_results
+    ]
+    aggregate_distribution = _seed_sweep_action_distribution(runs)
+    strict_expected_actions = ["execute", "query", "retry"]
+    unexpected_action_count = sum(
+        count
+        for action, count in aggregate_distribution.items()
+        if action not in strict_expected_actions
+    )
+    total_actions = sum(aggregate_distribution.values())
+    accuracy_summary = _seed_sweep_accuracy_summary(runs)
+    train_values = [
+        max(
+            run.accuracy_by_split.get("train", 0.0),
+            run.accuracy_by_split.get("augmented_train", 0.0),
+        )
+        for run in runs
+    ]
+    hard_values = [run.accuracy_by_split.get("hard_holdout", 0.0) for run in runs]
+    gaps = [train - hard for train, hard in zip(train_values, hard_values, strict=False)]
+    return CunxonAigarthActionHardHoldoutResult(
+        status=status,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        readout_ids=probe_results[0].readout_ids,
+        seed_offsets=list(seed_offsets),
+        strict_expected_actions=strict_expected_actions,
+        runs=runs,
+        accuracy_summary_by_split=accuracy_summary,
+        aggregate_action_distribution=aggregate_distribution,
+        seeds_beating_baseline_by_split=_seed_sweep_beating_baseline_counts(runs),
+        unexpected_action_count=unexpected_action_count,
+        unexpected_action_rate=unexpected_action_count / total_actions if total_actions else 0.0,
+        leakage_control_accuracy_mean=accuracy_summary.get("permuted_control", {}).get("mean", 0.0),
+        train_to_hard_holdout_gap_mean=sum(gaps) / len(gaps) if gaps else 0.0,
+        fitness_variant=fitness_variant,
+        notes=list(notes),
+    )
+
+
+def run_ctypes_aigarth_action_target_contract_augmented_train_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (112, 113, 114, 115, 116),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_augmented_train",
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Run target-contract Aigarth with low-margin augmented training cases."""
+    if fitness_variant != "target_contract_augmented_train":
+        raise ValueError(
+            "target-contract augmented-train audit only supports "
+            "fitness_variant='target_contract_augmented_train'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    specs = _aigarth_action_target_contract_augmented_train_specs()
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    return _summarize_aigarth_action_runs(
+        probe_results=probe_results,
+        seed_offsets=seed_offsets,
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        status="aigarth target-contract augmented-train audit completed",
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "target-contract fitness decodes with the signed-first-lane project contract",
+            "fitness callback uses train plus augmented_train low-margin cases only",
+            "stress_holdout, hard holdout, and control labels are never optimized",
+            "target-contract augmented-train stress audit, not intelligence evidence",
         ],
     )
 
@@ -6444,6 +6632,51 @@ def _aigarth_action_target_contract_stress_specs() -> list[
             "counterfactual_control",
             (0.05, 0.0, -0.05),
             "retry",
+        ),
+    ]
+
+
+def _aigarth_action_target_contract_augmented_train_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return target-contract stress cases plus low-margin train-only augmentations."""
+    return [
+        *_aigarth_action_target_contract_stress_specs(),
+        (
+            "execute-augmented-low-margin-train",
+            "augmented_train",
+            (0.28, 0.06, -0.02),
+            "execute",
+        ),
+        (
+            "execute-augmented-conflict-train",
+            "augmented_train",
+            (0.42, -0.18, 0.12),
+            "execute",
+        ),
+        (
+            "retry-augmented-low-margin-train",
+            "augmented_train",
+            (-0.28, -0.06, 0.02),
+            "retry",
+        ),
+        (
+            "retry-augmented-conflict-train",
+            "augmented_train",
+            (-0.42, 0.18, -0.12),
+            "retry",
+        ),
+        (
+            "query-augmented-balanced-train",
+            "augmented_train",
+            (0.12, -0.12, 0.02),
+            "query",
+        ),
+        (
+            "query-augmented-weak-train",
+            "augmented_train",
+            (-0.08, 0.08, -0.02),
+            "query",
         ),
     ]
 
