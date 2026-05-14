@@ -1188,5 +1188,92 @@ def test_cli_cunxon_aigarth_action_strict_label_probe_writes_json_and_markdown(
     assert "Aigarth strict-label action audit" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_cli_cunxon_aigarth_action_contract_penalty_probe_writes_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthActionHardHoldoutResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        assert isinstance(raw_seed_offsets, list)
+        assert kwargs["fitness_variant"] == "strict_label_heavy_penalty"
+        return CunxonAigarthActionHardHoldoutResult(
+            status="aigarth contract-penalty action audit completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            readout_ids=[35, 36, 37],
+            seed_offsets=raw_seed_offsets,
+            strict_expected_actions=["execute", "query", "retry"],
+            runs=[
+                CunxonAigarthActionSeedRun(
+                    seed_offset=97,
+                    generation_train_scores=[0.0, 0.5],
+                    accuracy_by_split={"hard_holdout": 0.333333, "overall": 0.333333},
+                    target_alignment_by_split={"hard_holdout": 0.333333, "overall": 0.333333},
+                    baseline_accuracy_by_split={
+                        "always_query": {"hard_holdout": 0.333333, "overall": 0.333333}
+                    },
+                    unique_readouts=1,
+                    action_distribution={"query": 6},
+                    cases=[],
+                )
+            ],
+            accuracy_summary_by_split={
+                "hard_holdout": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+                "overall": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+            },
+            aggregate_action_distribution={"query": 6},
+            seeds_beating_baseline_by_split={"hard_holdout": 0, "overall": 0},
+            unexpected_action_count=0,
+            unexpected_action_rate=0.0,
+            leakage_control_accuracy_mean=0.0,
+            train_to_hard_holdout_gap_mean=0.0,
+            fitness_variant=str(kwargs["fitness_variant"]),
+            notes=["fake contract-penalty audit"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_contract_penalty_probe", fake_probe
+    )
+    json_path = tmp_path / "aigarth-action-contract-penalty.json"
+    markdown_path = tmp_path / "aigarth-action-contract-penalty.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-contract-penalty-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "97,98",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "aigarth contract-penalty action audit completed"' in data
+    assert '"fitness_variant": "strict_label_heavy_penalty"' in data
+    assert "Aigarth contract-penalty action audit" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
 def test_cli_no_command() -> None:
     assert main([]) == 2
