@@ -14,6 +14,7 @@ from neuraxon_agent.cunxon_smoke import (
     ensure_no_active_vram_resident_run,
     run_ctypes_action_probe,
     run_ctypes_aigarth_action_probe,
+    run_ctypes_aigarth_action_seed_sweep_probe,
     run_ctypes_aigarth_readout_probe,
     run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
@@ -29,6 +30,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_vram_resident_probe,
     write_action_probe_artifacts,
     write_aigarth_action_artifacts,
+    write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -519,6 +521,37 @@ def cmd_cunxon_aigarth_action_probe(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_cunxon_aigarth_action_seed_sweep_probe(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_aigarth_action_seed_sweep_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            generations=args.generations,
+            population_size=args.population_size,
+            eval_steps=args.eval_steps,
+            device_id=args.device,
+        )
+        write_aigarth_action_seed_sweep_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon Aigarth action seed sweep\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed Aigarth/action seed sweep does not support any "
+            "GPU-backed repeatability, holdout, or action-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 
 def cmd_cunxon_resident_action_probe(args: argparse.Namespace) -> int:
     try:
@@ -982,6 +1015,65 @@ def main(argv: list[str] | None = None) -> int:
         help="Markdown artifact path",
     )
     p_cunxon_aigarth_action.set_defaults(func=cmd_cunxon_aigarth_action_probe)
+
+    p_cunxon_aigarth_action_sweep = sub.add_parser(
+        "cunxon-aigarth-action-seed-sweep-probe",
+        help="Run Aigarth action probe across fresh cuNxon seed offsets",
+        description=(
+            "Repeat the train-only Aigarth action probe with a fresh cuNxon "
+            "network/context per seed to audit repeatability and action coverage."
+        ),
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--seed-offsets",
+        default="82,83,84,85,86",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--generations",
+        type=int,
+        default=16,
+        help="Aigarth generations per seed using train-only action fitness",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--population-size",
+        type=int,
+        default=32,
+        help="Aigarth mutation population size per generation",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--eval-steps",
+        type=int,
+        default=24,
+        help="Inference steps per train/holdout case evaluation",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--device", type=int, default=0, help="CUDA device id"
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_aigarth_action_sweep.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_aigarth_action_seed_sweep.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_aigarth_action_sweep.set_defaults(
+        func=cmd_cunxon_aigarth_action_seed_sweep_probe
+    )
 
     p_cunxon_sensitivity = sub.add_parser(
         "cunxon-sensitivity-probe",

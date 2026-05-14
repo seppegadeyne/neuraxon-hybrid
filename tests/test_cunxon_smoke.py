@@ -11,6 +11,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonAigarthActionCase,
     CunxonAigarthActionProbeResult,
+    CunxonAigarthActionSeedRun,
+    CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
     CunxonExternalDriveWindowProbeResult,
@@ -41,6 +43,7 @@ from neuraxon_agent.cunxon_smoke import (
     classify_cunxon_status,
     render_action_probe_markdown_report,
     render_aigarth_action_markdown_report,
+    render_aigarth_action_seed_sweep_markdown_report,
     render_aigarth_readout_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
@@ -57,6 +60,7 @@ from neuraxon_agent.cunxon_smoke import (
     validate_trinary_readout,
     write_action_probe_artifacts,
     write_aigarth_action_artifacts,
+    write_aigarth_action_seed_sweep_artifacts,
     write_aigarth_readout_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
@@ -456,6 +460,99 @@ def test_aigarth_action_report_scores_holdout_against_trivial_baselines(
     assert '"case_count": 2' in data
     assert '"generation_train_scores": [' in data
     assert "holdout accuracy must beat trivial baselines" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
+def test_aigarth_action_seed_sweep_report_records_repeatability_and_coverage(
+    tmp_path: Path,
+) -> None:
+    shared_case = CunxonAigarthActionCase(
+        name="execute-holdout-noisy",
+        split="holdout",
+        input_vector=[0.8, 0.2, 0.1],
+        expected_action="execute",
+        target_readout=[1, 0, 0],
+        readout=[1, 0, 0],
+        decoded_action="proceed",
+        normalized_action="execute",
+        confidence=1.0,
+        outcome="success",
+        target_alignment=1.0,
+        baseline_actions={"always_execute": "execute", "always_query": "query"},
+        energy=4.0,
+    )
+    result = CunxonAigarthActionSeedSweepResult(
+        status="aigarth action seed sweep completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        readout_ids=[35, 36, 37],
+        seed_offsets=[82, 83],
+        runs=[
+            CunxonAigarthActionSeedRun(
+                seed_offset=82,
+                generation_train_scores=[0.5, 0.75],
+                accuracy_by_split={"holdout": 0.666667, "overall": 0.666667, "train": 0.666667},
+                target_alignment_by_split={"holdout": 0.5, "overall": 0.5, "train": 0.5},
+                baseline_accuracy_by_split={
+                    "always_query": {"holdout": 0.333333, "overall": 0.333333}
+                },
+                unique_readouts=4,
+                action_distribution={"execute": 2, "query": 4},
+                cases=[shared_case],
+            ),
+            CunxonAigarthActionSeedRun(
+                seed_offset=83,
+                generation_train_scores=[0.5, 0.5],
+                accuracy_by_split={"holdout": 0.333333, "overall": 0.333333, "train": 0.333333},
+                target_alignment_by_split={"holdout": 0.25, "overall": 0.25, "train": 0.25},
+                baseline_accuracy_by_split={
+                    "always_query": {"holdout": 0.333333, "overall": 0.333333}
+                },
+                unique_readouts=1,
+                action_distribution={"query": 6},
+                cases=[shared_case],
+            ),
+        ],
+        accuracy_summary_by_split={
+            "holdout": {"mean": 0.5, "min": 0.333333, "max": 0.666667},
+            "overall": {"mean": 0.5, "min": 0.333333, "max": 0.666667},
+            "train": {"mean": 0.5, "min": 0.333333, "max": 0.666667},
+        },
+        aggregate_action_distribution={"assertive": 1, "execute": 2, "query": 10},
+        seeds_beating_baseline_by_split={"holdout": 1, "overall": 1, "train": 1},
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "repeatability audit, not intelligence evidence",
+        ],
+    )
+
+    markdown = render_aigarth_action_seed_sweep_markdown_report(result)
+    assert "Aigarth action seed sweep" in markdown
+    assert "Seed repeatability" in markdown
+    assert "1/2" in markdown
+    assert "partial action coverage" in markdown
+    assert "unexpected normalized labels" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-seed-sweep.json"
+    markdown_path = tmp_path / "aigarth-action-seed-sweep.md"
+    write_aigarth_action_seed_sweep_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json_path.read_text(encoding="utf-8")
+    assert '"seed_count": 2' in data
+    assert '"seed_offsets": [' in data
+    assert "fresh cuNxon network/context per seed" in markdown_path.read_text(
         encoding="utf-8"
     )
 
@@ -1097,6 +1194,10 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon resident task-coupled action probe" in markdown
     assert "cuNxon Aigarth readout semantics probe" in markdown
     assert "cuNxon Aigarth holdout/action probe" in markdown
+    assert "cuNxon Aigarth action seed sweep" in markdown
+    assert "holdout mean=0.533333" in markdown
+    assert "3/5 seeds beat the best constant baseline on holdout" in markdown
+    assert "unexpected normalized labels: assertive" in markdown
     assert "absolute output readout margin improved 0.625000→1.500000" in markdown
     assert "holdout=0.666667; overall=0.666667; beats constant-action baselines" in markdown
     assert "12 epochs / 72 scored cases" in markdown
@@ -1150,6 +1251,10 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
         in data
     )
     assert '"cunxon_aigarth_action_probe"' in data
+    assert '"cunxon_aigarth_action_seed_sweep"' in data
+    assert '"mean_holdout": 0.5333333333333333' in data
+    assert '"holdout": 3' in data
+    assert '"unexpected_actions": [' in data
     assert '"holdout": 0.6666666666666666' in data
     assert '"unique_readouts": 4' in data
     assert '"absolute_output_improvement": 0.875' in data
@@ -1177,6 +1282,26 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"decision_quality_measured": false' in data
     assert '"decision_quality_measured": true' in data
+
+
+def test_tracked_cunxon_aigarth_action_seed_sweep_records_repeatability() -> None:
+    markdown = Path("benchmarks/results/cunxon_aigarth_action_seed_sweep.md").read_text(
+        encoding="utf-8"
+    )
+    data = Path("benchmarks/results/cunxon_aigarth_action_seed_sweep.json").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Aigarth action seed sweep" in markdown
+    assert "Seed repeatability" in markdown
+    assert "holdout | 0.533333" in markdown
+    assert "3/5" in markdown
+    assert "unexpected normalized labels: assertive" in markdown
+    assert "not intelligence evidence" in markdown
+    assert '"seed_count": 5' in data
+    assert '"seed_offsets": [' in data
+    assert '"mean": 0.5333333333333333' in data
+    assert '"aggregate_action_distribution"' in data
 
 
 def test_tracked_cunxon_aigarth_action_probe_records_holdout_action_result() -> None:

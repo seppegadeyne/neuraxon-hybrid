@@ -13,6 +13,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonActionProbeTrial,
     CunxonAigarthActionCase,
     CunxonAigarthActionProbeResult,
+    CunxonAigarthActionSeedRun,
+    CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
     CunxonInputProxyTargetCase,
@@ -937,6 +939,83 @@ def test_cli_cunxon_aigarth_action_probe_writes_json_and_markdown(
         encoding="utf-8"
     )
     assert "Aigarth holdout action probe" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_aigarth_action_seed_sweep_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthActionSeedSweepResult:
+        seed_offsets = list(kwargs["seed_offsets"])
+        return CunxonAigarthActionSeedSweepResult(
+            status="aigarth action seed sweep completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            readout_ids=[35, 36, 37],
+            seed_offsets=seed_offsets,
+            runs=[
+                CunxonAigarthActionSeedRun(
+                    seed_offset=seed_offsets[0],
+                    generation_train_scores=[0.333333],
+                    accuracy_by_split={"holdout": 0.333333, "overall": 0.333333},
+                    target_alignment_by_split={"holdout": 0.333333, "overall": 0.333333},
+                    baseline_accuracy_by_split={
+                        "always_query": {"holdout": 0.333333, "overall": 0.333333}
+                    },
+                    unique_readouts=1,
+                    action_distribution={"query": 6},
+                    cases=[],
+                )
+            ],
+            accuracy_summary_by_split={
+                "holdout": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+                "overall": {"mean": 0.333333, "min": 0.333333, "max": 0.333333},
+            },
+            aggregate_action_distribution={"query": 6},
+            seeds_beating_baseline_by_split={"holdout": 0, "overall": 0},
+            notes=["fake seed sweep"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_seed_sweep_probe", fake_probe
+    )
+    json_path = tmp_path / "aigarth-action-seed-sweep.json"
+    markdown_path = tmp_path / "aigarth-action-seed-sweep.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-seed-sweep-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--seed-offsets",
+            "82,83",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "aigarth action seed sweep completed"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "Aigarth action seed sweep" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_no_command() -> None:

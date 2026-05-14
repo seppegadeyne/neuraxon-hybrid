@@ -270,6 +270,7 @@ class CunxonAigarthActionProbeResult:
     baseline_accuracy_by_split: dict[str, dict[str, float]]
     unique_readouts: int
     action_distribution: dict[str, int]
+    seed_offset: int = 82
     notes: list[str] = field(default_factory=list)
 
     @property
@@ -281,6 +282,57 @@ class CunxonAigarthActionProbeResult:
         """Return a JSON-serializable result dictionary."""
         data = asdict(self)
         data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonAigarthActionSeedRun:
+    """One seed from an Aigarth action repeatability sweep."""
+
+    seed_offset: int
+    generation_train_scores: list[float]
+    accuracy_by_split: dict[str, float]
+    target_alignment_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    unique_readouts: int
+    action_distribution: dict[str, int]
+    cases: list[CunxonAigarthActionCase]
+
+
+@dataclass(frozen=True)
+class CunxonAigarthActionSeedSweepResult:
+    """Multi-seed repeatability audit for Aigarth action evidence."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    readout_ids: list[int]
+    seed_offsets: list[int]
+    runs: list[CunxonAigarthActionSeedRun]
+    accuracy_summary_by_split: dict[str, dict[str, float]]
+    aggregate_action_distribution: dict[str, int]
+    seeds_beating_baseline_by_split: dict[str, int]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def seed_count(self) -> int:
+        """Return the number of seed offsets evaluated."""
+        return len(self.runs)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["seed_count"] = self.seed_count
         return data
 
     def to_json(self, *, indent: int | None = 2) -> str:
@@ -1288,6 +1340,128 @@ def write_aigarth_action_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_aigarth_action_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_aigarth_action_seed_sweep_markdown_report(
+    result: CunxonAigarthActionSeedSweepResult,
+) -> str:
+    """Render a multi-seed Aigarth action repeatability report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    summary_rows = [
+        "| Split | Mean accuracy | Min | Max | Seeds > best constant baseline |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for split, summary in sorted(result.accuracy_summary_by_split.items()):
+        beating = result.seeds_beating_baseline_by_split.get(split, 0)
+        summary_rows.append(
+            f"| {split} | {summary.get('mean', 0.0):.6f} | "
+            f"{summary.get('min', 0.0):.6f} | {summary.get('max', 0.0):.6f} | "
+            f"{beating}/{result.seed_count} |"
+        )
+    run_rows = [
+        "| Seed | Train | Holdout | Overall | Unique readouts | Actions | Final train score |",
+        "| ---: | ---: | ---: | ---: | ---: | --- | ---: |",
+    ]
+    for run in result.runs:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(run.action_distribution.items())
+        )
+        final_score = run.generation_train_scores[-1] if run.generation_train_scores else 0.0
+        run_rows.append(
+            f"| {run.seed_offset} | {run.accuracy_by_split.get('train', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('holdout', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('overall', 0.0):.6f} | "
+            f"{run.unique_readouts} | {actions or 'none'} | {final_score:.6f} |"
+        )
+    aggregate_actions = ", ".join(
+        f"{action}={count}"
+        for action, count in sorted(result.aggregate_action_distribution.items())
+    )
+    expected_actions = {"execute", "query", "retry"}
+    missing_actions = sorted(expected_actions - set(result.aggregate_action_distribution))
+    unexpected_actions = sorted(set(result.aggregate_action_distribution) - expected_actions)
+    coverage_bits = []
+    if missing_actions:
+        coverage_bits.append("partial action coverage: missing " + ", ".join(missing_actions))
+    else:
+        coverage_bits.append("all three action labels appeared at least once")
+    if unexpected_actions:
+        coverage_bits.append(
+            "unexpected normalized labels: " + ", ".join(unexpected_actions)
+        )
+    coverage_note = "; ".join(coverage_bits)
+    return "\n".join(
+        [
+            "# cuNxon Aigarth action seed sweep",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Generations per seed: {result.generations}",
+            f"- Population size: {result.population_size}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Readout ids: {', '.join(str(port) for port in result.readout_ids)}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Aggregate action distribution: {aggregate_actions or 'none'}",
+            f"- Coverage note: {coverage_note}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The single-seed Aigarth action probe was the first cuNxon action lane that "
+            "beat constant-action baselines, but it still failed the retry class and used "
+            "one engineered seed. This sweep reruns the same train-only Aigarth fitness "
+            "protocol with a fresh cuNxon network/context per seed to test repeatability "
+            "before treating the result as stronger adapter evidence.",
+            "",
+            "## Seed repeatability",
+            "",
+            *summary_rows,
+            "",
+            "## Per-seed runs",
+            "",
+            *run_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is a repeatability audit, not intelligence evidence. A seed sweep can "
+            "show whether a small Aigarth/evolutionary adapter result is stable or brittle, "
+            "but it does not by itself prove broad generalization, useful learning, or "
+            "production readiness. Partial action coverage remains a caveat until all "
+            "expected action labels are learned and verified on harder holdouts.",
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_seed_sweep_artifacts(
+    result: CunxonAigarthActionSeedSweepResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown Aigarth action seed-sweep artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_seed_sweep_markdown_report(result), encoding="utf-8"
+    )
     return json_output, markdown_output
 
 
@@ -2531,6 +2705,7 @@ def run_ctypes_aigarth_action_probe(
     generations: int = 16,
     population_size: int = 32,
     eval_steps: int = 24,
+    seed_offset: int = 82,
     device_id: int = 0,
 ) -> CunxonAigarthActionProbeResult:
     """Evolve a cuNxon readout with Aigarth and score train/holdout actions."""
@@ -2560,7 +2735,7 @@ def run_ctypes_aigarth_action_probe(
         params.num_input_neurons = 3
         params.num_hidden_neurons = 32
         params.num_output_neurons = 3
-        params.random_seed_offset = 82
+        params.random_seed_offset = seed_offset
         params.synapse_death_prob = 0.0
         params.synapse_formation_prob = 0.0
 
@@ -2665,6 +2840,7 @@ def run_ctypes_aigarth_action_probe(
             baseline_accuracy_by_split=_aigarth_action_baseline_accuracy_by_split(cases),
             unique_readouts=len({tuple(case.readout) for case in cases}),
             action_distribution=_aigarth_action_distribution(cases),
+            seed_offset=seed_offset,
             notes=[
                 "Aigarth fitness callback uses train cases only; holdout labels are not optimized",
                 "final train and holdout readouts are decoded through the existing ActionDecoder",
@@ -2676,6 +2852,71 @@ def run_ctypes_aigarth_action_probe(
             lib.cunxonNetworkDestroy(net)
         if ctx.value:
             lib.cunxonDestroyContext(ctx)
+
+
+def run_ctypes_aigarth_action_seed_sweep_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (82, 83, 84, 85, 86),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    device_id: int = 0,
+) -> CunxonAigarthActionSeedSweepResult:
+    """Run the Aigarth action probe across fresh cuNxon seeds."""
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    runs = [
+        CunxonAigarthActionSeedRun(
+            seed_offset=result.seed_offset,
+            generation_train_scores=result.generation_train_scores,
+            accuracy_by_split=result.accuracy_by_split,
+            target_alignment_by_split=result.target_alignment_by_split,
+            baseline_accuracy_by_split=result.baseline_accuracy_by_split,
+            unique_readouts=result.unique_readouts,
+            action_distribution=result.action_distribution,
+            cases=result.cases,
+        )
+        for result in probe_results
+    ]
+    return CunxonAigarthActionSeedSweepResult(
+        status="aigarth action seed sweep completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        readout_ids=probe_results[0].readout_ids,
+        seed_offsets=list(seed_offsets),
+        runs=runs,
+        accuracy_summary_by_split=_seed_sweep_accuracy_summary(runs),
+        aggregate_action_distribution=_seed_sweep_action_distribution(runs),
+        seeds_beating_baseline_by_split=_seed_sweep_beating_baseline_counts(runs),
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "fitness callback still uses train cases only; holdout labels are never optimized",
+            "repeatability audit, not intelligence evidence",
+        ],
+    )
 
 
 def run_ctypes_supervised_motor_probe(
@@ -4560,6 +4801,54 @@ def _aigarth_action_distribution(
     for case in cases:
         distribution[case.normalized_action] = distribution.get(case.normalized_action, 0) + 1
     return dict(sorted(distribution.items()))
+
+
+def _seed_sweep_accuracy_summary(
+    runs: Sequence[CunxonAigarthActionSeedRun],
+) -> dict[str, dict[str, float]]:
+    splits = sorted({split for run in runs for split in run.accuracy_by_split})
+    summary: dict[str, dict[str, float]] = {}
+    for split in splits:
+        values = [run.accuracy_by_split[split] for run in runs if split in run.accuracy_by_split]
+        if values:
+            summary[split] = {
+                "mean": sum(values) / len(values),
+                "min": min(values),
+                "max": max(values),
+            }
+    return summary
+
+
+def _seed_sweep_action_distribution(
+    runs: Sequence[CunxonAigarthActionSeedRun],
+) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for run in runs:
+        for action, count in run.action_distribution.items():
+            distribution[action] = distribution.get(action, 0) + count
+    return dict(sorted(distribution.items()))
+
+
+def _seed_sweep_beating_baseline_counts(
+    runs: Sequence[CunxonAigarthActionSeedRun],
+) -> dict[str, int]:
+    splits = sorted({split for run in runs for split in run.accuracy_by_split})
+    counts: dict[str, int] = {}
+    for split in splits:
+        count = 0
+        for run in runs:
+            if split not in run.accuracy_by_split:
+                continue
+            baseline_scores = [
+                by_split[split]
+                for by_split in run.baseline_accuracy_by_split.values()
+                if split in by_split
+            ]
+            best_baseline = max(baseline_scores) if baseline_scores else 0.0
+            if run.accuracy_by_split[split] > best_baseline:
+                count += 1
+        counts[split] = count
+    return counts
 
 
 def _default_multisphere_action_specs() -> list[
