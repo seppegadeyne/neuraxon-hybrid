@@ -23,6 +23,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonMultisphereActionCase,
     CunxonMultisphereActionProbeResult,
     CunxonPatternRecallSample,
+    CunxonResidentActionCase,
+    CunxonResidentActionProbeResult,
     CunxonSensitivityProbeResult,
     CunxonSensitivityProbeSample,
     CunxonSmokeResult,
@@ -248,6 +250,81 @@ def test_cli_cunxon_vram_resident_writes_json_markdown_and_state(
     assert '"status": "completed"' in json_path.read_text(encoding="utf-8")
     assert "VRAM-resident" in markdown_path.read_text(encoding="utf-8")
     assert '"pid": 9876' in state_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_resident_action_probe_writes_json_and_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonResidentActionProbeResult:
+        return CunxonResidentActionProbeResult(
+            status="resident action probe viable",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            train_epochs=int(kwargs["train_epochs"]),
+            train_steps_per_case=int(kwargs["train_steps_per_case"]),
+            eval_steps=int(kwargs["eval_steps"]),
+            sphere_count=3,
+            cases=[
+                CunxonResidentActionCase(
+                    epoch=1,
+                    name="query-holdout-low-drive",
+                    split="holdout",
+                    input_vector=[0.05, 0.0, -0.05, 0.0],
+                    expected_action="query",
+                    sensory_readout=[0, 0, 0, 0],
+                    association_readout=[0, 0, 0, 0],
+                    motor_readout=[0, 0, 0],
+                    decoded_action="query",
+                    normalized_action="query",
+                    confidence=0.0,
+                    outcome="success",
+                    baseline_actions={"always_query": "query"},
+                    energy=1.0,
+                    motor_active_state_count=0,
+                    elapsed_ms=1.0,
+                )
+            ],
+            accuracy_by_epoch={"1": 1.0},
+            accuracy_by_split={"holdout": 1.0, "overall": 1.0},
+            baseline_accuracy_by_split={"always_query": {"holdout": 1.0, "overall": 1.0}},
+            unique_motor_readouts=1,
+            notes=["fake resident action probe"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_resident_action_probe", fake_probe)
+    json_path = tmp_path / "resident-action.json"
+    markdown_path = tmp_path / "resident-action.md"
+
+    rc = main(
+        [
+            "cunxon-resident-action-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--train-epochs",
+            "2",
+            "--train-steps-per-case",
+            "4",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    assert '"status": "resident action probe viable"' in json_path.read_text(
+        encoding="utf-8"
+    )
+    assert "resident task-coupled action probe" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_long_sweep_writes_json_and_markdown(

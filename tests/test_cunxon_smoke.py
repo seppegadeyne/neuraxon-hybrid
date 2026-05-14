@@ -23,6 +23,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonMultisphereActionCase,
     CunxonMultisphereActionProbeResult,
     CunxonPatternRecallSample,
+    CunxonResidentActionCase,
+    CunxonResidentActionProbeResult,
     CunxonSensitivityProbeResult,
     CunxonSensitivityProbeSample,
     CunxonSmokeResult,
@@ -41,6 +43,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_long_sweep_markdown_report,
     render_markdown_report,
     render_multisphere_action_markdown_report,
+    render_resident_action_markdown_report,
     render_sensitivity_probe_markdown_report,
     render_snapshot_pattern_markdown_report,
     render_supervised_motor_markdown_report,
@@ -53,6 +56,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_long_horizon_artifacts,
     write_long_sweep_artifacts,
     write_multisphere_action_artifacts,
+    write_resident_action_artifacts,
     write_sensitivity_probe_artifacts,
     write_smoke_artifacts,
     write_snapshot_pattern_artifacts,
@@ -230,6 +234,85 @@ def test_vram_resident_report_writes_progress_and_durable_state(tmp_path: Path) 
     assert '"pid": 12345' in state
     assert "resident.json" in state
     assert "runtime/dynamics evidence only" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_resident_action_report_keeps_task_scoring_and_baselines_explicit(
+    tmp_path: Path,
+) -> None:
+    result = CunxonResidentActionProbeResult(
+        status="resident action probe viable",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        train_epochs=2,
+        train_steps_per_case=4,
+        eval_steps=3,
+        sphere_count=3,
+        cases=[
+            CunxonResidentActionCase(
+                epoch=1,
+                name="execute-train",
+                split="train",
+                input_vector=[1.0, 0.25, 0.0, 0.1],
+                expected_action="execute",
+                sensory_readout=[1, 0, 0, 0],
+                association_readout=[0, 0, 0, 0],
+                motor_readout=[0, 0, 0],
+                decoded_action="query",
+                normalized_action="query",
+                confidence=0.0,
+                outcome="failure",
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=12.5,
+                motor_active_state_count=0,
+                elapsed_ms=1.25,
+            ),
+            CunxonResidentActionCase(
+                epoch=1,
+                name="query-holdout-low-drive",
+                split="holdout",
+                input_vector=[0.05, 0.0, -0.05, 0.0],
+                expected_action="query",
+                sensory_readout=[0, 0, 0, 0],
+                association_readout=[0, 0, 0, 0],
+                motor_readout=[0, 0, 0],
+                decoded_action="query",
+                normalized_action="query",
+                confidence=0.0,
+                outcome="success",
+                baseline_actions={"always_execute": "execute", "always_query": "query"},
+                energy=20.0,
+                motor_active_state_count=0,
+                elapsed_ms=2.5,
+            ),
+        ],
+        accuracy_by_epoch={"1": 0.5},
+        accuracy_by_split={"holdout": 1.0, "overall": 0.5, "train": 0.0},
+        baseline_accuracy_by_split={
+            "always_execute": {"holdout": 0.0, "overall": 0.5, "train": 1.0},
+            "always_query": {"holdout": 1.0, "overall": 0.5, "train": 0.0},
+        },
+        unique_motor_readouts=1,
+        notes=["same cuNxon network remains resident across task epochs"],
+    )
+
+    markdown = render_resident_action_markdown_report(result)
+    assert "resident task-coupled action probe" in markdown
+    assert "same cuNxon network/context resident" in markdown
+    assert "Trivial baselines" in markdown
+    assert "does not prove intelligence" in markdown
+    assert "Unique motor readouts: 1" in markdown
+
+    json_path = tmp_path / "resident-action.json"
+    markdown_path = tmp_path / "resident-action.md"
+    write_resident_action_artifacts(result, json_path=json_path, markdown_path=markdown_path)
+
+    assert '"case_count": 2' in json_path.read_text(encoding="utf-8")
+    assert "holdout accuracy must beat trivial baselines" in markdown_path.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(
@@ -866,6 +949,8 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert "cuNxon snapshot/pattern probe" in markdown
     assert "cuNxon multi-sphere/action adapter" in markdown
     assert "cuNxon supervised motor-target adapter" in markdown
+    assert "cuNxon resident task-coupled action probe" in markdown
+    assert "12 epochs / 72 scored cases" in markdown
     assert "4h run completed with 16 samples/4194304 steps" in markdown
     assert "resident readout stayed `[0, 0, 0]`" in markdown
     assert "no decision-quality score measured" in markdown
@@ -900,6 +985,13 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
+    assert (
+        '"verdict": "resident task-coupled action loop remains flat query and does not beat '
+        'trivial baselines"'
+        in data
+    )
+    assert '"case_count": 72' in data
+    assert '"unique_motor_readouts": 1' in data
     assert '"verdict": "sensitivity diagnostic train-mode flat"' in data
     assert (
         '"verdict": "snapshot channels viable; pattern recall callable but flat zero in this setup"'
@@ -921,6 +1013,26 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert '"decision_quality_measured": false' in data
     assert '"decision_quality_measured": true' in data
+
+
+def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:
+    markdown = Path("benchmarks/results/cunxon_resident_action_probe.md").read_text(
+        encoding="utf-8"
+    )
+    data = Path("benchmarks/results/cunxon_resident_action_probe.json").read_text(
+        encoding="utf-8"
+    )
+
+    assert "resident task-coupled action probe" in markdown
+    assert "same cuNxon network/context resident" in markdown
+    assert "Train epochs: 12" in markdown
+    assert "Unique motor readouts: 1" in markdown
+    assert "Trivial baselines" in markdown
+    assert "does not prove intelligence" in markdown
+    assert '"case_count": 72' in data
+    assert '"unique_motor_readouts": 1' in data
+    assert '"overall": 0.3333333333333333' in data
+    assert '"motor_readout": [' in data
 
 
 def test_tracked_cunxon_source_semantics_audit_records_output_target_boundary() -> None:

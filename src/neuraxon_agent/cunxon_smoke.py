@@ -663,6 +663,65 @@ class CunxonInputProxyTargetProbeResult:
         return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
 
 
+@dataclass(frozen=True)
+class CunxonResidentActionCase:
+    """One eval case from a task-coupled resident cuNxon action probe."""
+
+    epoch: int
+    name: str
+    split: str
+    input_vector: list[float]
+    expected_action: str
+    sensory_readout: list[int]
+    association_readout: list[int]
+    motor_readout: list[int]
+    decoded_action: str
+    normalized_action: str
+    confidence: float
+    outcome: str
+    baseline_actions: dict[str, str]
+    energy: float
+    motor_active_state_count: int
+    elapsed_ms: float
+
+
+@dataclass(frozen=True)
+class CunxonResidentActionProbeResult:
+    """Task-coupled resident cuNxon probe result scored across epochs."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    train_epochs: int
+    train_steps_per_case: int
+    eval_steps: int
+    sphere_count: int
+    cases: list[CunxonResidentActionCase]
+    accuracy_by_epoch: dict[str, float]
+    accuracy_by_split: dict[str, float]
+    baseline_accuracy_by_split: dict[str, dict[str, float]]
+    unique_motor_readouts: int
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def case_count(self) -> int:
+        """Return the number of scored resident action cases."""
+        return len(self.cases)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["case_count"] = self.case_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
 class CunxonError(RuntimeError):
     """Raised when the cuNxon C API returns a non-OK status."""
 
@@ -928,6 +987,113 @@ def write_vram_resident_artifacts(
         encoding="utf-8",
     )
     return json_output, markdown_output, state_output
+
+
+def render_resident_action_markdown_report(result: CunxonResidentActionProbeResult) -> str:
+    """Render a task-coupled resident cuNxon action probe report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    epoch_rows = ["| Epoch | Accuracy |", "| ---: | ---: |"]
+    for epoch, accuracy in sorted(result.accuracy_by_epoch.items(), key=lambda item: int(item[0])):
+        epoch_rows.append(f"| {epoch} | {accuracy:.6f} |")
+    split_rows = ["| Split | Accuracy |", "| --- | ---: |"]
+    for split, accuracy in sorted(result.accuracy_by_split.items()):
+        split_rows.append(f"| {split} | {accuracy:.6f} |")
+    baseline_rows = ["| Baseline | Split | Accuracy |", "| --- | --- | ---: |"]
+    for baseline, by_split in sorted(result.baseline_accuracy_by_split.items()):
+        for split, accuracy in sorted(by_split.items()):
+            baseline_rows.append(f"| {baseline} | {split} | {accuracy:.6f} |")
+    case_rows = [
+        (
+            "| Epoch | Case | Split | Expected | Motor readout | Decoded | Outcome | "
+            "Motor active | Energy | Elapsed ms |"
+        ),
+        "| ---: | --- | --- | --- | --- | --- | --- | ---: | ---: | ---: |",
+    ]
+    for case in result.cases:
+        motor = ", ".join(_format_trinary(value) for value in case.motor_readout)
+        case_rows.append(
+            "| "
+            f"{case.epoch} | {case.name} | {case.split} | {case.expected_action} | "
+            f"[{motor}] | {case.decoded_action} ({case.normalized_action}, "
+            f"{case.confidence:.4f}) | {case.outcome} | "
+            f"{case.motor_active_state_count} | {case.energy:.6g} | {case.elapsed_ms:.3f} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon resident task-coupled action probe",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Sphere count: {result.sphere_count}",
+            f"- Train epochs: {result.train_epochs}",
+            f"- Train steps per case: {result.train_steps_per_case}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Cases: {result.case_count}",
+            f"- Unique motor readouts: {result.unique_motor_readouts}",
+            "",
+            "## Why this probe exists",
+            "",
+            "The previous four-hour VRAM-resident run kept one small infer-only network alive "
+            "but did not include task-coupled scoring. This probe keeps the same cuNxon "
+            "network/context resident across repeated train/eval task epochs, decodes motor "
+            "readout through the existing action contract, and compares every result with "
+            "trivial constant-action baselines.",
+            "",
+            "## Accuracy by resident epoch",
+            "",
+            *epoch_rows,
+            "",
+            "## Accuracy by split",
+            "",
+            *split_rows,
+            "",
+            "## Trivial baselines",
+            "",
+            *baseline_rows,
+            "",
+            "## Cases",
+            "",
+            *case_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "This is task-coupled runtime/adapter evidence, not an intelligence claim. A "
+            "same-process resident run, action decoding, or one positive case does not prove "
+            "intelligence, useful learning, or generalization. The holdout accuracy must beat "
+            "trivial baselines before this route can be treated as useful adapter evidence.",
+            "",
+        ]
+    )
+
+
+def write_resident_action_artifacts(
+    result: CunxonResidentActionProbeResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown resident action probe artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(render_resident_action_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
 
 
 def read_active_vram_resident_state(state_path: str | Path) -> dict[str, object] | None:
@@ -3193,6 +3359,125 @@ def run_ctypes_multisphere_action_probe(
             lib.cunxonDestroyContext(ctx)
 
 
+def run_ctypes_resident_action_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    train_epochs: int = 6,
+    train_steps_per_case: int = 64,
+    eval_steps: int = 32,
+    device_id: int = 0,
+) -> CunxonResidentActionProbeResult:
+    """Keep one task-coupled cuNxon network resident across train/eval epochs."""
+    if train_epochs <= 0:
+        raise ValueError("train_epochs must be positive")
+    if train_steps_per_case <= 0:
+        raise ValueError("train_steps_per_case must be positive")
+    if eval_steps <= 0:
+        raise ValueError("eval_steps must be positive")
+
+    lib_path = Path(library_path)
+    lib = _load_library(lib_path)
+    ctx = C.c_void_p()
+    net = C.c_void_p()
+    decoder = ActionDecoder(num_output_neurons=3)
+    start = time.perf_counter()
+    try:
+        _check(lib, lib.cunxonCreateContext(C.byref(ctx), device_id, 0xC0FFEE2026, 0))
+        device_name = _query_device_name(lib, ctx)
+        compute_capability = _query_compute_capability(lib, ctx)
+        _check(
+            lib,
+            lib.cunxonNetworkCreate(
+                ctx,
+                C.byref(net),
+                b"neuraxon_hybrid_cunxon_resident_action",
+            ),
+        )
+        sensory_id, association_id, motor_id = _build_multisphere_action_topology(lib, net)
+        _check(lib, lib.cunxonNetworkFinalize(net))
+
+        specs = _default_multisphere_action_specs()
+        cases: list[CunxonResidentActionCase] = []
+        for epoch in range(1, train_epochs + 1):
+            for _name, split, input_vector, expected_action in specs:
+                if split != "train":
+                    continue
+                for _ in range(train_steps_per_case):
+                    ext_inputs = _pack_three_sphere_inputs(input_vector)
+                    _check(lib, lib.cunxonNetworkStepTrain(net, ext_inputs, C.c_float(1.0)))
+                    _inject_expected_action_modulator(lib, net, expected_action)
+            _check(lib, lib.cunxonContextSync(ctx))
+
+            for case_index, (name, split, input_vector, expected_action) in enumerate(specs):
+                for _ in range(eval_steps):
+                    ext_inputs = _pack_three_sphere_inputs(input_vector)
+                    _check(lib, lib.cunxonNetworkStepInfer(net, ext_inputs, C.c_float(1.0)))
+                _check(lib, lib.cunxonContextSync(ctx))
+                sensory_readout = _capture_readout(lib, net, sensory_id)
+                association_readout = _capture_readout(lib, net, association_id)
+                motor_readout = _capture_readout(lib, net, motor_id)
+                decoded = decoder.decode(motor_readout)
+                normalized_action = normalize_benchmark_action(decoded.actie_type)
+                motor_states = _capture_snapshot_states(lib, net, motor_id)
+                cases.append(
+                    CunxonResidentActionCase(
+                        epoch=epoch,
+                        name=name,
+                        split=split,
+                        input_vector=list(input_vector),
+                        expected_action=expected_action,
+                        sensory_readout=sensory_readout,
+                        association_readout=association_readout,
+                        motor_readout=motor_readout,
+                        decoded_action=decoded.actie_type,
+                        normalized_action=normalized_action,
+                        confidence=decoded.confidence,
+                        outcome=(
+                            "success" if normalized_action == expected_action else "failure"
+                        ),
+                        baseline_actions=_baseline_actions_for_case(case_index),
+                        energy=_capture_energy(lib, net),
+                        motor_active_state_count=sum(
+                            1 for value in motor_states if value != 0
+                        ),
+                        elapsed_ms=(time.perf_counter() - start) * 1000.0,
+                    )
+                )
+
+        return CunxonResidentActionProbeResult(
+            status="resident action probe viable",
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            library_path=str(lib_path),
+            device_name=device_name,
+            compute_capability=compute_capability,
+            train_epochs=train_epochs,
+            train_steps_per_case=train_steps_per_case,
+            eval_steps=eval_steps,
+            sphere_count=3,
+            cases=cases,
+            accuracy_by_epoch=_resident_accuracy_by_epoch(cases),
+            accuracy_by_split=_resident_accuracy_by_split(cases),
+            baseline_accuracy_by_split=_resident_baseline_accuracy_by_split(cases),
+            unique_motor_readouts=len({tuple(case.motor_readout) for case in cases}),
+            notes=[
+                "same three-sphere cuNxon network/context remains resident across all epochs",
+                (
+                    "training uses StepTrain plus expected-action neuromodulator pulses; "
+                    "evaluation uses StepInfer without target labels"
+                ),
+                "holdout accuracy must beat trivial baselines before any adapter claim",
+            ],
+        )
+    finally:
+        if net.value:
+            lib.cunxonNetworkDestroy(net)
+        if ctx.value:
+            lib.cunxonDestroyContext(ctx)
+
+
 def _capture_snapshot_observation(
     lib: C.CDLL,
     net: C.c_void_p,
@@ -3527,6 +3812,64 @@ def _case_accuracy(cases: Sequence[CunxonMultisphereActionCase]) -> float:
     if not cases:
         return 0.0
     successes = sum(1 for case in cases if case.normalized_action == case.expected_action)
+    return successes / len(cases)
+
+
+def _resident_accuracy_by_epoch(
+    cases: Sequence[CunxonResidentActionCase],
+) -> dict[str, float]:
+    by_epoch: dict[int, list[CunxonResidentActionCase]] = {}
+    for case in cases:
+        by_epoch.setdefault(case.epoch, []).append(case)
+    return {
+        str(epoch): _resident_case_accuracy(epoch_cases)
+        for epoch, epoch_cases in sorted(by_epoch.items())
+        if epoch_cases
+    }
+
+
+def _resident_accuracy_by_split(
+    cases: Sequence[CunxonResidentActionCase],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonResidentActionCase]] = {}
+    for case in cases:
+        by_split.setdefault(case.split, []).append(case)
+    by_split["overall"] = list(cases)
+    return {
+        split: _resident_case_accuracy(split_cases)
+        for split, split_cases in sorted(by_split.items())
+        if split_cases
+    }
+
+
+def _resident_baseline_accuracy_by_split(
+    cases: Sequence[CunxonResidentActionCase],
+) -> dict[str, dict[str, float]]:
+    baseline_names = sorted({name for case in cases for name in case.baseline_actions})
+    result: dict[str, dict[str, float]] = {}
+    for baseline_name in baseline_names:
+        split_scores: dict[str, float] = {}
+        for split in sorted({case.split for case in cases} | {"overall"}):
+            split_cases = (
+                list(cases)
+                if split == "overall"
+                else [case for case in cases if case.split == split]
+            )
+            if not split_cases:
+                continue
+            split_scores[split] = sum(
+                1
+                for case in split_cases
+                if case.baseline_actions[baseline_name] == case.expected_action
+            ) / len(split_cases)
+        result[baseline_name] = split_scores
+    return result
+
+
+def _resident_case_accuracy(cases: Sequence[CunxonResidentActionCase]) -> float:
+    if not cases:
+        return 0.0
+    successes = sum(1 for case in cases if case.outcome == "success")
     return successes / len(cases)
 
 
