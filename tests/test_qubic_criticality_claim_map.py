@@ -39,6 +39,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
         "cunxon-vram-resident",
         "cunxon-resident-action",
         "cunxon-aigarth-augmented-train",
+        "cunxon-branching-regime-scan",
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
@@ -51,6 +52,8 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "branching_ratio_mean=1.194208" in markdown
     assert "VRAM-resident active-state ratio mean≈1.017778" in markdown
     assert "stress-holdout mean=0.333333" in markdown
+    assert "mean branching proxy=0.997701" in markdown
+    assert "0/5 seeds beat the best constant stress baseline" in markdown
     assert "not intelligence evidence" in markdown
     assert "cunxon-branching-ratio-regime-scan" in markdown
     assert "\\n" not in markdown
@@ -58,5 +61,11 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
         "cunxon-branching-ratio-regime-scan"
     )
+    scan_summary = comparison_data["cunxon_branching_regime_scan"]
+    assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
+    assert scan_summary["mean_stress_holdout"] == 0.333333
+    assert scan_summary["beats_stress_baseline_count"] == 0
     assert "Qubic NIA Vol. 8 criticality claim map" in comparison_markdown
     assert "branching ratio is a necessary diagnostic" in comparison_markdown
+    assert "cuNxon branching-ratio regime scan" in comparison_markdown
+    assert "mean branching proxy=0.997701" in comparison_markdown

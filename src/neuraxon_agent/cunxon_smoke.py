@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import ctypes as C
 import json
+import math
 import os
 import subprocess
 import time
@@ -376,6 +377,64 @@ class CunxonAigarthActionHardHoldoutResult:
         """Return a JSON-serializable result dictionary."""
         data = asdict(self)
         data["seed_count"] = self.seed_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonBranchingRegimeRun:
+    """Per-seed activity-regime proxy metrics coupled to action quality."""
+
+    seed_offset: int
+    active_state_sequence: list[int]
+    branching_activity_ratio_proxy: float
+    neutral_occupancy: float
+    transition_entropy_bits: float
+    energy_slope: float
+    readout_diversity: int
+    regime_label: str
+    accuracy_by_split: dict[str, float]
+    best_constant_baseline_by_split: dict[str, float]
+    beats_best_baseline_by_split: dict[str, bool]
+    action_distribution: dict[str, int]
+    gpu_memory_used_mb: int | None = None
+    gpu_utilization_percent: int | None = None
+    gpu_temperature_c: int | None = None
+
+
+@dataclass(frozen=True)
+class CunxonBranchingRegimeScanResult:
+    """Small cuNxon branching/activity-regime scan with task-coupled baselines."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    source_probe: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    seed_offsets: list[int]
+    runs: list[CunxonBranchingRegimeRun]
+    regime_bucket_summary: dict[str, dict[str, float | int]]
+    correlation_summary: dict[str, float]
+    verdict: str
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def run_count(self) -> int:
+        """Return the number of per-seed runs in the scan."""
+        return len(self.runs)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["run_count"] = self.run_count
         return data
 
     def to_json(self, *, indent: int | None = 2) -> str:
@@ -2073,6 +2132,129 @@ def write_aigarth_action_target_contract_augmented_train_artifacts(
     markdown_output.write_text(
         render_aigarth_action_target_contract_augmented_train_markdown_report(result),
         encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
+def render_branching_regime_scan_markdown_report(
+    result: CunxonBranchingRegimeScanResult,
+) -> str:
+    """Render the cuNxon branching/activity-regime scan report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    run_rows = [
+        (
+            "| Seed | Regime | Branching/activity-ratio proxy | Neutral occupancy | "
+            "Transition entropy | Energy slope | Readout diversity | Holdout | "
+            "Stress holdout | Beats stress baseline | GPU mem/util/temp |"
+        ),
+        "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |",
+    ]
+    for run in result.runs:
+        gpu = (
+            f"{_format_optional_int(run.gpu_memory_used_mb)} MB / "
+            f"{_format_optional_int(run.gpu_utilization_percent)}% / "
+            f"{_format_optional_int(run.gpu_temperature_c)} C"
+        )
+        run_rows.append(
+            f"| {run.seed_offset} | {run.regime_label} | "
+            f"{run.branching_activity_ratio_proxy:.6f} | {run.neutral_occupancy:.6f} | "
+            f"{run.transition_entropy_bits:.6f} | {run.energy_slope:.6f} | "
+            f"{run.readout_diversity} | {run.accuracy_by_split.get('holdout', 0.0):.6f} | "
+            f"{run.accuracy_by_split.get('stress_holdout', 0.0):.6f} | "
+            f"{run.beats_best_baseline_by_split.get('stress_holdout', False)} | {gpu} |"
+        )
+    bucket_rows = [
+        (
+            "| Regime bucket | Seeds | Mean branching proxy | Mean holdout | "
+            "Mean stress_holdout | Stress seeds > best constant baseline |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for label, summary in sorted(result.regime_bucket_summary.items()):
+        bucket_rows.append(
+            f"| {label} | {summary.get('seed_count', 0)} | "
+            f"{float(summary.get('mean_branching_activity_ratio_proxy', 0.0)):.6f} | "
+            f"{float(summary.get('mean_holdout_accuracy', 0.0)):.6f} | "
+            f"{float(summary.get('mean_stress_holdout_accuracy', 0.0)):.6f} | "
+            f"{int(summary.get('beats_stress_baseline_count', 0))} |"
+        )
+    correlation_lines = [
+        f"- {name}: {value:.6f}" for name, value in sorted(result.correlation_summary.items())
+    ] or ["- none"]
+    return "\n".join(
+        [
+            "# cuNxon branching-ratio regime scan",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            f"- Source probe: `{result.source_probe}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Generations per seed: {result.generations}",
+            f"- Population size: {result.population_size}",
+            f"- Eval steps per case: {result.eval_steps}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            "",
+            "## Why this probe exists",
+            "",
+            "Qubic NIA Vol. 8 makes branching ratio / criticality a concrete hypothesis. "
+            "This scan treats the branching/activity-ratio proxy as instrumentation only: "
+            "it must be read beside holdout, stress_holdout, controls, and best constant "
+            "baseline scores before any adapter-quality conclusion is considered.",
+            "",
+            "## Per-seed regime metrics and task quality",
+            "",
+            *run_rows,
+            "",
+            "## Regime buckets",
+            "",
+            *bucket_rows,
+            "",
+            "## Correlation summary",
+            "",
+            *correlation_lines,
+            "",
+            "## Verdict",
+            "",
+            result.verdict,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            "The branching/activity-ratio proxy is a coarse readout/action-sample proxy, not a "
+            "neuroscience-grade branching-ratio estimator. A near-critical-looking proxy is "
+            "not intelligence evidence by itself; useful computation requires held-out task "
+            "quality above best constant baseline and leakage/control checks.",
+            "",
+        ]
+    )
+
+
+def write_branching_regime_scan_artifacts(
+    result: CunxonBranchingRegimeScanResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown branching-regime scan artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_branching_regime_scan_markdown_report(result), encoding="utf-8"
     )
     return json_output, markdown_output
 
@@ -4175,6 +4357,77 @@ def run_ctypes_aigarth_action_target_contract_augmented_train_probe(
             "fitness callback uses train plus augmented_train low-margin cases only",
             "stress_holdout, hard holdout, and control labels are never optimized",
             "target-contract augmented-train stress audit, not intelligence evidence",
+        ],
+    )
+
+
+def run_ctypes_branching_regime_scan_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (117, 118, 119, 120, 121),
+    generations: int = 12,
+    population_size: int = 24,
+    eval_steps: int = 24,
+    source_probe: str = "target_contract_augmented_train",
+    device_id: int = 0,
+) -> CunxonBranchingRegimeScanResult:
+    """Run a bounded branching/activity-regime scan coupled to Aigarth action scores."""
+    if source_probe != "target_contract_augmented_train":
+        raise ValueError(
+            "branching-regime scan currently supports "
+            "source_probe='target_contract_augmented_train'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    source_result = run_ctypes_aigarth_action_target_contract_augmented_train_probe(
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        seed_offsets=seed_offsets,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant="target_contract_augmented_train",
+        device_id=device_id,
+    )
+    gpu_sample = _query_nvidia_smi_sample(device_id)
+    runs = [
+        _branching_regime_run_from_aigarth_seed_run(
+            run,
+            gpu_memory_used_mb=gpu_sample["memory_used_mb"],
+            gpu_utilization_percent=gpu_sample["utilization_percent"],
+            gpu_temperature_c=gpu_sample["temperature_c"],
+        )
+        for run in source_result.runs
+    ]
+    bucket_summary = _branching_regime_bucket_summary(runs)
+    correlation_summary = _branching_regime_correlation_summary(runs)
+    return CunxonBranchingRegimeScanResult(
+        status="branching-regime scan completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=source_result.device_name,
+        compute_capability=source_result.compute_capability,
+        source_probe=source_probe,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        seed_offsets=list(seed_offsets),
+        runs=runs,
+        regime_bucket_summary=bucket_summary,
+        correlation_summary=correlation_summary,
+        verdict=_branching_regime_verdict(runs),
+        notes=[
+            "branching/activity ratio is a proxy over final action-case readout samples",
+            "source action probe uses train plus augmented_train cases inside fitness only",
+            (
+                "holdout, stress_holdout, counterfactual_control and permuted_control "
+                "labels are never optimized"
+            ),
+            "regime metrics are diagnostics only and must be interpreted beside task baselines",
         ],
     )
 
@@ -6560,6 +6813,176 @@ def _count_action_changes_by_stimulus(
         if actions.get("infer") != actions.get("train"):
             change_counts[stimulus] = change_counts.get(stimulus, 0) + 1
     return change_counts
+
+
+def _branching_regime_run_from_aigarth_seed_run(
+    run: CunxonAigarthActionSeedRun,
+    *,
+    gpu_memory_used_mb: int | None,
+    gpu_utilization_percent: int | None,
+    gpu_temperature_c: int | None,
+) -> CunxonBranchingRegimeRun:
+    """Derive activity-regime proxy metrics from one scored Aigarth action seed."""
+    active_sequence = [sum(1 for value in case.readout if value != 0) for case in run.cases]
+    if not active_sequence:
+        active_sequence = [0]
+    readout_values = [value for case in run.cases for value in case.readout]
+    neutral_occupancy = (
+        sum(1 for value in readout_values if value == 0) / len(readout_values)
+        if readout_values
+        else 1.0
+    )
+    energies = [case.energy for case in run.cases]
+    energy_slope = (
+        (energies[-1] - energies[0]) / max(1, len(energies) - 1) if len(energies) > 1 else 0.0
+    )
+    best_baselines = _best_constant_baseline_by_split(run.baseline_accuracy_by_split)
+    return CunxonBranchingRegimeRun(
+        seed_offset=run.seed_offset,
+        active_state_sequence=active_sequence,
+        branching_activity_ratio_proxy=_branching_activity_ratio_proxy(active_sequence),
+        neutral_occupancy=neutral_occupancy,
+        transition_entropy_bits=_transition_entropy_bits(active_sequence),
+        energy_slope=energy_slope,
+        readout_diversity=run.unique_readouts,
+        regime_label=_classify_branching_regime(active_sequence, neutral_occupancy),
+        accuracy_by_split=run.accuracy_by_split,
+        best_constant_baseline_by_split=best_baselines,
+        beats_best_baseline_by_split={
+            split: accuracy > best_baselines.get(split, 0.0)
+            for split, accuracy in run.accuracy_by_split.items()
+        },
+        action_distribution=run.action_distribution,
+        gpu_memory_used_mb=gpu_memory_used_mb,
+        gpu_utilization_percent=gpu_utilization_percent,
+        gpu_temperature_c=gpu_temperature_c,
+    )
+
+
+def _branching_activity_ratio_proxy(active_sequence: Sequence[int]) -> float:
+    """Estimate a coarse branching/activity ratio from sampled active-count transitions."""
+    if len(active_sequence) < 2:
+        return 0.0
+    ratios: list[float] = []
+    for previous, current in zip(active_sequence, active_sequence[1:], strict=False):
+        if previous == 0:
+            ratios.append(1.0 if current == 0 else float(current))
+        else:
+            ratios.append(current / previous)
+    return sum(ratios) / len(ratios) if ratios else 0.0
+
+
+def _transition_entropy_bits(active_sequence: Sequence[int]) -> float:
+    if not active_sequence:
+        return 0.0
+    counts: dict[int, int] = {}
+    for value in active_sequence:
+        counts[value] = counts.get(value, 0) + 1
+    total = len(active_sequence)
+    return -sum((count / total) * math.log2(count / total) for count in counts.values())
+
+
+def _classify_branching_regime(active_sequence: Sequence[int], neutral_occupancy: float) -> str:
+    ratio = _branching_activity_ratio_proxy(active_sequence)
+    mean_active = sum(active_sequence) / len(active_sequence) if active_sequence else 0.0
+    if mean_active <= 0.1 or ratio < 0.75:
+        return "dead/subcritical proxy"
+    if ratio > 1.25 or neutral_occupancy < 0.2:
+        return "runaway/saturated proxy"
+    return "reverberating/near-critical proxy"
+
+
+def _best_constant_baseline_by_split(
+    baseline_accuracy_by_split: dict[str, dict[str, float]],
+) -> dict[str, float]:
+    splits = sorted({split for values in baseline_accuracy_by_split.values() for split in values})
+    return {
+        split: max(values.get(split, 0.0) for values in baseline_accuracy_by_split.values())
+        for split in splits
+    }
+
+
+def _branching_regime_bucket_summary(
+    runs: Sequence[CunxonBranchingRegimeRun],
+) -> dict[str, dict[str, float | int]]:
+    buckets: dict[str, list[CunxonBranchingRegimeRun]] = {}
+    for run in runs:
+        buckets.setdefault(run.regime_label, []).append(run)
+    summary: dict[str, dict[str, float | int]] = {}
+    for label, bucket_runs in buckets.items():
+        summary[label] = {
+            "seed_count": len(bucket_runs),
+            "mean_branching_activity_ratio_proxy": _mean_sequence(
+                run.branching_activity_ratio_proxy for run in bucket_runs
+            ),
+            "mean_holdout_accuracy": _mean_sequence(
+                run.accuracy_by_split.get("holdout", 0.0) for run in bucket_runs
+            ),
+            "mean_stress_holdout_accuracy": _mean_sequence(
+                run.accuracy_by_split.get("stress_holdout", 0.0) for run in bucket_runs
+            ),
+            "beats_stress_baseline_count": sum(
+                1
+                for run in bucket_runs
+                if run.beats_best_baseline_by_split.get("stress_holdout", False)
+            ),
+        }
+    return dict(sorted(summary.items()))
+
+
+def _branching_regime_correlation_summary(
+    runs: Sequence[CunxonBranchingRegimeRun],
+) -> dict[str, float]:
+    ratios = [run.branching_activity_ratio_proxy for run in runs]
+    return {
+        "holdout_accuracy_vs_branching_proxy": _pearson_correlation(
+            ratios, [run.accuracy_by_split.get("holdout", 0.0) for run in runs]
+        ),
+        "stress_holdout_accuracy_vs_branching_proxy": _pearson_correlation(
+            ratios, [run.accuracy_by_split.get("stress_holdout", 0.0) for run in runs]
+        ),
+    }
+
+
+def _branching_regime_verdict(runs: Sequence[CunxonBranchingRegimeRun]) -> str:
+    if not runs:
+        return "No runs were captured; no branching-regime or action-quality claim is supported."
+    near_runs = [run for run in runs if run.regime_label == "reverberating/near-critical proxy"]
+    stress_beats = sum(
+        1 for run in near_runs if run.beats_best_baseline_by_split.get("stress_holdout", False)
+    )
+    if near_runs and stress_beats == len(near_runs):
+        return (
+            "All near-critical proxy runs beat the best constant baseline on stress_holdout, "
+            "but this remains a tiny proxy scan rather than intelligence evidence."
+        )
+    if near_runs:
+        return (
+            "Near-critical-looking proxy activity did not consistently beat the best constant "
+            "baseline on stress_holdout; branching ratio remains diagnostic, not "
+            "sufficient evidence."
+        )
+    return (
+        "This scan did not observe a near-critical proxy bucket; regime instrumentation is useful, "
+        "but no criticality/action-quality conclusion is supported."
+    )
+
+
+def _mean_sequence(values: Sequence[float] | Any) -> float:
+    values_list = list(values)
+    return sum(values_list) / len(values_list) if values_list else 0.0
+
+
+def _pearson_correlation(xs: Sequence[float], ys: Sequence[float]) -> float:
+    if len(xs) != len(ys) or len(xs) < 2:
+        return 0.0
+    x_mean = sum(xs) / len(xs)
+    y_mean = sum(ys) / len(ys)
+    numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(xs, ys, strict=False))
+    x_var = sum((x - x_mean) ** 2 for x in xs)
+    y_var = sum((y - y_mean) ** 2 for y in ys)
+    denominator = math.sqrt(x_var * y_var)
+    return numerator / denominator if denominator else 0.0
 
 
 def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float], str]]:

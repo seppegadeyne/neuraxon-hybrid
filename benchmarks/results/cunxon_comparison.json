@@ -1,11 +1,17 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels. The stress audit exposed baseline-level low-margin stress_holdout behavior, and the augmented-train follow-up improved hard_holdout/holdout while stress_holdout stayed at 0.333333 and counterfactual_control stayed non-zero at 0.066667. This is useful objective-shaping/brittleness evidence, not broad intelligence/generalization evidence. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis, but the new claim map treats it as necessary instrumentation rather than intelligence evidence unless it predicts held-out task quality above baselines.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative: pattern recall readouts are flat zero, the multi-sphere action adapter decodes all cases to query, a 108-sample long sweep matches constant-action baselines at 0.333333 accuracy, the supervised motor-target adapter stays at constant-query baseline accuracy, and the resident action probe also stays at baseline accuracy across every epoch. The interface semantics probe supports absolute neuron-index readout mapping, while the source semantics audit found no desired-output API surface and explains why teacher-forcing absolute output-neuron target ports through sensory inputs is unsupported by the kernel path. The input-proxy and external-drive probes confirm that supported input-class drive is observable but not a motor target channel. The four-hour VRAM-resident run adds process-residence/runtime evidence, not decision-quality evidence. The Aigarth readout/action route remains the only constructive action-quality lead so far: target-contract fitness moved the signed-first-lane decoder contract into train-only Aigarth optimization and removed unexpected labels. The stress audit exposed baseline-level low-margin stress_holdout behavior, and the augmented-train follow-up improved hard_holdout/holdout while stress_holdout stayed at 0.333333 and counterfactual_control stayed non-zero at 0.066667. This is useful objective-shaping/brittleness evidence, not broad intelligence/generalization evidence. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The first bounded branching-regime scan observed near-critical-looking proxy ratios (mean 0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline (0.333333, 0/5 seeds beating it), so branching/criticality remains necessary instrumentation rather than intelligence evidence.",
   "comparison_lanes": [
     {
+      "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
       "lane": "Qubic NIA Vol. 8 criticality claim map",
       "metric": "source-claim evidence map",
-      "value": "branching-ratio/criticality claims mapped to existing artifacts; recommends cunxon-branching-ratio-regime-scan; no new decision-quality score",
-      "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json"
+      "value": "branching-ratio/criticality claims mapped to existing artifacts; recommends cunxon-branching-ratio-regime-scan; no new decision-quality score"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_branching_regime_scan.json",
+      "lane": "cuNxon branching-ratio regime scan",
+      "metric": "regime proxy vs action quality",
+      "value": "5/5 seeds bucketed as reverberating/near-critical proxy; mean branching proxy=0.997701; holdout=1.000000; stress_holdout=0.333333; 0/5 beat best constant stress baseline"
     },
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -131,7 +137,7 @@
       "evidence": "benchmarks/results/cunxon_snapshot_pattern_probe.json",
       "lane": "cuNxon snapshot/pattern probe",
       "metric": "hidden-state and recall signal",
-      "value": "snapshots active=0,8,2; patterns=2→0; recall hamming=0"
+      "value": "snapshots active=0,8,2; patterns=2\u21920; recall hamming=0"
     },
     {
       "evidence": "benchmarks/results/cunxon_multisphere_action_probe.json",
@@ -651,6 +657,28 @@
     "relative_demo_improvement": 0.5,
     "status": "aigarth readout semantics probe viable",
     "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
+  },
+  "cunxon_branching_regime_scan": {
+    "beats_stress_baseline_count": 0,
+    "correlation_summary": {
+      "holdout_accuracy_vs_branching_proxy": 0.0,
+      "stress_holdout_accuracy_vs_branching_proxy": 0.0
+    },
+    "evidence_boundary": "coarse action-readout branching/activity proxy; near-critical-looking dynamics are diagnostic only and did not beat stress_holdout baselines",
+    "mean_branching_activity_ratio_proxy": 0.997701,
+    "mean_holdout": 1.0,
+    "mean_stress_holdout": 0.333333,
+    "regime_bucket": "reverberating/near-critical proxy",
+    "seed_count": 5,
+    "seed_offsets": [
+      117,
+      118,
+      119,
+      120,
+      121
+    ],
+    "source_probe": "target_contract_augmented_train",
+    "status": "branching-regime scan completed"
   },
   "cunxon_external_drive_window_probe": {
     "decision_quality_measured": false,
@@ -1297,6 +1325,14 @@
     "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
     "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md"
   ],
+  "qubic_nia_vol8_criticality_claim_map": {
+    "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
+    "evidence_boundary": "source-claim map only; no new decision-quality score; branching ratio is a diagnostic, not intelligence evidence by itself",
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/84",
+    "hypothesis": "branching_ratio_as_measured_regime_gate",
+    "recommended_next_probe": "cunxon-branching-ratio-regime-scan",
+    "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8"
+  },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
     "benchmarks/results/cunxon_resident_action_probe.json",
@@ -1314,13 +1350,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "Target-contract Aigarth fitness remains the strongest strict-contract cuNxon action lane; augmented low-margin training improves hard/standard holdout but still fails stress holdout",
-  "qubic_nia_vol8_criticality_claim_map": {
-    "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
-    "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
-    "hypothesis": "branching_ratio_as_measured_regime_gate",
-    "evidence_boundary": "source-claim map only; no new decision-quality score; branching ratio is a diagnostic, not intelligence evidence by itself",
-    "recommended_next_probe": "cunxon-branching-ratio-regime-scan",
-    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/84"
-  }
+  "verdict": "Target-contract Aigarth fitness remains the strongest strict-contract cuNxon action lane; augmented low-margin training improves hard/standard holdout but still fails stress holdout"
 }

@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonBranchingRegimeRun,
+    CunxonBranchingRegimeScanResult,
     CunxonExternalDriveWindowProbeResult,
     CunxonExternalDriveWindowSample,
     CunxonInputProxyTargetCase,
@@ -55,6 +57,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_target_contract_markdown_report,
     render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_readout_markdown_report,
+    render_branching_regime_scan_markdown_report,
     render_external_drive_window_markdown_report,
     render_input_proxy_target_markdown_report,
     render_interface_semantics_markdown_report,
@@ -79,6 +82,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_augmented_train_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
+    write_branching_regime_scan_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
@@ -1151,6 +1155,84 @@ def test_aigarth_action_target_contract_augmented_train_report_records_train_exp
     data = json_path.read_text(encoding="utf-8")
     assert '"fitness_variant": "target_contract_augmented_train"' in data
     assert "augmented-train audit" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_branching_regime_scan_report_couples_regime_metrics_to_action_quality(
+    tmp_path: Path,
+) -> None:
+    result = CunxonBranchingRegimeScanResult(
+        status="branching-regime scan completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        source_probe="target_contract_augmented_train",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        seed_offsets=[117, 118],
+        runs=[
+            CunxonBranchingRegimeRun(
+                seed_offset=117,
+                active_state_sequence=[1, 1, 2, 2],
+                branching_activity_ratio_proxy=1.166667,
+                neutral_occupancy=0.5,
+                transition_entropy_bits=0.918296,
+                energy_slope=0.25,
+                readout_diversity=3,
+                regime_label="reverberating/near-critical proxy",
+                accuracy_by_split={"holdout": 1.0, "stress_holdout": 0.333333},
+                best_constant_baseline_by_split={"holdout": 0.333333, "stress_holdout": 0.333333},
+                beats_best_baseline_by_split={"holdout": True, "stress_holdout": False},
+                action_distribution={"execute": 3, "query": 3, "retry": 3},
+                gpu_memory_used_mb=2456,
+                gpu_utilization_percent=0,
+                gpu_temperature_c=42,
+            )
+        ],
+        regime_bucket_summary={
+            "reverberating/near-critical proxy": {
+                "seed_count": 1,
+                "mean_branching_activity_ratio_proxy": 1.166667,
+                "mean_holdout_accuracy": 1.0,
+                "mean_stress_holdout_accuracy": 0.333333,
+                "beats_stress_baseline_count": 0,
+            }
+        },
+        correlation_summary={
+            "holdout_accuracy_vs_branching_proxy": 0.0,
+            "stress_holdout_accuracy_vs_branching_proxy": 0.0,
+        },
+        verdict=(
+            "Near-critical-looking proxy activity did not correlate with stress_holdout "
+            "quality above the best constant baseline."
+        ),
+        notes=["branching ratio is a proxy over final action readouts"],
+    )
+
+    markdown = render_branching_regime_scan_markdown_report(result)
+    assert "cuNxon branching-ratio regime scan" in markdown
+    assert "branching/activity-ratio proxy" in markdown
+    assert "reverberating/near-critical proxy" in markdown
+    assert "stress_holdout" in markdown
+    assert "best constant baseline" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    json_path = tmp_path / "branching-regime-scan.json"
+    markdown_path = tmp_path / "branching-regime-scan.md"
+    write_branching_regime_scan_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["status"] == "branching-regime scan completed"
+    assert data["run_count"] == 1
+    assert data["runs"][0]["branching_activity_ratio_proxy"] == 1.166667
+    assert "branching/activity-ratio proxy" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_input_proxy_target_report_separates_supported_input_drive_from_decision_quality(

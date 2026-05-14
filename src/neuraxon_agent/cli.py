@@ -23,6 +23,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_aigarth_action_target_contract_probe,
     run_ctypes_aigarth_action_target_contract_stress_probe,
     run_ctypes_aigarth_readout_probe,
+    run_ctypes_branching_regime_scan_probe,
     run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
     run_ctypes_interface_semantics_probe,
@@ -46,6 +47,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_augmented_train_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
+    write_branching_regime_scan_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
@@ -757,6 +759,38 @@ def cmd_cunxon_aigarth_action_target_contract_augmented_train_probe(
             "Evidence boundary: a failed Aigarth/action target-contract augmented-train "
             "audit does not support any GPU-backed label-contract, holdout, or "
             "action-quality claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_branching_regime_scan(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_branching_regime_scan_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            generations=args.generations,
+            population_size=args.population_size,
+            eval_steps=args.eval_steps,
+            source_probe=args.source_probe,
+            device_id=args.device,
+        )
+        write_branching_regime_scan_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon branching-ratio regime scan\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed branching-regime scan does not support any "
+            "GPU-backed criticality, action-quality, or intelligence claim.\n",
             encoding="utf-8",
         )
         return 1
@@ -1663,6 +1697,67 @@ def main(argv: list[str] | None = None) -> int:
     p_cunxon_aigarth_target_contract_augmented.set_defaults(
         func=cmd_cunxon_aigarth_action_target_contract_augmented_train_probe
     )
+
+    p_cunxon_branching_regime = sub.add_parser(
+        "cunxon-branching-regime-scan",
+        help="Scan cuNxon branching/activity regimes beside action baselines",
+        description=(
+            "Run a bounded target-contract augmented-train Aigarth source probe, then "
+            "derive branching/activity-ratio proxy metrics and compare regime buckets "
+            "with holdout/stress_holdout action quality and constant baselines."
+        ),
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--seed-offsets",
+        default="117,118,119,120,121",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--generations",
+        type=int,
+        default=12,
+        help="Aigarth generations per seed for the bounded source probe",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--population-size",
+        type=int,
+        default=24,
+        help="Aigarth mutation population size per generation",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--eval-steps",
+        type=int,
+        default=24,
+        help="Inference steps per action case evaluation",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--source-probe",
+        default="target_contract_augmented_train",
+        help="Source action probe used before deriving regime metrics",
+    )
+    p_cunxon_branching_regime.add_argument("--device", type=int, default=0, help="CUDA device id")
+    p_cunxon_branching_regime.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_branching_regime_scan.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_branching_regime.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_branching_regime_scan.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_branching_regime.set_defaults(func=cmd_cunxon_branching_regime_scan)
 
     p_cunxon_aigarth_remap = sub.add_parser(
         "cunxon-aigarth-action-remap-audit",

@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonBranchingRegimeRun,
+    CunxonBranchingRegimeScanResult,
     CunxonInputProxyTargetCase,
     CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
@@ -1556,6 +1558,97 @@ def test_cli_cunxon_aigarth_action_target_contract_augmented_train_probe_writes_
     assert '"status": "aigarth target-contract augmented-train audit completed"' in data
     assert '"fitness_variant": "target_contract_augmented_train"' in data
     assert "Aigarth target-contract augmented-train audit" in markdown_path.read_text(
+        encoding="utf-8"
+    )
+
+
+def test_cli_cunxon_branching_regime_scan_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonBranchingRegimeScanResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        assert isinstance(raw_seed_offsets, list)
+        assert raw_seed_offsets == [117, 118]
+        assert kwargs["source_probe"] == "target_contract_augmented_train"
+        return CunxonBranchingRegimeScanResult(
+            status="branching-regime scan completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            source_probe=str(kwargs["source_probe"]),
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            seed_offsets=raw_seed_offsets,
+            runs=[
+                CunxonBranchingRegimeRun(
+                    seed_offset=117,
+                    active_state_sequence=[1, 1, 2],
+                    branching_activity_ratio_proxy=1.25,
+                    neutral_occupancy=0.555556,
+                    transition_entropy_bits=0.918296,
+                    energy_slope=0.5,
+                    readout_diversity=2,
+                    regime_label="reverberating/near-critical proxy",
+                    accuracy_by_split={"holdout": 1.0, "stress_holdout": 0.333333},
+                    best_constant_baseline_by_split={
+                        "holdout": 0.333333,
+                        "stress_holdout": 0.333333,
+                    },
+                    beats_best_baseline_by_split={"holdout": True, "stress_holdout": False},
+                    action_distribution={"execute": 1, "query": 1, "retry": 1},
+                )
+            ],
+            regime_bucket_summary={
+                "reverberating/near-critical proxy": {
+                    "seed_count": 1,
+                    "mean_branching_activity_ratio_proxy": 1.25,
+                    "mean_holdout_accuracy": 1.0,
+                    "mean_stress_holdout_accuracy": 0.333333,
+                    "beats_stress_baseline_count": 0,
+                }
+            },
+            correlation_summary={"stress_holdout_accuracy_vs_branching_proxy": 0.0},
+            verdict="Near-critical proxy did not beat stress_holdout baselines.",
+            notes=["fake branching regime scan"],
+        )
+
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_branching_regime_scan_probe", fake_probe)
+    json_path = tmp_path / "branching-regime-scan.json"
+    markdown_path = tmp_path / "branching-regime-scan.md"
+
+    rc = main(
+        [
+            "cunxon-branching-regime-scan",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "117,118",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '"status": "branching-regime scan completed"' in data
+    assert '"branching_activity_ratio_proxy": 1.25' in data
+    assert "cuNxon branching-ratio regime scan" in markdown_path.read_text(
         encoding="utf-8"
     )
 
