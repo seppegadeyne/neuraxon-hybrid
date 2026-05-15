@@ -20,6 +20,12 @@ AVALANCHE_TASK_CORRELATION_JSON_PATH = (
 AVALANCHE_TASK_CORRELATION_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_avalanche_intervention_task_correlation.md"
 )
+AVALANCHE_SEED_REPLICATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_seed_replication.json"
+)
+AVALANCHE_SEED_REPLICATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_seed_replication.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -55,8 +61,8 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "higher_resolution_task_coupled_regime_probe"
-    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/85")
+    assert data["recommended_next_probe"]["id"] == "controlled_regime_calibration_probe"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/86")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
 
@@ -74,7 +80,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "higher_resolution_task_coupled_regime_probe"
+        "controlled_regime_calibration_probe"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -171,7 +177,46 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
     assert "stress_holdout" in comparison_markdown
 
-    assert claim_data["recommended_next_probe"]["id"] == (
-        "higher_resolution_task_coupled_regime_probe"
-    )
+    assert claim_data["recommended_next_probe"]["id"] == "controlled_regime_calibration_probe"
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
+
+
+def test_cunxon_avalanche_intervention_seed_replication_records_brittleness() -> None:
+    data = json.loads(AVALANCHE_SEED_REPLICATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = AVALANCHE_SEED_REPLICATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "avalanche_intervention_task_correlation"
+    assert data["seed_offsets"] == [129, 130, 131, 132]
+    assert data["sample_count"] >= 300
+    assert data["config_count"] == 2
+    assert set(data["split_accuracy"]) >= {
+        "holdout",
+        "hard_holdout",
+        "stress_holdout",
+        "counterfactual_control",
+        "permuted_control",
+    }
+    assert data["configurations_beating_stress_baseline"] == []
+    assert data["split_accuracy"]["stress_holdout"] <= data["best_constant_baseline_by_split"][
+        "stress_holdout"
+    ]
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon avalanche intervention/task correlation" in markdown
+    assert "129" in markdown
+    assert "stress_holdout" in markdown
+    assert "permuted_control" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_avalanche_intervention_seed_replication"]
+    assert summary["hypothesis"] == "avalanche_intervention_seed_replication"
+    assert summary["seed_offsets"] == [129, 130, 131, 132]
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert summary["stress_holdout_accuracy"] == data["split_accuracy"]["stress_holdout"]
+    assert "cuNxon avalanche intervention seed replication" in comparison_markdown
+    assert "seed-replication" in comparison_markdown
+    assert "cunxon_avalanche_intervention_seed_replication" in claim_markdown
