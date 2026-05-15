@@ -48,6 +48,12 @@ STRESS_AMPLITUDE_LADDER_MD_PATH = (
     ROOT
     / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.md"
 )
+STRESS_OBJECTIVE_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json"
+)
+STRESS_OBJECTIVE_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -83,8 +89,9 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
-    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/88")
+    assert data["recommended_next_probe"]["id"] == "stress_objective_decoder_geometry_followup"
+    assert data["recommended_next_probe"]["status"] == "open"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/89")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
 
@@ -103,7 +110,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "target_aligned_stress_objective_followup"
+        "stress_objective_decoder_geometry_followup"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -200,7 +207,9 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
     assert "stress_holdout" in comparison_markdown
 
-    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "stress_objective_decoder_geometry_followup"
+    )
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
 
 
@@ -384,7 +393,9 @@ def test_cunxon_stress_injection_upper_bound_keeps_stress_baseline_boundary() ->
         item["id"] == "cunxon-stress-injection-upper-bound"
         for item in claim_data["evidence_map"]
     )
-    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "stress_objective_decoder_geometry_followup"
+    )
     assert claim_data["recommended_next_probe"]["status"] == "open"
     assert "stress-injection upper-bound diagnostic" in claim_markdown
 
@@ -426,7 +437,9 @@ def test_cunxon_stress_geometry_audit_identifies_low_margin_query_collapse() -> 
     assert "cuNxon stress stimulus geometry audit" in comparison_markdown
 
     assert any(item["id"] == "cunxon-stress-geometry-audit" for item in claim_data["evidence_map"])
-    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "stress_objective_decoder_geometry_followup"
+    )
     assert "cunxon_stress_geometry_audit" in claim_markdown
 
 
@@ -471,5 +484,48 @@ def test_cunxon_stress_amplitude_ladder_identifies_drive_threshold_but_not_gener
         item["id"] == "cunxon-stress-amplitude-ladder"
         for item in claim_data["evidence_map"]
     )
-    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "stress_objective_decoder_geometry_followup"
+    )
     assert "cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe" in claim_markdown
+
+
+def test_cunxon_stress_objective_preserves_scaled_separability_but_original_stress_fails() -> None:
+    data = json.loads(STRESS_OBJECTIVE_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_OBJECTIVE_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "aigarth target-contract stress objective completed"
+    assert data["seed_offsets"] == [147, 148, 149]
+    assert data["fitness_variant"] == "target_contract_stress_margin_weighted"
+    assert data["amplitude_factor"] == 3.0
+    assert data["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout_query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout_execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert data["scaled_stress_holdout_execute_retry_accuracy"] == 1.0
+    assert data["counterfactual_control_accuracy_mean"] < 1 / 3
+    assert data["permuted_control_accuracy_mean"] == 0.0
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon Aigarth target-contract stress objective" in markdown
+    assert "Original stress_holdout accuracy: `0.333333`" in markdown
+    assert "Scaled stress_holdout accuracy: `0.888889`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_objective_probe"]
+    assert summary["hypothesis"] == "target_aligned_stress_objective"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert "cuNxon Aigarth target-contract stress objective" in comparison_markdown
+
+    assert any(item["id"] == "cunxon-stress-objective" for item in claim_data["evidence_map"])
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "stress_objective_decoder_geometry_followup"
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "open"
+    assert "cunxon_aigarth_action_target_contract_stress_objective_probe" in claim_markdown

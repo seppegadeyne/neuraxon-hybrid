@@ -441,6 +441,52 @@ class CunxonAigarthStressAmplitudeLadderResult:
 
 
 @dataclass(frozen=True)
+class CunxonAigarthStressObjectiveResult:
+    """Target-aligned objective-shaping diagnostic after the stress amplitude ladder."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    seed_offsets: list[int]
+    amplitude_factor: float
+    fitness_variant: str
+    split_summaries: list[CunxonAigarthStressAmplitudeSplitSummary]
+    original_stress_holdout_accuracy_mean: float
+    original_stress_holdout_query_collapse_rate: float
+    original_stress_holdout_execute_retry_accuracy: float
+    scaled_stress_holdout_accuracy_mean: float
+    scaled_stress_holdout_query_collapse_rate: float
+    scaled_stress_holdout_execute_retry_accuracy: float
+    counterfactual_control_accuracy_mean: float
+    permuted_control_accuracy_mean: float
+    aggregate_action_distribution: dict[str, int]
+    evidence_boundary: str
+    recommended_next_probe: dict[str, object]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def seed_count(self) -> int:
+        """Return the number of seed offsets evaluated."""
+        return len(self.seed_offsets)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["seed_count"] = self.seed_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonBranchingRegimeRun:
     """Per-seed activity-regime proxy metrics coupled to action quality."""
 
@@ -2561,6 +2607,124 @@ def write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts(
     return json_output, markdown_output
 
 
+def render_aigarth_action_target_contract_stress_objective_markdown_report(
+    result: CunxonAigarthStressObjectiveResult,
+) -> str:
+    """Render the target-aligned stress objective diagnostic report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    distribution = ", ".join(
+        f"{action}={count}"
+        for action, count in sorted(result.aggregate_action_distribution.items())
+    )
+    split_rows = [
+        (
+            "| Split | Amplitude | Samples | Accuracy | Best constant baseline | "
+            "Seeds > baseline | Query collapse | Execute/retry accuracy | Actions |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for summary in result.split_summaries:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(summary.action_distribution.items())
+        )
+        split_rows.append(
+            "| "
+            f"`{summary.split}` | {_format_amplitude_factor(summary.amplitude_factor)} | "
+            f"{summary.sample_count} | {summary.accuracy_mean:.6f} | "
+            f"{summary.best_constant_baseline_mean:.6f} | "
+            f"{summary.seeds_beating_best_baseline} | "
+            f"{summary.query_collapse_rate:.6f} | "
+            f"{summary.execute_retry_accuracy:.6f} | {actions} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon Aigarth target-contract stress objective",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Hypothesis",
+            "",
+            "After the stress amplitude-ladder showed that high-amplitude stress vectors "
+            "are separable while original low-margin stress_holdout stays collapsed, this "
+            "probe tests one target-aligned, margin-weighted objective. The goal is to "
+            "preserve the scaled separability signal while checking whether original "
+            "stress/control quality improves without upgrading label-injected training "
+            "cases to generalization evidence.",
+            "",
+            "## Runtime",
+            "",
+            f"- Device: `{result.device_name}` / compute capability `{result.compute_capability}`",
+            f"- Library: `{result.library_path}`",
+            f"- Seeds: `{result.seed_offsets}`",
+            f"- Generations/population/eval steps: `{result.generations}` / "
+            f"`{result.population_size}` / `{result.eval_steps}`",
+            f"- Fitness variant: `{result.fitness_variant}`",
+            f"- Stress amplitude factor: `{_format_amplitude_factor(result.amplitude_factor)}`",
+            "",
+            "## Core result",
+            "",
+            "- Original stress_holdout accuracy: "
+            f"`{result.original_stress_holdout_accuracy_mean:.6f}`",
+            "- Original stress_holdout query-collapse rate: "
+            f"`{result.original_stress_holdout_query_collapse_rate:.6f}`",
+            "- Original stress_holdout execute/retry accuracy: "
+            f"`{result.original_stress_holdout_execute_retry_accuracy:.6f}`",
+            "- Scaled stress_holdout accuracy: "
+            f"`{result.scaled_stress_holdout_accuracy_mean:.6f}`",
+            "- Scaled stress_holdout query-collapse rate: "
+            f"`{result.scaled_stress_holdout_query_collapse_rate:.6f}`",
+            "- Scaled stress_holdout execute/retry accuracy: "
+            f"`{result.scaled_stress_holdout_execute_retry_accuracy:.6f}`",
+            "- Counterfactual control accuracy: "
+            f"`{result.counterfactual_control_accuracy_mean:.6f}`",
+            "- Permuted control accuracy: "
+            f"`{result.permuted_control_accuracy_mean:.6f}`",
+            f"- Aggregate actions: {distribution}",
+            "",
+            "## Split summaries",
+            "",
+            *split_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            result.evidence_boundary,
+            "",
+            "This target-aligned stress objective is an objective-shaping diagnostic, not "
+            "intelligence evidence. If original stress/control quality stays at constant "
+            "baselines, the next question is decoder/readout geometry rather than a longer "
+            "run of the same objective.",
+            "",
+            "## Recommended next probe",
+            "",
+            f"- Probe id: `{result.recommended_next_probe.get('id', 'unknown')}`",
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_target_contract_stress_objective_artifacts(
+    result: CunxonAigarthStressObjectiveResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON/Markdown Aigarth target-contract stress objective artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_stress_objective_markdown_report(result),
+        encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
 def render_avalanche_window_markdown_report(
     result: CunxonAvalancheWindowProbeResult,
 ) -> str:
@@ -4496,6 +4660,13 @@ def run_ctypes_aigarth_action_probe(
                 if spec[1] in {"train", "augmented_train"}
                 or spec[1].startswith("stress_train_scaled_")
             ]
+        elif fitness_variant == "target_contract_stress_margin_weighted":
+            train_specs = [
+                spec
+                for spec in specs
+                if spec[1] in {"train", "augmented_train"}
+                or spec[1].startswith("stress_train_scaled_")
+            ]
         else:
             train_splits = {"train"}
             train_specs = [spec for spec in specs if spec[1] in train_splits]
@@ -4511,6 +4682,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_augmented_train",
                     "target_contract_stress_injection",
                     "target_contract_stress_amplitude_ladder",
+                    "target_contract_stress_margin_weighted",
                 }
                 else "action_decoder"
             )
@@ -4537,6 +4709,20 @@ def run_ctypes_aigarth_action_probe(
             }:
                 margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
                 return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
+            if fitness_variant == "target_contract_stress_margin_weighted":
+                weighted_total = 0.0
+                weight_sum = 0.0
+                for case in cases:
+                    weight = 2.0 if case.split.startswith("stress_train_scaled_") else 1.0
+                    case_success = 1.0 if case.outcome == "success" else 0.0
+                    case_score = (
+                        case_success
+                        + 0.25 * case.target_alignment
+                        + 0.5 * _target_contract_margin(case)
+                    )
+                    weighted_total += weight * case_score
+                    weight_sum += weight
+                return float(weighted_total / weight_sum if weight_sum else 0.0)
             if fitness_variant in {"strict_label_margin", "strict_label_heavy_penalty"}:
                 strict_actions = {"execute", "query", "retry"}
                 unexpected_rate = sum(
@@ -4593,6 +4779,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_augmented_train",
                     "target_contract_stress_injection",
                     "target_contract_stress_amplitude_ladder",
+                    "target_contract_stress_margin_weighted",
                 }
                 else "action_decoder"
             ),
@@ -5413,6 +5600,151 @@ def run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe(
             "stress_train cases",
             "original stress_holdout and scaled stress_holdout splits are reported separately",
             "bounded amplitude ladder; not a long-sweep or intelligence claim",
+        ],
+    )
+
+
+def _split_summary_by_name(
+    summaries: Sequence[CunxonAigarthStressAmplitudeSplitSummary],
+    split: str,
+) -> CunxonAigarthStressAmplitudeSplitSummary | None:
+    for summary in summaries:
+        if summary.split == split:
+            return summary
+    return None
+
+
+def run_ctypes_aigarth_action_target_contract_stress_objective_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (147, 148, 149),
+    amplitude_factor: float = 3.0,
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_stress_margin_weighted",
+    device_id: int = 0,
+) -> CunxonAigarthStressObjectiveResult:
+    """Run one target-aligned objective-shaping follow-up after the amplitude ladder."""
+    if fitness_variant != "target_contract_stress_margin_weighted":
+        raise ValueError(
+            "stress objective audit only supports "
+            "fitness_variant='target_contract_stress_margin_weighted'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    if amplitude_factor <= 0.0:
+        raise ValueError("amplitude_factor must be positive")
+    specs = _aigarth_action_target_contract_stress_objective_specs(amplitude_factor)
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    source_summary = _summarize_aigarth_action_runs(
+        probe_results=probe_results,
+        seed_offsets=seed_offsets,
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        status="aigarth target-contract stress objective completed",
+        notes=[],
+    )
+    amplitude_summaries = _stress_amplitude_split_summaries(
+        source_summary.runs,
+        amplitude_factors=[amplitude_factor],
+    )
+    original_stress_cases = [
+        case for run in source_summary.runs for case in run.cases if case.split == "stress_holdout"
+    ]
+    suffix = _amplitude_split_suffix(amplitude_factor)
+    scaled_split = f"stress_holdout_scaled_{suffix}"
+    scaled_stress_cases = [
+        case for run in source_summary.runs for case in run.cases if case.split == scaled_split
+    ]
+    original_summary = CunxonAigarthStressAmplitudeSplitSummary(
+        split="stress_holdout",
+        amplitude_factor=1.0,
+        sample_count=len(original_stress_cases),
+        accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "stress_holdout", {}
+        ).get("mean", 0.0),
+        best_constant_baseline_mean=sum(
+            _best_constant_baseline_for_split(run, "stress_holdout") for run in source_summary.runs
+        )
+        / len(source_summary.runs),
+        seeds_beating_best_baseline=source_summary.seeds_beating_baseline_by_split.get(
+            "stress_holdout", 0
+        ),
+        query_collapse_rate=_query_collapse_rate(original_stress_cases),
+        execute_retry_accuracy=_execute_retry_accuracy(original_stress_cases),
+        action_distribution=_aigarth_action_distribution(original_stress_cases),
+    )
+    scaled_summary = _split_summary_by_name(amplitude_summaries, scaled_split)
+    split_summaries = [original_summary, *amplitude_summaries]
+    return CunxonAigarthStressObjectiveResult(
+        status="aigarth target-contract stress objective completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        seed_offsets=list(seed_offsets),
+        amplitude_factor=float(amplitude_factor),
+        fitness_variant=fitness_variant,
+        split_summaries=split_summaries,
+        original_stress_holdout_accuracy_mean=original_summary.accuracy_mean,
+        original_stress_holdout_query_collapse_rate=original_summary.query_collapse_rate,
+        original_stress_holdout_execute_retry_accuracy=original_summary.execute_retry_accuracy,
+        scaled_stress_holdout_accuracy_mean=scaled_summary.accuracy_mean if scaled_summary else 0.0,
+        scaled_stress_holdout_query_collapse_rate=scaled_summary.query_collapse_rate
+        if scaled_summary
+        else _query_collapse_rate(scaled_stress_cases),
+        scaled_stress_holdout_execute_retry_accuracy=scaled_summary.execute_retry_accuracy
+        if scaled_summary
+        else _execute_retry_accuracy(scaled_stress_cases),
+        counterfactual_control_accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "counterfactual_control", {}
+        ).get("mean", 0.0),
+        permuted_control_accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "permuted_control", {}
+        ).get("mean", 0.0),
+        aggregate_action_distribution=source_summary.aggregate_action_distribution,
+        evidence_boundary=(
+            "This is one label-injected target-aligned objective-shaping diagnostic. Scaled "
+            "stress_train cases are optimized with extra margin weight, while original "
+            "stress_holdout, controls, and scaled holdouts are reported separately. It is "
+            "not intelligence evidence and not generalization evidence unless original "
+            "stress/control splits beat constant baselines."
+        ),
+        recommended_next_probe={
+            "id": "stress_objective_decoder_geometry_followup",
+            "condition": "only if original stress/control quality remains baseline-level",
+        },
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "fitness callback weights scaled stress_train margin more strongly than the ladder",
+            "original stress_holdout and controls are never optimized",
+            "objective-shaping diagnostic only; not a long-sweep or intelligence claim",
         ],
     )
 
@@ -8872,6 +9204,13 @@ def _aigarth_action_target_contract_stress_amplitude_ladder_specs(
                 )
             )
     return [*base_specs, *scaled_specs]
+
+
+def _aigarth_action_target_contract_stress_objective_specs(
+    amplitude_factor: float,
+) -> list[tuple[str, str, tuple[float, float, float], str]]:
+    """Return specs for one target-aligned stress objective-shaping run."""
+    return _aigarth_action_target_contract_stress_amplitude_ladder_specs([amplitude_factor])
 
 
 def _target_readout_for_action(action: str) -> tuple[int, int, int]:

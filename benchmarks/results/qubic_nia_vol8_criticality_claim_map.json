@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. Decoder separation explained the stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases. The stress-injection upper-bound follow-up then deliberately optimized duplicated stress_train cases, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings. The stress geometry audit further narrows this to a low-margin separability/readout-geometry bottleneck: stress execute/retry vectors collapse to query at 1.000000 rate in both injected stress_train and original stress_holdout, while stronger augmented_train execute/retry vectors remain separable. The stress amplitude-ladder follow-up resolves the immediate geometry question in a narrow way: the same stress vectors become separable when scaled, with best scaled stress_holdout 0.833333 at 3.0x, but original stress_holdout remains 0.333333/query-collapse 1.000000. This is diagnostic separability evidence, not generalization or intelligence evidence.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. Decoder separation explained the stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases. The stress-injection upper-bound follow-up then deliberately optimized duplicated stress_train cases, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings. The stress geometry audit further narrows this to a low-margin separability/readout-geometry bottleneck: stress execute/retry vectors collapse to query at 1.000000 rate in both injected stress_train and original stress_holdout, while stronger augmented_train execute/retry vectors remain separable. The stress amplitude-ladder follow-up resolves the immediate geometry question in a narrow way: the same stress vectors become separable when scaled, with best scaled stress_holdout 0.833333 at 3.0x, but original stress_holdout remains 0.333333/query-collapse 1.000000. This is diagnostic separability evidence, not generalization or intelligence evidence. The target-aligned stress objective follow-up preserved high-amplitude separability (scaled stress_holdout 0.888889, execute/retry 1.000000) but original stress_holdout remained 0.333333 with query-collapse 1.000000 and execute/retry 0.000000; objective shaping did not solve the original low-margin boundary.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -135,6 +135,13 @@
       "interpretation": "Scaling the low-margin stress vectors reduces query-collapse and improves scaled execute/retry accuracy, so the prior bottleneck has a stimulus/readout-amplitude component. Because scaled stress_train cases are optimized in the fitness callback and original stress_holdout still fails, this is separability evidence rather than generalization.",
       "observed": "Fresh seeds 142..144, amplitude ladder 1.0x/1.5x/2.0x/3.0x. Original stress_holdout accuracy=0.333333 and query-collapse=1.000000; scaled stress_holdout at 3.0x accuracy=0.833333, execute/retry accuracy=0.833333, query-collapse=0.388889, and 3/3 seeds beat the best constant baseline.",
       "status": "bounded live separability upper-bound; not intelligence evidence"
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+      "id": "cunxon-stress-objective",
+      "interpretation": "A margin-weighted target-aligned objective can preserve the high-amplitude scaled-stress signal, but it does not improve the original low-margin stress/control boundary. This supports a decoder/readout-geometry follow-up rather than more of the same objective or a longer run.",
+      "observed": "Fresh seeds 147..149 with target_contract_stress_margin_weighted and 3.0x stress scaling: original stress_holdout accuracy=0.333333, query-collapse=1.000000, execute/retry accuracy=0.000000; scaled stress_holdout accuracy=0.888889, query-collapse=0.222222, execute/retry accuracy=1.000000; counterfactual_control=0.111111 and permuted_control=0.000000.",
+      "status": "objective-shaping diagnostic; preserves scaled separability but negative for original stress/generalization"
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
@@ -148,19 +155,20 @@
     "Does controlled_regime_calibration show estimator movement without stress_holdout improvement because of decoder collapse, lack of task signal, or both?",
     "What target-contract or objective-level change can reduce low-margin execute/retry stress query collapse without using stress/control labels for optimization?",
     "If even injected stress_train labels remain baseline-level, is the next bottleneck Aigarth objective/readout expressivity, low-margin case separability, or the signed-first-lane action contract itself?",
-    "Can a target-aligned stress objective preserve the 3.0x separability signal while improving original low-margin stress_holdout above constant baselines without treating scaled label-injected cases as generalization?"
+    "Can a target-aligned stress objective preserve the 3.0x separability signal while improving original low-margin stress_holdout above constant baselines without treating scaled label-injected cases as generalization?",
+    "Why does the signed-first-lane route preserve scaled stress separability while original low-margin stress_holdout still collapses completely to query under a margin-weighted objective?"
   ],
   "recommended_next_probe": {
+    "id": "stress_objective_decoder_geometry_followup",
+    "status": "open",
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89",
+    "purpose": "Diagnose why target-aligned objective shaping preserves 3.0x scaled-stress separability but original low-margin stress_holdout remains at constant baseline/query-collapse.",
+    "shape": "Post-process or minimally probe readout margins/action-lane geometry for original vs scaled stress cases; keep labels and controls separate; do not run a longer identical objective sweep.",
     "acceptance_criteria": [
-      "Preserve the amplitude-ladder result as label-injected separability evidence, not generalization evidence.",
-      "Report original low-margin stress_holdout separately from scaled stress splits and controls.",
-      "Do not claim useful computation unless original stress/control splits beat constant baselines across fresh seeds."
-    ],
-    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88",
-    "id": "target_aligned_stress_objective_followup",
-    "purpose": "Test one narrow objective/readout-shaping variant after the amplitude ladder showed scaled stress separability but original stress_holdout remained baseline-level.",
-    "shape": "Keep original stress_holdout, scaled stress holdouts, counterfactual controls and permuted controls separate; report query-collapse and execute/retry accuracy with constant baselines.",
-    "status": "open"
+      "Report original and scaled stress readout margins/action distributions side by side.",
+      "Separate decoder/readout geometry from fitness/objective training success.",
+      "Keep the conclusion negative unless original stress/control splits beat constant baselines."
+    ]
   },
   "source": {
     "captured_with": "dokobot local read",

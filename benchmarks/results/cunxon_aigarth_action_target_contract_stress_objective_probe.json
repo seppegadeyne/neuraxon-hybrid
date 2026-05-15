@@ -1,0 +1,88 @@
+{
+  "aggregate_action_distribution": {
+    "execute": 30,
+    "query": 61,
+    "retry": 35
+  },
+  "amplitude_factor": 3.0,
+  "compute_capability": "12.0",
+  "counterfactual_control_accuracy_mean": 0.1111111111111111,
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 24,
+  "evidence_boundary": "This is one label-injected target-aligned objective-shaping diagnostic. Scaled stress_train cases are optimized with extra margin weight, while original stress_holdout, controls, and scaled holdouts are reported separately. It is not intelligence evidence and not generalization evidence unless original stress/control splits beat constant baselines.",
+  "fitness_variant": "target_contract_stress_margin_weighted",
+  "generations": 16,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "fresh cuNxon network/context per seed",
+    "fitness callback weights scaled stress_train margin more strongly than the ladder",
+    "original stress_holdout and controls are never optimized",
+    "objective-shaping diagnostic only; not a long-sweep or intelligence claim"
+  ],
+  "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+  "original_stress_holdout_execute_retry_accuracy": 0.0,
+  "original_stress_holdout_query_collapse_rate": 1.0,
+  "permuted_control_accuracy_mean": 0.0,
+  "population_size": 32,
+  "recommended_next_probe": {
+    "condition": "only if original stress/control quality remains baseline-level",
+    "id": "stress_objective_decoder_geometry_followup"
+  },
+  "scaled_stress_holdout_accuracy_mean": 0.888888888888889,
+  "scaled_stress_holdout_execute_retry_accuracy": 1.0,
+  "scaled_stress_holdout_query_collapse_rate": 0.2222222222222222,
+  "seed_count": 3,
+  "seed_offsets": [
+    147,
+    148,
+    149
+  ],
+  "split_summaries": [
+    {
+      "accuracy_mean": 0.3333333333333333,
+      "action_distribution": {
+        "query": 18
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 1.0,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 0,
+      "split": "stress_holdout"
+    },
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 6,
+        "query": 6,
+        "retry": 6
+      },
+      "amplitude_factor": 3.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_train_scaled_3_0x"
+    },
+    {
+      "accuracy_mean": 0.888888888888889,
+      "action_distribution": {
+        "execute": 6,
+        "query": 4,
+        "retry": 8
+      },
+      "amplitude_factor": 3.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.2222222222222222,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_holdout_scaled_3_0x"
+    }
+  ],
+  "status": "aigarth target-contract stress objective completed",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}
