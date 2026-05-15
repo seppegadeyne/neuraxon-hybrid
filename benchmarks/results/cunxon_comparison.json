@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality/decoder separation showed query/action collapse on low-margin execute/retry stress cases despite observable estimator movement. A new stress-injection upper-bound diagnostic deliberately put duplicated stress-like labels into Aigarth fitness, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Criticality metrics and stress-label injection are useful diagnostics, not intelligence or generalization evidence. The stress geometry audit post-processes the live stress-injection artifact and shows both injected stress_train and original stress_holdout collapse to query on every sample; stress execute/retry accuracy is 0.000000 while augmented_train execute/retry remains 1.000000. This supports a low-margin separability/readout-geometry hypothesis, not an intelligence or generalization claim.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality/decoder separation showed query/action collapse on low-margin execute/retry stress cases despite observable estimator movement. A new stress-injection upper-bound diagnostic deliberately put duplicated stress-like labels into Aigarth fitness, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Criticality metrics and stress-label injection are useful diagnostics, not intelligence or generalization evidence. The stress geometry audit post-processes the live stress-injection artifact and shows both injected stress_train and original stress_holdout collapse to query on every sample; stress execute/retry accuracy is 0.000000 while augmented_train execute/retry remains 1.000000. This supports a low-margin separability/readout-geometry hypothesis, not an intelligence or generalization claim. The stress amplitude-ladder probe then shows the geometry hypothesis is actionable as separability evidence: original stress_holdout still stays 0.333333 with query-collapse 1.000000, but scaled stress_holdout reaches 0.833333 at 3.0x over fresh seeds 142..144. This is a label-injected/separability upper-bound, not intelligence or generalization evidence.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
@@ -114,6 +114,12 @@
       "lane": "cuNxon stress stimulus geometry audit",
       "metric": "low-margin stress query collapse vs stimulus drive",
       "value": "180 cases from the live stress-injection artifact; stress_train and stress_holdout query-collapse=1.000000; stress execute/retry accuracy=0.000000; augmented_train execute/retry accuracy=1.000000; next probe is an amplitude ladder, not another long sweep"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress amplitude-ladder",
+      "metric": "scaled low-margin stress separability vs original stress boundary",
+      "value": "fresh seeds 142..144; original stress_holdout=0.333333/query-collapse=1.000000; scaled stress_holdout at 3.0x=0.833333 with execute/retry accuracy=0.833333; label-injected separability evidence only"
     },
     {
       "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_probe.json",
@@ -1472,6 +1478,28 @@
     "teacher_forcing_output_ports_supported_by_step_input": false,
     "verdict": "source-level semantics explain why output-port teacher forcing is unsupported"
   },
+  "cunxon_stress_amplitude_ladder_probe": {
+    "amplitude_factors": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "best_scaled_stress_holdout_accuracy_mean": 0.8333333333333334,
+    "best_scaled_stress_holdout_amplitude_factor": 3.0,
+    "evidence_boundary": "This is a label-injected separability upper-bound over scaled low-margin stress vectors. Scaled stress_train cases are inside the fitness callback, so any improvement is diagnostic adapter-capability evidence, not intelligence evidence and not generalization evidence unless stress/control holdouts beat constant baselines.",
+    "hypothesis": "stress_amplitude_ladder_separability",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "recommended_next_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88",
+    "recommended_next_probe": "target_aligned_stress_objective_followup",
+    "seed_offsets": [
+      142,
+      143,
+      144
+    ],
+    "status": "aigarth target-contract stress amplitude-ladder completed"
+  },
   "cunxon_stress_geometry_audit": {
     "augmented_train_execute_retry_accuracy": 1.0,
     "augmented_train_mean_abs_sum": 0.433333,
@@ -1607,13 +1635,13 @@
   ],
   "qubic_nia_vol8_criticality_claim_map": {
     "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
-    "evidence_boundary": "hypothesis source only; branching/regime and avalanche-window metrics are diagnostics until robust held-out/stress task quality beats baselines",
+    "evidence_boundary": "hypothesis source only; scaled stress separability is diagnostic until original held-out/stress/control task quality beats baselines",
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
     "hypothesis": "branching_ratio_as_measured_regime_gate",
-    "latest_evidence": "cunxon_aigarth_action_target_contract_stress_injection_probe",
-    "recommended_next_probe": "stress_injection_upper_bound_completed",
+    "latest_evidence": "cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe",
+    "recommended_next_probe": "target_aligned_stress_objective_followup",
     "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
-    "summary": "branching-ratio/criticality claims mapped to current artifacts; decoder separation found stress query collapse; stress-label injection upper-bound still left stress at baseline; no intelligence claim"
+    "summary": "branching-ratio/criticality claims mapped to current artifacts; stress amplitude ladder reduced scaled-stress query collapse while original stress_holdout stayed baseline-level; no intelligence claim"
   },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",

@@ -40,6 +40,14 @@ CRITICALITY_DECODER_SEPARATION_MD_PATH = (
 )
 STRESS_GEOMETRY_AUDIT_JSON_PATH = ROOT / "benchmarks/results/cunxon_stress_geometry_audit.json"
 STRESS_GEOMETRY_AUDIT_MD_PATH = ROOT / "benchmarks/results/cunxon_stress_geometry_audit.md"
+STRESS_AMPLITUDE_LADDER_JSON_PATH = (
+    ROOT
+    / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json"
+)
+STRESS_AMPLITUDE_LADDER_MD_PATH = (
+    ROOT
+    / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -75,8 +83,8 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "stress_amplitude_ladder_probe"
-    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/87")
+    assert data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/88")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
 
@@ -95,7 +103,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "stress_injection_upper_bound_completed"
+        "target_aligned_stress_objective_followup"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -192,7 +200,7 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
     assert "stress_holdout" in comparison_markdown
 
-    assert claim_data["recommended_next_probe"]["id"] == "stress_amplitude_ladder_probe"
+    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
 
 
@@ -376,7 +384,7 @@ def test_cunxon_stress_injection_upper_bound_keeps_stress_baseline_boundary() ->
         item["id"] == "cunxon-stress-injection-upper-bound"
         for item in claim_data["evidence_map"]
     )
-    assert claim_data["recommended_next_probe"]["id"] == "stress_amplitude_ladder_probe"
+    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
     assert claim_data["recommended_next_probe"]["status"] == "open"
     assert "stress-injection upper-bound diagnostic" in claim_markdown
 
@@ -418,5 +426,50 @@ def test_cunxon_stress_geometry_audit_identifies_low_margin_query_collapse() -> 
     assert "cuNxon stress stimulus geometry audit" in comparison_markdown
 
     assert any(item["id"] == "cunxon-stress-geometry-audit" for item in claim_data["evidence_map"])
-    assert claim_data["recommended_next_probe"]["id"] == "stress_amplitude_ladder_probe"
+    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
     assert "cunxon_stress_geometry_audit" in claim_markdown
+
+
+def test_cunxon_stress_amplitude_ladder_identifies_drive_threshold_but_not_generalization() -> None:
+    data = json.loads(STRESS_AMPLITUDE_LADDER_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_AMPLITUDE_LADDER_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "aigarth target-contract stress amplitude-ladder completed"
+    assert data["seed_offsets"] == [142, 143, 144]
+    assert data["amplitude_factors"] == [1.0, 1.5, 2.0, 3.0]
+    assert data["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout_query_collapse_rate"] == 1.0
+    assert data["best_scaled_stress_holdout_amplitude_factor"] == 3.0
+    assert data["best_scaled_stress_holdout_accuracy_mean"] > 0.8
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    scaled_holdout = {
+        summary["amplitude_factor"]: summary
+        for summary in data["split_summaries"]
+        if summary["split"].startswith("stress_holdout_scaled_")
+    }
+    assert scaled_holdout[1.0]["query_collapse_rate"] == 1.0
+    assert scaled_holdout[3.0]["execute_retry_accuracy"] > 0.8
+    assert scaled_holdout[3.0]["seeds_beating_best_baseline"] == 3
+
+    assert "# cuNxon Aigarth target-contract stress amplitude-ladder" in markdown
+    assert "Best scaled stress_holdout accuracy: `0.833333` at `3.0x`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_amplitude_ladder_probe"]
+    assert summary["hypothesis"] == "stress_amplitude_ladder_separability"
+    assert summary["best_scaled_stress_holdout_amplitude_factor"] == 3.0
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert "cuNxon Aigarth target-contract stress amplitude-ladder" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-amplitude-ladder"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == "target_aligned_stress_objective_followup"
+    assert "cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe" in claim_markdown

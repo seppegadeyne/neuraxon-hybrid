@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAigarthStressAmplitudeLadderResult,
+    CunxonAigarthStressAmplitudeSplitSummary,
     CunxonAvalancheInterventionTaskConfigSummary,
     CunxonAvalancheInterventionTaskCorrelationResult,
     CunxonAvalancheWindowProbeResult,
@@ -59,6 +61,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_strict_label_markdown_report,
     render_aigarth_action_target_contract_augmented_train_markdown_report,
     render_aigarth_action_target_contract_markdown_report,
+    render_aigarth_action_target_contract_stress_amplitude_ladder_markdown_report,
     render_aigarth_action_target_contract_stress_injection_markdown_report,
     render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_readout_markdown_report,
@@ -87,6 +90,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_strict_label_artifacts,
     write_aigarth_action_target_contract_artifacts,
     write_aigarth_action_target_contract_augmented_train_artifacts,
+    write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_action_target_contract_stress_injection_artifacts,
     write_aigarth_readout_artifacts,
@@ -583,9 +587,7 @@ def test_aigarth_action_seed_sweep_report_records_repeatability_and_coverage(
     data = json_path.read_text(encoding="utf-8")
     assert '"seed_count": 2' in data
     assert '"seed_offsets": [' in data
-    assert "fresh cuNxon network/context per seed" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert "fresh cuNxon network/context per seed" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_aigarth_action_hard_holdout_report_records_leakage_and_strict_labels(
@@ -1262,6 +1264,78 @@ def test_aigarth_action_target_contract_stress_injection_report_records_upper_bo
     assert "stress-injection audit" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_aigarth_action_target_contract_stress_amplitude_ladder_report_records_separability(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAigarthStressAmplitudeLadderResult(
+        status="aigarth target-contract stress amplitude-ladder completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        seed_offsets=[142, 143],
+        amplitude_factors=[1.0, 2.0],
+        split_summaries=[
+            CunxonAigarthStressAmplitudeSplitSummary(
+                split="stress_train_scaled_1_0x",
+                amplitude_factor=1.0,
+                sample_count=12,
+                accuracy_mean=0.333333,
+                best_constant_baseline_mean=0.333333,
+                seeds_beating_best_baseline=0,
+                query_collapse_rate=1.0,
+                execute_retry_accuracy=0.0,
+                action_distribution={"query": 12},
+            ),
+            CunxonAigarthStressAmplitudeSplitSummary(
+                split="stress_holdout_scaled_2_0x",
+                amplitude_factor=2.0,
+                sample_count=12,
+                accuracy_mean=0.5,
+                best_constant_baseline_mean=0.333333,
+                seeds_beating_best_baseline=1,
+                query_collapse_rate=0.5,
+                execute_retry_accuracy=0.25,
+                action_distribution={"execute": 3, "query": 6, "retry": 3},
+            ),
+        ],
+        original_stress_holdout_accuracy_mean=0.333333,
+        original_stress_holdout_query_collapse_rate=1.0,
+        best_scaled_stress_holdout_accuracy_mean=0.5,
+        best_scaled_stress_holdout_amplitude_factor=2.0,
+        aggregate_action_distribution={"execute": 3, "query": 18, "retry": 3},
+        evidence_boundary=(
+            "This is a label-injected separability upper-bound, not intelligence evidence."
+        ),
+        recommended_next_probe={"id": "target_aligned_stress_objective_followup"},
+        notes=["bounded amplitude ladder over low-margin stress vectors"],
+    )
+
+    markdown = render_aigarth_action_target_contract_stress_amplitude_ladder_markdown_report(result)
+    assert "stress amplitude-ladder" in markdown
+    assert "1.0x" in markdown
+    assert "2.0x" in markdown
+    assert "label-injected separability upper-bound" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-target-contract-stress-amplitude-ladder.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract-stress-amplitude-ladder.md"
+    write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["amplitude_factors"] == [1.0, 2.0]
+    assert data["best_scaled_stress_holdout_amplitude_factor"] == 2.0
+    assert "stress amplitude-ladder" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_branching_regime_scan_report_couples_regime_metrics_to_action_quality(
     tmp_path: Path,
 ) -> None:
@@ -1407,9 +1481,7 @@ def test_input_proxy_target_report_separates_supported_input_drive_from_decision
     markdown_path = tmp_path / "input_proxy.md"
     write_input_proxy_target_artifacts(result, json_path=json_path, markdown_path=markdown_path)
 
-    assert '"status": "input-proxy target probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "input-proxy target probe viable"' in json_path.read_text(encoding="utf-8")
     assert '"case_count": 2' in json_path.read_text(encoding="utf-8")
     assert "supported input-class external drive" in markdown_path.read_text(encoding="utf-8")
 
@@ -2008,8 +2080,7 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"unique_readouts": [' in data
     assert (
         '"verdict": "input-proxy route confirms target drive but motor readout remains '
-        'baseline-level"'
-        in data
+        'baseline-level"' in data
     )
     assert '"target_proxy_alignment_by_split"' in data
     assert "cuNxon input-proxy target route" in markdown
@@ -2019,25 +2090,21 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     assert '"verdict": "long-horizon runtime viable, not benchmark-integrated"' in data
     assert (
         '"verdict": "input-class direct drive observable; hidden/output windows are not '
-        'desired-output channels"'
-        in data
+        'desired-output channels"' in data
     )
     assert '"verdict": "longer action sweep remains baseline-level"' in data
     assert '"verdict": "task-coupled but not above baselines"' in data
     assert (
         '"verdict": "resident task-coupled action loop remains flat query and does not beat '
-        'trivial baselines"'
-        in data
+        'trivial baselines"' in data
     )
     assert (
         '"verdict": "Aigarth can improve absolute output margins on the two-pattern fitness '
-        'task, but this is not holdout/action evidence"'
-        in data
+        'task, but this is not holdout/action evidence"' in data
     )
     assert (
         '"verdict": "Aigarth action probe beats constant-action baselines on this small '
-        'train/holdout set, but remains a toy evidence slice"'
-        in data
+        'train/holdout set, but remains a toy evidence slice"' in data
     )
     assert '"cunxon_aigarth_action_probe"' in data
     assert '"cunxon_aigarth_action_seed_sweep"' in data
@@ -2092,13 +2159,11 @@ def test_tracked_cunxon_comparison_report_separates_gpu_smoke_from_decision_qual
     )
     assert (
         '"verdict": "three-sphere adapter runs but is flat query and does not beat '
-        'trivial baselines"'
-        in data
+        'trivial baselines"' in data
     )
     assert (
         '"verdict": "supervised motor-target adapter remains flat query and does not beat '
-        'trivial baselines"'
-        in data
+        'trivial baselines"' in data
     )
     assert (
         '"verdict": "source-level semantics explain why output-port teacher forcing is unsupported"'
@@ -2129,12 +2194,8 @@ def test_tracked_cunxon_aigarth_action_seed_sweep_records_repeatability() -> Non
 
 
 def test_tracked_cunxon_aigarth_action_probe_records_holdout_action_result() -> None:
-    markdown = Path("benchmarks/results/cunxon_aigarth_action_probe.md").read_text(
-        encoding="utf-8"
-    )
-    data = Path("benchmarks/results/cunxon_aigarth_action_probe.json").read_text(
-        encoding="utf-8"
-    )
+    markdown = Path("benchmarks/results/cunxon_aigarth_action_probe.md").read_text(encoding="utf-8")
+    data = Path("benchmarks/results/cunxon_aigarth_action_probe.json").read_text(encoding="utf-8")
 
     assert "Aigarth holdout action probe" in markdown
     assert "train cases only" in markdown
@@ -2168,9 +2229,9 @@ def test_tracked_cunxon_aigarth_action_strict_label_probe_records_contract_resul
 
 
 def test_tracked_cunxon_aigarth_action_contract_penalty_probe_records_negative_tradeoff() -> None:
-    markdown = Path(
-        "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.md"
-    ).read_text(encoding="utf-8")
+    markdown = Path("benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.md").read_text(
+        encoding="utf-8"
+    )
     data = Path("benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json").read_text(
         encoding="utf-8"
     )
@@ -2376,9 +2437,9 @@ def test_avalanche_window_report_records_snapshot_estimator_and_baselines(
     write_avalanche_window_artifacts(result, json_path=json_path, markdown_path=markdown_path)
 
     data = json_path.read_text(encoding="utf-8")
-    assert '\"status\": \"avalanche-window probe completed\"' in data
-    assert '\"sample_count\": 1' in data
-    assert '\"branching_ratio_estimate\": 1.0' in data
+    assert '"status": "avalanche-window probe completed"' in data
+    assert '"sample_count": 1' in data
+    assert '"branching_ratio_estimate": 1.0' in data
     assert "full-sphere snapshot" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -2498,9 +2559,7 @@ def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> N
     markdown = Path("benchmarks/results/cunxon_resident_action_probe.md").read_text(
         encoding="utf-8"
     )
-    data = Path("benchmarks/results/cunxon_resident_action_probe.json").read_text(
-        encoding="utf-8"
-    )
+    data = Path("benchmarks/results/cunxon_resident_action_probe.json").read_text(encoding="utf-8")
 
     assert "resident task-coupled action probe" in markdown
     assert "same cuNxon network/context resident" in markdown
@@ -2518,9 +2577,7 @@ def test_tracked_cunxon_source_semantics_audit_records_output_target_boundary() 
     markdown = Path("benchmarks/results/cunxon_source_semantics_audit.md").read_text(
         encoding="utf-8"
     )
-    data = Path("benchmarks/results/cunxon_source_semantics_audit.json").read_text(
-        encoding="utf-8"
-    )
+    data = Path("benchmarks/results/cunxon_source_semantics_audit.json").read_text(encoding="utf-8")
 
     assert "cuNxon source semantics audit" in markdown
     assert "no desired-output API surface" in markdown
@@ -2546,6 +2603,7 @@ def test_tracked_cunxon_sensitivity_probe_report_records_train_mode_flatness() -
     assert '"status": "sensitivity probe viable"' in data
     assert '"sample_count": 18' in data
     assert '"train": {' in data
+
 
 def test_tracked_cunxon_long_sweep_report_records_baseline_level_long_horizons() -> None:
     markdown = Path("benchmarks/results/cunxon_long_sweep.md").read_text(encoding="utf-8")

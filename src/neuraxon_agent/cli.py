@@ -1,4 +1,5 @@
 """JSON CLI interface for neuraxon-agent, compatible with Hermes tool-calling patterns."""
+
 from __future__ import annotations
 
 import argparse
@@ -21,6 +22,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_aigarth_action_strict_label_probe,
     run_ctypes_aigarth_action_target_contract_augmented_train_probe,
     run_ctypes_aigarth_action_target_contract_probe,
+    run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe,
     run_ctypes_aigarth_action_target_contract_stress_injection_probe,
     run_ctypes_aigarth_action_target_contract_stress_probe,
     run_ctypes_aigarth_readout_probe,
@@ -49,6 +51,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_strict_label_artifacts,
     write_aigarth_action_target_contract_artifacts,
     write_aigarth_action_target_contract_augmented_train_artifacts,
+    write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_action_target_contract_stress_injection_artifacts,
     write_aigarth_readout_artifacts,
@@ -99,6 +102,15 @@ def _parse_step_horizons(raw: str) -> list[int]:
     if any(horizon <= 0 for horizon in horizons):
         raise ValueError("--step-horizons must contain only positive integers")
     return horizons
+
+
+def _parse_float_factors(raw: str, *, flag_name: str) -> list[float]:
+    factors = [float(part.strip()) for part in raw.split(",") if part.strip()]
+    if not factors:
+        raise ValueError(f"{flag_name} must contain at least one number")
+    if any(factor <= 0.0 for factor in factors):
+        raise ValueError(f"{flag_name} must contain only positive numbers")
+    return factors
 
 
 def _parse_modes(raw: str) -> list[str]:
@@ -576,7 +588,6 @@ def cmd_cunxon_aigarth_action_seed_sweep_probe(args: argparse.Namespace) -> int:
         return 1
 
 
-
 def cmd_cunxon_aigarth_action_hard_holdout_probe(args: argparse.Namespace) -> int:
     try:
         result = run_ctypes_aigarth_action_hard_holdout_probe(
@@ -638,7 +649,6 @@ def cmd_cunxon_aigarth_action_strict_label_probe(args: argparse.Namespace) -> in
             encoding="utf-8",
         )
         return 1
-
 
 
 def cmd_cunxon_aigarth_action_contract_penalty_probe(args: argparse.Namespace) -> int:
@@ -806,6 +816,43 @@ def cmd_cunxon_aigarth_action_target_contract_stress_injection_probe(
         return 1
 
 
+def cmd_cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe(
+    args: argparse.Namespace,
+) -> int:
+    try:
+        result = run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            amplitude_factors=_parse_float_factors(
+                args.amplitude_factors, flag_name="--amplitude-factors"
+            ),
+            generations=args.generations,
+            population_size=args.population_size,
+            eval_steps=args.eval_steps,
+            fitness_variant="target_contract_stress_amplitude_ladder",
+            device_id=args.device,
+        )
+        write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon Aigarth target-contract stress amplitude-ladder\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed stress amplitude-ladder diagnostic does not support "
+            "any GPU-backed generalization, holdout, separability, or intelligence claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
 def cmd_cunxon_branching_regime_scan(args: argparse.Namespace) -> int:
     try:
         result = run_ctypes_branching_regime_scan_probe(
@@ -952,7 +999,6 @@ def cmd_cunxon_aigarth_action_remap_audit(args: argparse.Namespace) -> int:
             encoding="utf-8",
         )
         return 1
-
 
 
 def cmd_cunxon_resident_action_probe(args: argparse.Namespace) -> int:
@@ -1473,9 +1519,7 @@ def main(argv: list[str] | None = None) -> int:
         default="benchmarks/results/cunxon_aigarth_action_seed_sweep.md",
         help="Markdown artifact path",
     )
-    p_cunxon_aigarth_action_sweep.set_defaults(
-        func=cmd_cunxon_aigarth_action_seed_sweep_probe
-    )
+    p_cunxon_aigarth_action_sweep.set_defaults(func=cmd_cunxon_aigarth_action_seed_sweep_probe)
 
     p_cunxon_aigarth_hard = sub.add_parser(
         "cunxon-aigarth-action-hard-holdout-probe",
@@ -1531,9 +1575,7 @@ def main(argv: list[str] | None = None) -> int:
         default="benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md",
         help="Markdown artifact path",
     )
-    p_cunxon_aigarth_hard.set_defaults(
-        func=cmd_cunxon_aigarth_action_hard_holdout_probe
-    )
+    p_cunxon_aigarth_hard.set_defaults(func=cmd_cunxon_aigarth_action_hard_holdout_probe)
 
     p_cunxon_aigarth_strict = sub.add_parser(
         "cunxon-aigarth-action-strict-label-probe",
@@ -1589,9 +1631,7 @@ def main(argv: list[str] | None = None) -> int:
         default="benchmarks/results/cunxon_aigarth_action_strict_label_probe.md",
         help="Markdown artifact path",
     )
-    p_cunxon_aigarth_strict.set_defaults(
-        func=cmd_cunxon_aigarth_action_strict_label_probe
-    )
+    p_cunxon_aigarth_strict.set_defaults(func=cmd_cunxon_aigarth_action_strict_label_probe)
 
     p_cunxon_aigarth_contract_penalty = sub.add_parser(
         "cunxon-aigarth-action-contract-penalty-probe",
@@ -1891,6 +1931,71 @@ def main(argv: list[str] | None = None) -> int:
         func=cmd_cunxon_aigarth_action_target_contract_stress_injection_probe
     )
 
+    p_cunxon_aigarth_target_contract_stress_amplitude = sub.add_parser(
+        "cunxon-aigarth-action-target-contract-stress-amplitude-ladder-probe",
+        help="Run a bounded stress amplitude-ladder diagnostic for cuNxon Aigarth",
+        description=(
+            "Scale low-margin stress vectors across a small amplitude ladder while "
+            "keeping original and scaled stress holdouts reported separately. This is a "
+            "separability upper-bound/debugging diagnostic, not generalization evidence."
+        ),
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--seed-offsets",
+        default="142,143,144,145,146",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--amplitude-factors",
+        default="1.0,1.5,2.0,3.0",
+        help="Comma-separated positive scaling factors for stress vectors",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--generations",
+        type=int,
+        default=16,
+        help="Aigarth generations per seed using stress amplitude-ladder fitness",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--population-size",
+        type=int,
+        default=32,
+        help="Aigarth mutation population size per generation",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--eval-steps",
+        type=int,
+        default=24,
+        help="Inference steps per train/holdout/control case evaluation",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--device", type=int, default=0, help="CUDA device id"
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_aigarth_target_contract_stress_amplitude.set_defaults(
+        func=cmd_cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe
+    )
+
     p_cunxon_branching_regime = sub.add_parser(
         "cunxon-branching-regime-scan",
         help="Scan cuNxon branching/activity regimes beside action baselines",
@@ -1961,17 +2066,13 @@ def main(argv: list[str] | None = None) -> int:
             "the diagnostics with action-contract accuracy and trivial baselines."
         ),
     )
-    p_cunxon_avalanche.add_argument(
-        "--library", required=True, help="Path to built libcunxon.so"
-    )
+    p_cunxon_avalanche.add_argument("--library", required=True, help="Path to built libcunxon.so")
     p_cunxon_avalanche.add_argument(
         "--upstream-commit",
         required=True,
         help="Upstream Neuraxon commit",
     )
-    p_cunxon_avalanche.add_argument(
-        "--cunxon-commit", required=True, help="cuNxon source commit"
-    )
+    p_cunxon_avalanche.add_argument("--cunxon-commit", required=True, help="cuNxon source commit")
     p_cunxon_avalanche.add_argument(
         "--modes",
         default="infer,train",
@@ -2095,9 +2196,7 @@ def main(argv: list[str] | None = None) -> int:
         default=8,
         help="Capture full-sphere snapshots every N steps",
     )
-    p_cunxon_controlled_regime.add_argument(
-        "--device", type=int, default=0, help="CUDA device id"
-    )
+    p_cunxon_controlled_regime.add_argument("--device", type=int, default=0, help="CUDA device id")
     p_cunxon_controlled_regime.add_argument(
         "--json-output",
         default="benchmarks/results/cunxon_controlled_regime_calibration.json",

@@ -1,4 +1,5 @@
 """Tests for neuraxon-agent CLI."""
+
 from __future__ import annotations
 
 import json
@@ -18,6 +19,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAigarthStressAmplitudeLadderResult,
+    CunxonAigarthStressAmplitudeSplitSummary,
     CunxonAvalancheInterventionTaskConfigSummary,
     CunxonAvalancheInterventionTaskCorrelationResult,
     CunxonAvalancheWindowProbeResult,
@@ -336,9 +339,7 @@ def test_cli_cunxon_resident_action_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "resident action probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "resident action probe viable"' in json_path.read_text(encoding="utf-8")
     assert "resident task-coupled action probe" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -462,9 +463,7 @@ def test_cli_cunxon_action_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "task-coupled action probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "task-coupled action probe viable"' in json_path.read_text(encoding="utf-8")
     assert "decision-quality" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -596,9 +595,7 @@ def test_cli_cunxon_snapshot_pattern_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "snapshot-pattern probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "snapshot-pattern probe viable"' in json_path.read_text(encoding="utf-8")
     assert "hidden-state/snapshot" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -663,9 +660,7 @@ def test_cli_cunxon_multisphere_action_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "multi-sphere action probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "multi-sphere action probe viable"' in json_path.read_text(encoding="utf-8")
     assert "multi-sphere/action adapter" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -730,9 +725,7 @@ def test_cli_cunxon_interface_semantics_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "interface semantics probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "interface semantics probe viable"' in json_path.read_text(encoding="utf-8")
     assert "absolute neuron indices" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -805,9 +798,7 @@ def test_cli_cunxon_input_proxy_target_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "input-proxy target probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "input-proxy target probe viable"' in json_path.read_text(encoding="utf-8")
     assert "input-port proxy target probe" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -944,9 +935,7 @@ def test_cli_cunxon_aigarth_action_probe_writes_json_and_markdown(
     )
 
     assert rc == 0
-    assert '"status": "aigarth action probe viable"' in json_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "aigarth action probe viable"' in json_path.read_text(encoding="utf-8")
     assert "Aigarth holdout action probe" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -990,9 +979,7 @@ def test_cli_cunxon_aigarth_action_seed_sweep_probe_writes_json_and_markdown(
             notes=["fake seed sweep"],
         )
 
-    monkeypatch.setattr(
-        "neuraxon_agent.cli.run_ctypes_aigarth_action_seed_sweep_probe", fake_probe
-    )
+    monkeypatch.setattr("neuraxon_agent.cli.run_ctypes_aigarth_action_seed_sweep_probe", fake_probe)
     json_path = tmp_path / "aigarth-action-seed-sweep.json"
     markdown_path = tmp_path / "aigarth-action-seed-sweep.md"
 
@@ -1278,9 +1265,7 @@ def test_cli_cunxon_aigarth_action_contract_penalty_probe_writes_artifacts(
     data = json_path.read_text(encoding="utf-8")
     assert '"status": "aigarth contract-penalty action audit completed"' in data
     assert '"fitness_variant": "strict_label_heavy_penalty"' in data
-    assert "Aigarth contract-penalty action audit" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert "Aigarth contract-penalty action audit" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_aigarth_action_target_contract_probe_writes_artifacts(
@@ -1365,9 +1350,7 @@ def test_cli_cunxon_aigarth_action_target_contract_probe_writes_artifacts(
     data = json_path.read_text(encoding="utf-8")
     assert '"status": "aigarth target-contract action audit completed"' in data
     assert '"fitness_variant": "target_contract_margin"' in data
-    assert "Aigarth target-contract action audit" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert "Aigarth target-contract action audit" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_aigarth_action_target_contract_stress_probe_writes_artifacts(
@@ -1464,9 +1447,7 @@ def test_cli_cunxon_aigarth_action_target_contract_stress_probe_writes_artifacts
     data = json_path.read_text(encoding="utf-8")
     assert '"status": "aigarth target-contract stress audit completed"' in data
     assert '"fitness_variant": "target_contract_margin"' in data
-    assert "Aigarth target-contract stress audit" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert "Aigarth target-contract stress audit" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_aigarth_action_target_contract_augmented_train_probe_writes_artifacts(
@@ -1568,6 +1549,94 @@ def test_cli_cunxon_aigarth_action_target_contract_augmented_train_probe_writes_
     )
 
 
+def test_cli_cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthStressAmplitudeLadderResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        raw_amplitudes = kwargs["amplitude_factors"]
+        assert isinstance(raw_seed_offsets, list)
+        assert isinstance(raw_amplitudes, list)
+        assert raw_seed_offsets == [142, 143]
+        assert raw_amplitudes == [1.0, 2.0]
+        return CunxonAigarthStressAmplitudeLadderResult(
+            status="aigarth target-contract stress amplitude-ladder completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            seed_offsets=raw_seed_offsets,
+            amplitude_factors=raw_amplitudes,
+            split_summaries=[
+                CunxonAigarthStressAmplitudeSplitSummary(
+                    split="stress_holdout_scaled_2_0x",
+                    amplitude_factor=2.0,
+                    sample_count=12,
+                    accuracy_mean=0.5,
+                    best_constant_baseline_mean=0.333333,
+                    seeds_beating_best_baseline=1,
+                    query_collapse_rate=0.5,
+                    execute_retry_accuracy=0.25,
+                    action_distribution={"execute": 3, "query": 6, "retry": 3},
+                )
+            ],
+            original_stress_holdout_accuracy_mean=0.333333,
+            original_stress_holdout_query_collapse_rate=1.0,
+            best_scaled_stress_holdout_accuracy_mean=0.5,
+            best_scaled_stress_holdout_amplitude_factor=2.0,
+            aggregate_action_distribution={"execute": 3, "query": 6, "retry": 3},
+            evidence_boundary=(
+                "This is a label-injected separability upper-bound, not intelligence evidence."
+            ),
+            recommended_next_probe={"id": "target_aligned_stress_objective_followup"},
+            notes=["fake stress amplitude ladder"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe",
+        fake_probe,
+    )
+    json_path = tmp_path / "aigarth-action-target-contract-stress-amplitude-ladder.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract-stress-amplitude-ladder.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-target-contract-stress-amplitude-ladder-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "142,143",
+            "--amplitude-factors",
+            "1.0,2.0",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["status"] == "aigarth target-contract stress amplitude-ladder completed"
+    assert data["amplitude_factors"] == [1.0, 2.0]
+    assert "stress amplitude-ladder" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_cli_cunxon_branching_regime_scan_writes_artifacts(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -1654,9 +1723,7 @@ def test_cli_cunxon_branching_regime_scan_writes_artifacts(
     data = json_path.read_text(encoding="utf-8")
     assert '"status": "branching-regime scan completed"' in data
     assert '"branching_activity_ratio_proxy": 1.25' in data
-    assert "cuNxon branching-ratio regime scan" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert "cuNxon branching-ratio regime scan" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_avalanche_window_probe_writes_artifacts(
@@ -1738,11 +1805,9 @@ def test_cli_cunxon_avalanche_window_probe_writes_artifacts(
 
     assert rc == 0
     data = json_path.read_text(encoding="utf-8")
-    assert '\"status\": \"avalanche-window probe completed\"' in data
-    assert '\"branching_ratio_estimate\": 1.0' in data
-    assert "cuNxon avalanche-window snapshot probe" in markdown_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"status": "avalanche-window probe completed"' in data
+    assert '"branching_ratio_estimate": 1.0' in data
+    assert "cuNxon avalanche-window snapshot probe" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_avalanche_intervention_task_correlation_writes_artifacts(
@@ -1818,8 +1883,8 @@ def test_cli_cunxon_avalanche_intervention_task_correlation_writes_artifacts(
 
     assert rc == 0
     data = json_path.read_text(encoding="utf-8")
-    assert '\"status\": \"avalanche intervention/task correlation completed\"' in data
-    assert '\"hypothesis_for_this_slice\": \"avalanche_intervention_task_correlation\"' in data
+    assert '"status": "avalanche intervention/task correlation completed"' in data
+    assert '"hypothesis_for_this_slice": "avalanche_intervention_task_correlation"' in data
     assert "stress_holdout" in markdown_path.read_text(encoding="utf-8")
 
 
@@ -1907,8 +1972,8 @@ def test_cli_cunxon_controlled_regime_calibration_writes_artifacts(
 
     assert rc == 0
     data = json_path.read_text(encoding="utf-8")
-    assert '\"status\": \"controlled-regime calibration completed\"' in data
-    assert '\"hypothesis_for_this_slice\": \"controlled_regime_calibration\"' in data
+    assert '"status": "controlled-regime calibration completed"' in data
+    assert '"hypothesis_for_this_slice": "controlled_regime_calibration"' in data
     assert "cuNxon controlled-regime criticality calibration" in markdown_path.read_text(
         encoding="utf-8"
     )

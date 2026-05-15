@@ -385,6 +385,62 @@ class CunxonAigarthActionHardHoldoutResult:
 
 
 @dataclass(frozen=True)
+class CunxonAigarthStressAmplitudeSplitSummary:
+    """Aggregate separability metrics for one stress amplitude split."""
+
+    split: str
+    amplitude_factor: float
+    sample_count: int
+    accuracy_mean: float
+    best_constant_baseline_mean: float
+    seeds_beating_best_baseline: int
+    query_collapse_rate: float
+    execute_retry_accuracy: float
+    action_distribution: dict[str, int]
+
+
+@dataclass(frozen=True)
+class CunxonAigarthStressAmplitudeLadderResult:
+    """Bounded stress-vector amplitude-ladder diagnostic."""
+
+    status: str
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    generations: int
+    population_size: int
+    eval_steps: int
+    seed_offsets: list[int]
+    amplitude_factors: list[float]
+    split_summaries: list[CunxonAigarthStressAmplitudeSplitSummary]
+    original_stress_holdout_accuracy_mean: float
+    original_stress_holdout_query_collapse_rate: float
+    best_scaled_stress_holdout_accuracy_mean: float
+    best_scaled_stress_holdout_amplitude_factor: float | None
+    aggregate_action_distribution: dict[str, int]
+    evidence_boundary: str
+    recommended_next_probe: dict[str, object]
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def seed_count(self) -> int:
+        """Return the number of seed offsets evaluated."""
+        return len(self.seed_offsets)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["seed_count"] = self.seed_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonBranchingRegimeRun:
     """Per-seed activity-regime proxy metrics coupled to action quality."""
 
@@ -1872,9 +1928,7 @@ def render_aigarth_action_seed_sweep_markdown_report(
     else:
         coverage_bits.append("all three action labels appeared at least once")
     if unexpected_actions:
-        coverage_bits.append(
-            "unexpected normalized labels: " + ", ".join(unexpected_actions)
-        )
+        coverage_bits.append("unexpected normalized labels: " + ", ".join(unexpected_actions))
     coverage_note = "; ".join(coverage_bits)
     return "\n".join(
         [
@@ -2265,6 +2319,101 @@ def render_aigarth_action_target_contract_stress_injection_markdown_report(
     )
 
 
+def _format_amplitude_factor(factor: float) -> str:
+    return f"{factor:.1f}x"
+
+
+def render_aigarth_action_target_contract_stress_amplitude_ladder_markdown_report(
+    result: CunxonAigarthStressAmplitudeLadderResult,
+) -> str:
+    """Render a bounded stress-vector amplitude-ladder diagnostic report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    ladder = ", ".join(_format_amplitude_factor(factor) for factor in result.amplitude_factors)
+    distribution = ", ".join(
+        f"{action}={count}"
+        for action, count in sorted(result.aggregate_action_distribution.items())
+    )
+    split_rows = [
+        (
+            "| Split | Amplitude | Samples | Accuracy | Best constant baseline | "
+            "Seeds > baseline | Query collapse | Execute/retry accuracy | Actions |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for summary in result.split_summaries:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(summary.action_distribution.items())
+        )
+        split_rows.append(
+            "| "
+            f"`{summary.split}` | {_format_amplitude_factor(summary.amplitude_factor)} | "
+            f"{summary.sample_count} | {summary.accuracy_mean:.6f} | "
+            f"{summary.best_constant_baseline_mean:.6f} | "
+            f"{summary.seeds_beating_best_baseline} | "
+            f"{summary.query_collapse_rate:.6f} | "
+            f"{summary.execute_retry_accuracy:.6f} | {actions} |"
+        )
+    best_amplitude = (
+        _format_amplitude_factor(result.best_scaled_stress_holdout_amplitude_factor)
+        if result.best_scaled_stress_holdout_amplitude_factor is not None
+        else "n/a"
+    )
+    return "\n".join(
+        [
+            "# cuNxon Aigarth target-contract stress amplitude-ladder",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Hypothesis",
+            "",
+            "The stress geometry audit showed that low-margin execute/retry stress vectors "
+            "collapsed to `query`. This bounded stress amplitude-ladder scales those "
+            "vectors to test whether stronger stimulus drive reduces query collapse under "
+            "the same signed-first-lane target-contract route.",
+            "",
+            "## Runtime",
+            "",
+            f"- Device: `{result.device_name}` / compute capability `{result.compute_capability}`",
+            f"- Library: `{result.library_path}`",
+            f"- Seeds: `{result.seed_offsets}`",
+            f"- Generations/population/eval steps: `{result.generations}` / "
+            f"`{result.population_size}` / `{result.eval_steps}`",
+            f"- Amplitude ladder: {ladder}",
+            "",
+            "## Core result",
+            "",
+            "- Original stress_holdout accuracy: "
+            f"`{result.original_stress_holdout_accuracy_mean:.6f}`",
+            f"- Original stress_holdout query-collapse rate: "
+            f"`{result.original_stress_holdout_query_collapse_rate:.6f}`",
+            f"- Best scaled stress_holdout accuracy: "
+            f"`{result.best_scaled_stress_holdout_accuracy_mean:.6f}` at `{best_amplitude}`",
+            f"- Aggregate actions: {distribution}",
+            "",
+            "## Amplitude split summaries",
+            "",
+            *split_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            result.evidence_boundary,
+            "",
+            "This is a label-injected separability upper-bound over scaled stress vectors, "
+            "not intelligence evidence and not a generalization claim. Stress/control "
+            "quality must beat constant baselines before any useful-computation claim.",
+            "",
+            "## Recommended next probe",
+            "",
+            f"- Probe id: `{result.recommended_next_probe.get('id', 'unknown')}`",
+            "",
+        ]
+    )
+
+
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
     *,
@@ -2388,6 +2537,25 @@ def write_aigarth_action_target_contract_stress_injection_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_target_contract_stress_injection_markdown_report(result),
+        encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_target_contract_stress_amplitude_ladder_artifacts(
+    result: CunxonAigarthStressAmplitudeLadderResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON/Markdown Aigarth stress amplitude-ladder artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_stress_amplitude_ladder_markdown_report(result),
         encoding="utf-8",
     )
     return json_output, markdown_output
@@ -2531,9 +2699,7 @@ def render_avalanche_intervention_task_correlation_markdown_report(
     ]
     for split, accuracy in sorted(result.split_accuracy.items()):
         baseline = result.best_constant_baseline_by_split.get(split, 0.0)
-        split_rows.append(
-            f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |"
-        )
+        split_rows.append(f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |")
     sample_rows = [
         (
             "| Elapsed | Mode | Seed | Split | Stimulus | Branching | Neutral | "
@@ -2671,9 +2837,7 @@ def render_controlled_regime_calibration_markdown_report(
     ]
     for split, accuracy in sorted(result.split_accuracy.items()):
         baseline = result.best_constant_baseline_by_split.get(split, 0.0)
-        split_rows.append(
-            f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |"
-        )
+        split_rows.append(f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |")
     correlation_lines = [
         f"- {name}: {value:.6f}" for name, value in sorted(result.correlation_summary.items())
     ] or ["- none"]
@@ -3012,7 +3176,6 @@ def write_aigarth_action_remap_audit_artifacts(
     return json_output, markdown_output
 
 
-
 def render_resident_action_markdown_report(result: CunxonResidentActionProbeResult) -> str:
     """Render a task-coupled resident cuNxon action probe report."""
     notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
@@ -3161,9 +3324,10 @@ def render_long_sweep_markdown_report(result: CunxonLongSweepProbeResult) -> str
             distribution = result.action_distribution_by_mode_and_steps.get(mode, {}).get(
                 steps_text, {}
             )
-            distribution_text = ", ".join(
-                f"{action}={count}" for action, count in sorted(distribution.items())
-            ) or "none"
+            distribution_text = (
+                ", ".join(f"{action}={count}" for action, count in sorted(distribution.items()))
+                or "none"
+            )
             summary_rows.append(
                 f"| {mode} | {steps_text} | {accuracy:.6f} | {unique} | {distribution_text} |"
             )
@@ -3351,9 +3515,10 @@ def render_sensitivity_probe_markdown_report(result: CunxonSensitivityProbeResul
     mode_rows = ["| Mode | Unique readouts | Action distribution |", "| --- | ---: | --- |"]
     for mode, unique_count in sorted(result.unique_readouts_by_mode.items()):
         distribution = result.action_distribution_by_mode.get(mode, {})
-        distribution_text = ", ".join(
-            f"{action}={count}" for action, count in sorted(distribution.items())
-        ) or "none"
+        distribution_text = (
+            ", ".join(f"{action}={count}" for action, count in sorted(distribution.items()))
+            or "none"
+        )
         mode_rows.append(f"| {mode} | {unique_count} | {distribution_text} |")
     stimulus_rows = ["| Stimulus | action changes by stimulus |", "| --- | ---: |"]
     for stimulus, change_count in sorted(result.action_change_count_by_stimulus.items()):
@@ -3638,9 +3803,7 @@ def render_interface_semantics_markdown_report(
         "| --- | --- | --- | --- | --- | ---: | ---: |",
     ]
     for relay_sample in result.relay_samples:
-        source = ", ".join(
-            _format_trinary(value) for value in relay_sample.source_relay_readout
-        )
+        source = ", ".join(_format_trinary(value) for value in relay_sample.source_relay_readout)
         downstream = ", ".join(
             _format_trinary(value) for value in relay_sample.downstream_input_readout
         )
@@ -3711,9 +3874,7 @@ def write_interface_semantics_artifacts(
     json_output.parent.mkdir(parents=True, exist_ok=True)
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
-    markdown_output.write_text(
-        render_interface_semantics_markdown_report(result), encoding="utf-8"
-    )
+    markdown_output.write_text(render_interface_semantics_markdown_report(result), encoding="utf-8")
     return json_output, markdown_output
 
 
@@ -4324,11 +4485,20 @@ def run_ctypes_aigarth_action_probe(
         )
         if fitness_variant == "target_contract_augmented_train":
             train_splits = {"train", "augmented_train"}
+            train_specs = [spec for spec in specs if spec[1] in train_splits]
         elif fitness_variant == "target_contract_stress_injection":
             train_splits = {"train", "augmented_train", "stress_train"}
+            train_specs = [spec for spec in specs if spec[1] in train_splits]
+        elif fitness_variant == "target_contract_stress_amplitude_ladder":
+            train_specs = [
+                spec
+                for spec in specs
+                if spec[1] in {"train", "augmented_train"}
+                or spec[1].startswith("stress_train_scaled_")
+            ]
         else:
             train_splits = {"train"}
-        train_specs = [spec for spec in specs if spec[1] in train_splits]
+            train_specs = [spec for spec in specs if spec[1] in train_splits]
         if not train_specs:
             raise ValueError("evaluation_specs must include at least one train case")
 
@@ -4340,6 +4510,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_margin",
                     "target_contract_augmented_train",
                     "target_contract_stress_injection",
+                    "target_contract_stress_amplitude_ladder",
                 }
                 else "action_decoder"
             )
@@ -4362,15 +4533,15 @@ def run_ctypes_aigarth_action_probe(
                 "target_contract_margin",
                 "target_contract_augmented_train",
                 "target_contract_stress_injection",
+                "target_contract_stress_amplitude_ladder",
             }:
                 margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
                 return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
             if fitness_variant in {"strict_label_margin", "strict_label_heavy_penalty"}:
                 strict_actions = {"execute", "query", "retry"}
-                unexpected_rate = (
-                    sum(1.0 for case in cases if case.normalized_action not in strict_actions)
-                    / len(cases)
-                )
+                unexpected_rate = sum(
+                    1.0 for case in cases if case.normalized_action not in strict_actions
+                ) / len(cases)
                 penalty_weight = 3.0 if fitness_variant == "strict_label_heavy_penalty" else 1.0
                 strict_label_score = (
                     success_score + 0.25 * alignment_score - penalty_weight * unexpected_rate
@@ -4421,6 +4592,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_margin",
                     "target_contract_augmented_train",
                     "target_contract_stress_injection",
+                    "target_contract_stress_amplitude_ladder",
                 }
                 else "action_decoder"
             ),
@@ -4748,8 +4920,7 @@ def run_ctypes_aigarth_action_contract_penalty_probe(
     """Run a heavier unexpected-label penalty audit across fresh cuNxon seeds."""
     if fitness_variant != "strict_label_heavy_penalty":
         raise ValueError(
-            "contract-penalty audit only supports "
-            "fitness_variant='strict_label_heavy_penalty'"
+            "contract-penalty audit only supports fitness_variant='strict_label_heavy_penalty'"
         )
     return run_ctypes_aigarth_action_strict_label_probe(
         library_path=library_path,
@@ -5071,6 +5242,177 @@ def run_ctypes_aigarth_action_target_contract_stress_injection_probe(
             "fitness callback deliberately includes duplicated stress_train low-margin cases",
             "stress_holdout is the original stress split, but stress-like labels are optimized",
             "upper-bound/debugging diagnostic only; not generalization or intelligence evidence",
+        ],
+    )
+
+
+def _query_collapse_rate(cases: Sequence[CunxonAigarthActionCase]) -> float:
+    return (
+        sum(1 for case in cases if case.normalized_action == "query") / len(cases) if cases else 0.0
+    )
+
+
+def _execute_retry_accuracy(cases: Sequence[CunxonAigarthActionCase]) -> float:
+    execute_retry_cases = [case for case in cases if case.expected_action in {"execute", "retry"}]
+    if not execute_retry_cases:
+        return 0.0
+    return sum(1 for case in execute_retry_cases if case.outcome == "success") / len(
+        execute_retry_cases
+    )
+
+
+def _best_constant_baseline_for_split(run: CunxonAigarthActionSeedRun, split: str) -> float:
+    scores = [
+        by_split[split] for by_split in run.baseline_accuracy_by_split.values() if split in by_split
+    ]
+    return max(scores) if scores else 0.0
+
+
+def _stress_amplitude_split_summaries(
+    runs: Sequence[CunxonAigarthActionSeedRun],
+    *,
+    amplitude_factors: Sequence[float],
+) -> list[CunxonAigarthStressAmplitudeSplitSummary]:
+    summaries: list[CunxonAigarthStressAmplitudeSplitSummary] = []
+    for factor in amplitude_factors:
+        suffix = _amplitude_split_suffix(factor)
+        for split in (f"stress_train_scaled_{suffix}", f"stress_holdout_scaled_{suffix}"):
+            split_cases = [case for run in runs for case in run.cases if case.split == split]
+            accuracies = [
+                run.accuracy_by_split[split] for run in runs if split in run.accuracy_by_split
+            ]
+            baselines = [_best_constant_baseline_for_split(run, split) for run in runs]
+            action_distribution = _aigarth_action_distribution(split_cases)
+            summaries.append(
+                CunxonAigarthStressAmplitudeSplitSummary(
+                    split=split,
+                    amplitude_factor=float(factor),
+                    sample_count=len(split_cases),
+                    accuracy_mean=sum(accuracies) / len(accuracies) if accuracies else 0.0,
+                    best_constant_baseline_mean=sum(baselines) / len(baselines)
+                    if baselines
+                    else 0.0,
+                    seeds_beating_best_baseline=sum(
+                        1
+                        for run in runs
+                        if split in run.accuracy_by_split
+                        and run.accuracy_by_split[split]
+                        > _best_constant_baseline_for_split(run, split)
+                    ),
+                    query_collapse_rate=_query_collapse_rate(split_cases),
+                    execute_retry_accuracy=_execute_retry_accuracy(split_cases),
+                    action_distribution=action_distribution,
+                )
+            )
+    return summaries
+
+
+def run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (142, 143, 144, 145, 146),
+    amplitude_factors: Sequence[float] = (1.0, 1.5, 2.0, 3.0),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_stress_amplitude_ladder",
+    device_id: int = 0,
+) -> CunxonAigarthStressAmplitudeLadderResult:
+    """Run a bounded amplitude ladder over low-margin stress vectors."""
+    if fitness_variant != "target_contract_stress_amplitude_ladder":
+        raise ValueError(
+            "stress amplitude-ladder audit only supports "
+            "fitness_variant='target_contract_stress_amplitude_ladder'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    if not amplitude_factors:
+        raise ValueError("amplitude_factors must contain at least one value")
+    specs = _aigarth_action_target_contract_stress_amplitude_ladder_specs(amplitude_factors)
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    source_summary = _summarize_aigarth_action_runs(
+        probe_results=probe_results,
+        seed_offsets=seed_offsets,
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        status="aigarth target-contract stress amplitude-ladder completed",
+        notes=[],
+    )
+    split_summaries = _stress_amplitude_split_summaries(
+        source_summary.runs,
+        amplitude_factors=amplitude_factors,
+    )
+    original_stress_cases = [
+        case for run in source_summary.runs for case in run.cases if case.split == "stress_holdout"
+    ]
+    scaled_holdout_summaries = [
+        summary for summary in split_summaries if summary.split.startswith("stress_holdout_scaled_")
+    ]
+    best_scaled = max(
+        scaled_holdout_summaries,
+        key=lambda summary: summary.accuracy_mean,
+        default=None,
+    )
+    return CunxonAigarthStressAmplitudeLadderResult(
+        status="aigarth target-contract stress amplitude-ladder completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        seed_offsets=list(seed_offsets),
+        amplitude_factors=[float(factor) for factor in amplitude_factors],
+        split_summaries=split_summaries,
+        original_stress_holdout_accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "stress_holdout", {}
+        ).get("mean", 0.0),
+        original_stress_holdout_query_collapse_rate=_query_collapse_rate(original_stress_cases),
+        best_scaled_stress_holdout_accuracy_mean=best_scaled.accuracy_mean if best_scaled else 0.0,
+        best_scaled_stress_holdout_amplitude_factor=best_scaled.amplitude_factor
+        if best_scaled
+        else None,
+        aggregate_action_distribution=source_summary.aggregate_action_distribution,
+        evidence_boundary=(
+            "This is a label-injected separability upper-bound over scaled low-margin stress "
+            "vectors. Scaled stress_train cases are inside the fitness callback, so any "
+            "improvement is diagnostic adapter-capability evidence, not intelligence "
+            "evidence and not generalization evidence unless stress/control holdouts beat "
+            "constant baselines."
+        ),
+        recommended_next_probe={
+            "id": "target_aligned_stress_objective_followup",
+            "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88",
+        },
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "target-contract fitness includes train, augmented_train, and scaled "
+            "stress_train cases",
+            "original stress_holdout and scaled stress_holdout splits are reported separately",
+            "bounded amplitude ladder; not a long-sweep or intelligence claim",
         ],
     )
 
@@ -5491,19 +5833,11 @@ def _run_avalanche_window_sample(
                 active_state_sequence.append(sum(1 for value in states if value != 0))
                 transitions = zip(previous_states, states, strict=False)
                 activation_event_sequence.append(
-                    sum(
-                        1
-                        for previous, current in transitions
-                        if previous == 0 and current != 0
-                    )
+                    sum(1 for previous, current in transitions if previous == 0 and current != 0)
                 )
                 transitions = zip(previous_states, states, strict=False)
                 deactivation_event_sequence.append(
-                    sum(
-                        1
-                        for previous, current in transitions
-                        if previous != 0 and current == 0
-                    )
+                    sum(1 for previous, current in transitions if previous != 0 and current == 0)
                 )
                 all_state_values.extend(states)
                 previous_states = states
@@ -6839,14 +7173,10 @@ def run_ctypes_resident_action_probe(
                         decoded_action=decoded.actie_type,
                         normalized_action=normalized_action,
                         confidence=decoded.confidence,
-                        outcome=(
-                            "success" if normalized_action == expected_action else "failure"
-                        ),
+                        outcome=("success" if normalized_action == expected_action else "failure"),
                         baseline_actions=_baseline_actions_for_case(case_index),
                         energy=_capture_energy(lib, net),
-                        motor_active_state_count=sum(
-                            1 for value in motor_states if value != 0
-                        ),
+                        motor_active_state_count=sum(1 for value in motor_states if value != 0),
                         elapsed_ms=(time.perf_counter() - start) * 1000.0,
                     )
                 )
@@ -7073,7 +7403,6 @@ def _build_multisphere_action_topology(lib: C.CDLL, net: C.c_void_p) -> tuple[in
         ),
     )
     return sensory_id, association_id, motor_id
-
 
 
 def _add_sphere(
@@ -7575,11 +7904,7 @@ def _baseline_accuracy_by_split(
     baseline_names = sorted({name for case in cases for name in case.baseline_actions})
     result: dict[str, dict[str, float]] = {}
     for baseline_name in baseline_names:
-        pseudo_cases = [
-            case
-            for case in cases
-            if baseline_name in case.baseline_actions
-        ]
+        pseudo_cases = [case for case in cases if baseline_name in case.baseline_actions]
         split_scores: dict[str, float] = {}
         for split in sorted({case.split for case in pseudo_cases} | {"overall"}):
             if split == "overall":
@@ -8375,16 +8700,12 @@ def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float],
     ]
 
 
-def _avalanche_intervention_task_specs() -> list[
-    tuple[str, str, tuple[float, float, float], str]
-]:
+def _avalanche_intervention_task_specs() -> list[tuple[str, str, tuple[float, float, float], str]]:
     """Return held-out/stress/control cases for task-coupled avalanche probes."""
     return _aigarth_action_target_contract_stress_specs()
 
 
-def _default_supervised_motor_specs() -> list[
-    tuple[str, str, tuple[float, float, float], str]
-]:
+def _default_supervised_motor_specs() -> list[tuple[str, str, tuple[float, float, float], str]]:
     """Return train/holdout cases for absolute-output motor-target testing."""
     return [
         ("execute-train", "train", (1.0, 0.25, 0.0), "execute"),
@@ -8396,9 +8717,7 @@ def _default_supervised_motor_specs() -> list[
     ]
 
 
-def _aigarth_action_hard_holdout_specs() -> list[
-    tuple[str, str, tuple[float, float, float], str]
-]:
+def _aigarth_action_hard_holdout_specs() -> list[tuple[str, str, tuple[float, float, float], str]]:
     """Return train/holdout/hard/control cases for Aigarth action audits."""
     return [
         *_default_supervised_motor_specs(),
@@ -8505,6 +8824,54 @@ def _aigarth_action_target_contract_stress_injection_specs() -> list[
         *_aigarth_action_target_contract_augmented_train_specs(),
         *stress_train_specs,
     ]
+
+
+def _amplitude_split_suffix(factor: float) -> str:
+    return f"{factor:.1f}".replace(".", "_") + "x"
+
+
+def _scale_stress_vector(
+    vector: tuple[float, float, float], factor: float
+) -> tuple[float, float, float]:
+    return (float(vector[0] * factor), float(vector[1] * factor), float(vector[2] * factor))
+
+
+def _aigarth_action_target_contract_stress_amplitude_ladder_specs(
+    amplitude_factors: Sequence[float],
+) -> list[tuple[str, str, tuple[float, float, float], str]]:
+    """Return specs with scaled stress train/evaluation splits for an amplitude ladder."""
+    if not amplitude_factors:
+        raise ValueError("amplitude_factors must contain at least one value")
+    if any(factor <= 0.0 for factor in amplitude_factors):
+        raise ValueError("amplitude_factors must be positive")
+    base_specs = _aigarth_action_target_contract_augmented_train_specs()
+    stress_specs = [
+        (name, vector, expected)
+        for name, split, vector, expected in _aigarth_action_target_contract_stress_specs()
+        if split == "stress_holdout"
+    ]
+    scaled_specs: list[tuple[str, str, tuple[float, float, float], str]] = []
+    for factor in amplitude_factors:
+        suffix = _amplitude_split_suffix(factor)
+        for name, vector, expected in stress_specs:
+            scaled_vector = _scale_stress_vector(vector, factor)
+            scaled_specs.append(
+                (
+                    f"{name}-scaled-{suffix}-train",
+                    f"stress_train_scaled_{suffix}",
+                    scaled_vector,
+                    expected,
+                )
+            )
+            scaled_specs.append(
+                (
+                    f"{name}-scaled-{suffix}-holdout",
+                    f"stress_holdout_scaled_{suffix}",
+                    scaled_vector,
+                    expected,
+                )
+            )
+    return [*base_specs, *scaled_specs]
 
 
 def _target_readout_for_action(action: str) -> tuple[int, int, int]:
