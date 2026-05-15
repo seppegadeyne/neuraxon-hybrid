@@ -1,0 +1,87 @@
+{
+  "baseline_delta": {
+    "best_constant_baseline": 0.3333333333333333,
+    "original_vs_best_constant": 0.0,
+    "scaled_vs_best_constant": 0.555556
+  },
+  "evidence_boundary": "Low-margin readout geometry separates the prior success from the remaining failure: the original stress execute/retry lanes are on the wrong side of the query boundary and remain at the best constant baseline, while 3.0x scaled stress crosses the boundary. This is post-hoc geometry evidence, not intelligence evidence and not generalization evidence.",
+  "hypothesis_for_this_slice": "low_margin_readout_geometry_separability_boundary",
+  "issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89",
+  "original_stress_holdout": {
+    "accuracy_mean": 0.3333333333333333,
+    "action_distribution": {
+      "query": 18
+    },
+    "amplitude_factor": 1.0,
+    "best_constant_baseline_mean": 0.3333333333333333,
+    "execute_retry_accuracy": 0.0,
+    "query_collapse_rate": 1.0,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 0,
+    "split": "stress_holdout"
+  },
+  "readout_geometry": {
+    "first_lane_gain": 3.0,
+    "original_execute_retry_l2_mean": 0.209134,
+    "original_first_lane_abs_mean": 0.15,
+    "original_first_lane_margin_to_query": -0.15,
+    "query_boundary_first_lane_abs_threshold": 0.3,
+    "scaled_execute_retry_l2_mean": 0.627402,
+    "scaled_first_lane_abs_mean": 0.45,
+    "scaled_first_lane_margin_to_query": 0.15,
+    "threshold_source": "post-hoc diagnostic boundary inferred from the observed action flip between original and 3.0x scaled stress splits; not a trained parameter"
+  },
+  "recommended_next_probe": {
+    "acceptance_criteria": [
+      "Keep original stress_holdout, counterfactual_control, and permuted_control labels outside the fitness callback.",
+      "Report original stress_holdout accuracy, query-collapse, execute/retry accuracy, first-lane margins, and constant baselines.",
+      "Do not claim useful computation unless original stress/control splits beat trivial baselines across fresh seeds."
+    ],
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89",
+    "id": "supervised_low_margin_target_objective",
+    "purpose": "Test a normalized or supervised low-margin objective that optimizes target-lane margin for original stress-like training cases while keeping original stress_holdout/control labels outside the callback.",
+    "status": "proposed"
+  },
+  "scaled_stress_holdout_3_0x": {
+    "accuracy_mean": 0.888888888888889,
+    "action_distribution": {
+      "execute": 6,
+      "query": 4,
+      "retry": 8
+    },
+    "amplitude_factor": 3.0,
+    "best_constant_baseline_mean": 0.3333333333333333,
+    "execute_retry_accuracy": 1.0,
+    "query_collapse_rate": 0.2222222222222222,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 3,
+    "split": "stress_holdout_scaled_3_0x"
+  },
+  "source_artifacts": [
+    "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json"
+  ],
+  "source_runtime": {
+    "amplitude_factor": 3.0,
+    "compute_capability": "12.0",
+    "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "eval_steps": 24,
+    "fitness_variant": "target_contract_stress_margin_weighted",
+    "generations": 16,
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+    "population_size": 32,
+    "seed_offsets": [
+      147,
+      148,
+      149
+    ],
+    "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+  },
+  "status": "low-margin readout geometry probe completed",
+  "stress_control_separation": {
+    "interpretation": "Original low-margin execute/retry stress vectors remain below the current query/non-query boundary and decode to query; scaled vectors cross it, so the current route is amplitude-sensitive rather than stress-generalizing.",
+    "original_execute_retry_margin_sign": "wrong_side",
+    "scaled_execute_retry_margin_sign": "right_side"
+  }
+}

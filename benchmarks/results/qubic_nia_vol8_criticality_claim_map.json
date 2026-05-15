@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. Decoder separation explained the stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases. The stress-injection upper-bound follow-up then deliberately optimized duplicated stress_train cases, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings. The stress geometry audit further narrows this to a low-margin separability/readout-geometry bottleneck: stress execute/retry vectors collapse to query at 1.000000 rate in both injected stress_train and original stress_holdout, while stronger augmented_train execute/retry vectors remain separable. The stress amplitude-ladder follow-up resolves the immediate geometry question in a narrow way: the same stress vectors become separable when scaled, with best scaled stress_holdout 0.833333 at 3.0x, but original stress_holdout remains 0.333333/query-collapse 1.000000. This is diagnostic separability evidence, not generalization or intelligence evidence. The target-aligned stress objective follow-up preserved high-amplitude separability (scaled stress_holdout 0.888889, execute/retry 1.000000) but original stress_holdout remained 0.333333 with query-collapse 1.000000 and execute/retry 0.000000; objective shaping did not solve the original low-margin boundary. The stress-objective decoder geometry follow-up confirms the boundary rather than changing it: original stress_holdout remains at 0.333333/query-collapse 1.000000, while scaled stress_holdout at 3.0x stays separable with 0.888889 accuracy and a 3.0 first-lane gain.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. Decoder separation explained the stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases. The stress-injection upper-bound follow-up then deliberately optimized duplicated stress_train cases, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings. The stress geometry audit further narrows this to a low-margin separability/readout-geometry bottleneck: stress execute/retry vectors collapse to query at 1.000000 rate in both injected stress_train and original stress_holdout, while stronger augmented_train execute/retry vectors remain separable. The stress amplitude-ladder follow-up resolves the immediate geometry question in a narrow way: the same stress vectors become separable when scaled, with best scaled stress_holdout 0.833333 at 3.0x, but original stress_holdout remains 0.333333/query-collapse 1.000000. This is diagnostic separability evidence, not generalization or intelligence evidence. The target-aligned stress objective follow-up preserved high-amplitude separability (scaled stress_holdout 0.888889, execute/retry 1.000000) but original stress_holdout remained 0.333333 with query-collapse 1.000000 and execute/retry 0.000000; objective shaping did not solve the original low-margin boundary. The stress-objective decoder geometry follow-up confirms the boundary rather than changing it: original stress_holdout remains at 0.333333/query-collapse 1.000000, while scaled stress_holdout at 3.0x stays separable with 0.888889 accuracy and a 3.0 first-lane gain. The low-margin readout geometry probe adds the next post-hoc boundary: original stress execute/retry cases have negative first-lane margin to the observed query boundary and remain baseline-level, while the 3.0x scaled split has positive margin and remains separable. This strengthens the readout-geometry bottleneck interpretation without adding intelligence evidence.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -149,6 +149,13 @@
       "interpretation": "Post-hoc issue #89 artifact: the latest stress objective preserves 3.0x scaled-stress separability, but original low-margin stress remains baseline-level; this narrows the bottleneck to readout/decoder geometry without improving task quality.",
       "observed": "Original stress_holdout accuracy=0.333333, query-collapse=1.000000, execute/retry=0.000000; scaled stress_holdout 3.0x accuracy=0.888889, query-collapse=0.222222, execute/retry=1.000000; original execute/retry first-lane abs mean=0.150000 vs scaled=0.450000.",
       "status": "post-hoc geometry diagnostic, not intelligence evidence"
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json",
+      "id": "cunxon-low-margin-readout-geometry",
+      "interpretation": "The immediate issue #89 follow-up makes the low-margin boundary explicit: original stress execute/retry readouts sit on the wrong side of the query boundary, while scaled stress crosses it. This supports a supervised/normalized low-margin target objective as the next hypothesis, not a longer repeat of the same 3.0x objective.",
+      "observed": "Original stress_holdout accuracy=0.333333, query-collapse=1.000000, execute/retry=0.000000, first-lane margin=-0.150000; scaled stress_holdout 3.0x accuracy=0.888889, query-collapse=0.222222, execute/retry=1.000000, first-lane margin=0.150000.",
+      "status": "post-hoc readout-geometry diagnostic, not intelligence evidence"
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
@@ -164,19 +171,20 @@
     "If even injected stress_train labels remain baseline-level, is the next bottleneck Aigarth objective/readout expressivity, low-margin case separability, or the signed-first-lane action contract itself?",
     "Can a target-aligned stress objective preserve the 3.0x separability signal while improving original low-margin stress_holdout above constant baselines without treating scaled label-injected cases as generalization?",
     "Why does the signed-first-lane route preserve scaled stress separability while original low-margin stress_holdout still collapses completely to query under a margin-weighted objective?",
-    "How can lower-level readout geometry represent original low-margin stress execute/retry cases without relying on 3.0x label-injected scaling?"
+    "How can lower-level readout geometry represent original low-margin stress execute/retry cases without relying on 3.0x label-injected scaling?",
+    "Can a supervised or normalized low-margin target objective move original stress execute/retry readout margins across the query boundary without using original stress_holdout/control labels in the fitness callback?"
   ],
   "recommended_next_probe": {
     "acceptance_criteria": [
-      "Report original and scaled stress readout margins/action distributions side by side.",
-      "Separate decoder/readout geometry from fitness/objective training success.",
-      "Keep the conclusion negative unless original stress/control splits beat constant baselines."
+      "Original stress_holdout, counterfactual_control, and permuted_control labels stay outside the optimization callback.",
+      "Report first-lane margins/action distributions for original stress_holdout and controls.",
+      "Do not claim useful computation unless original stress/control splits beat constant baselines across fresh seeds."
     ],
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89",
-    "id": "stress_objective_decoder_geometry_followup",
-    "purpose": "Diagnose why target-aligned objective shaping preserves 3.0x scaled-stress separability but original low-margin stress_holdout remains at constant baseline/query-collapse.",
-    "shape": "Post-process or minimally probe readout margins/action-lane geometry for original vs scaled stress cases; keep labels and controls separate; do not run a longer identical objective sweep.",
-    "status": "open"
+    "id": "supervised_low_margin_target_objective",
+    "purpose": "Test a target-lane objective that explicitly optimizes original-scale low-margin margins while keeping original stress_holdout and controls as unseen evaluation splits.",
+    "shape": "Small fresh-seed Aigarth objective slice with train/augmented_train plus separate stress-like training cases if needed; report original stress_holdout/control accuracy, query-collapse, margins, and constant baselines separately.",
+    "status": "proposed"
   },
   "source": {
     "captured_with": "dokobot local read",

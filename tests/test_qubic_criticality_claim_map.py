@@ -60,6 +60,12 @@ STRESS_OBJECTIVE_GEOMETRY_JSON_PATH = (
 STRESS_OBJECTIVE_GEOMETRY_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.md"
 )
+LOW_MARGIN_READOUT_GEOMETRY_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json"
+)
+LOW_MARGIN_READOUT_GEOMETRY_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_readout_geometry_probe.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -95,8 +101,8 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "stress_objective_decoder_geometry_followup"
-    assert data["recommended_next_probe"]["status"] == "open"
+    assert data["recommended_next_probe"]["id"] == "supervised_low_margin_target_objective"
+    assert data["recommended_next_probe"]["status"] == "proposed"
     assert data["recommended_next_probe"]["github_issue"].endswith("/issues/89")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
@@ -116,7 +122,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -214,7 +220,7 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "stress_holdout" in comparison_markdown
 
     assert claim_data["recommended_next_probe"]["id"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
 
@@ -355,7 +361,7 @@ def test_cunxon_criticality_decoder_separation_explains_stress_bottleneck() -> N
         item["id"] == "cunxon-criticality-decoder-separation"
         for item in claim_data["evidence_map"]
     )
-    assert claim_data["recommended_next_probe"]["status"] == "open"
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
     assert "cunxon_criticality_decoder_separation" in claim_markdown
 
 
@@ -400,9 +406,9 @@ def test_cunxon_stress_injection_upper_bound_keeps_stress_baseline_boundary() ->
         for item in claim_data["evidence_map"]
     )
     assert claim_data["recommended_next_probe"]["id"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
-    assert claim_data["recommended_next_probe"]["status"] == "open"
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
     assert "stress-injection upper-bound diagnostic" in claim_markdown
 
 
@@ -444,7 +450,7 @@ def test_cunxon_stress_geometry_audit_identifies_low_margin_query_collapse() -> 
 
     assert any(item["id"] == "cunxon-stress-geometry-audit" for item in claim_data["evidence_map"])
     assert claim_data["recommended_next_probe"]["id"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
     assert "cunxon_stress_geometry_audit" in claim_markdown
 
@@ -491,7 +497,7 @@ def test_cunxon_stress_amplitude_ladder_identifies_drive_threshold_but_not_gener
         for item in claim_data["evidence_map"]
     )
     assert claim_data["recommended_next_probe"]["id"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
     assert "cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe" in claim_markdown
 
@@ -531,9 +537,9 @@ def test_cunxon_stress_objective_preserves_scaled_separability_but_original_stre
 
     assert any(item["id"] == "cunxon-stress-objective" for item in claim_data["evidence_map"])
     assert claim_data["recommended_next_probe"]["id"] == (
-        "stress_objective_decoder_geometry_followup"
+        "supervised_low_margin_target_objective"
     )
-    assert claim_data["recommended_next_probe"]["status"] == "open"
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
     assert "cunxon_aigarth_action_target_contract_stress_objective_probe" in claim_markdown
 
 
@@ -586,3 +592,54 @@ def test_cunxon_stress_objective_geometry_followup_records_boundary() -> None:
         for item in claim_data["evidence_map"]
     )
     assert "cunxon_stress_objective_decoder_geometry_followup" in claim_markdown
+
+
+def test_cunxon_low_margin_readout_geometry_probe_records_no_new_intelligence_claim() -> None:
+    data = json.loads(LOW_MARGIN_READOUT_GEOMETRY_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = LOW_MARGIN_READOUT_GEOMETRY_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "low-margin readout geometry probe completed"
+    assert data["hypothesis_for_this_slice"] == "low_margin_readout_geometry_separability_boundary"
+    assert data["issue"] == "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89"
+    assert data["source_artifacts"] == [
+        "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json",
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+    ]
+    assert data["original_stress_holdout"]["accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout"]["query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout"]["execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_3_0x"]["accuracy_mean"] > 0.88
+    assert data["readout_geometry"]["original_first_lane_abs_mean"] == 0.15
+    assert data["readout_geometry"]["scaled_first_lane_abs_mean"] == 0.45
+    assert data["readout_geometry"]["original_first_lane_margin_to_query"] < 0
+    assert data["readout_geometry"]["scaled_first_lane_margin_to_query"] > 0
+    assert data["stress_control_separation"]["original_execute_retry_margin_sign"] == "wrong_side"
+    assert data["stress_control_separation"]["scaled_execute_retry_margin_sign"] == "right_side"
+    assert data["baseline_delta"]["original_vs_best_constant"] == 0.0
+    assert data["evidence_boundary"].startswith("Low-margin readout geometry separates")
+    assert data["recommended_next_probe"]["id"] == "supervised_low_margin_target_objective"
+
+    assert "# cuNxon low-margin readout geometry probe" in markdown
+    assert "Original first-lane abs mean: `0.150000`" in markdown
+    assert "Scaled first-lane abs mean: `0.450000`" in markdown
+    assert "wrong side of the query boundary" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_low_margin_readout_geometry_probe"]
+    assert summary["hypothesis"] == "low_margin_readout_geometry_separability_boundary"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["original_first_lane_margin_to_query"] < 0
+    assert summary["scaled_first_lane_margin_to_query"] > 0
+    assert "cuNxon low-margin readout geometry" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-low-margin-readout-geometry"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == "supervised_low_margin_target_objective"
+    assert "cunxon_low_margin_readout_geometry_probe" in claim_markdown
