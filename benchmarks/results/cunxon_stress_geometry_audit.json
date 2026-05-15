@@ -1,0 +1,841 @@
+{
+  "augmented_train_execute_retry_accuracy": 1.0,
+  "evidence_boundary": "This is a post-hoc geometry/separability audit over a live RTX 5090 artifact. It is useful diagnostic evidence, not intelligence evidence, not a generalization claim, and not proof that scaling will solve the bottleneck until a bounded live probe beats constant baselines on stress/control splits.",
+  "hypothesis_for_this_slice": "stress_stimulus_geometry_separability",
+  "mean_abs_sum_by_split": {
+    "augmented_train": 0.433333,
+    "counterfactual_control": 0.766667,
+    "hard_holdout": 0.658333,
+    "holdout": 0.766667,
+    "permuted_control": 0.833333,
+    "stress_holdout": 0.353333,
+    "stress_train": 0.353333,
+    "train": 0.833333
+  },
+  "mean_l2_norm_by_split": {
+    "augmented_train": 0.300793,
+    "counterfactual_control": 0.577345,
+    "hard_holdout": 0.423794,
+    "holdout": 0.577345,
+    "permuted_control": 0.687184,
+    "stress_holdout": 0.224275,
+    "stress_train": 0.224275,
+    "train": 0.687184
+  },
+  "notes": [
+    "No new GPU sweep was needed for this audit; it post-processes the completed live stress-injection artifact.",
+    "The next live GPU run should test stimulus amplitude/separability rather than another longer criticality or resident sweep."
+  ],
+  "recommended_next_probe": {
+    "acceptance_criteria": [
+      "Report per-amplitude execute/retry/query accuracy and query-collapse rates.",
+      "Keep label-injected stress_train_scaled evidence separated from original stress_holdout and controls.",
+      "Do not claim generalization unless original stress_holdout beats the best constant baseline across fresh seeds.",
+      "Update comparison and NIA Vol. 8 claim-map artifacts conservatively."
+    ],
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/87",
+    "id": "stress_amplitude_ladder_probe",
+    "purpose": "Run a bounded live amplitude ladder over low-margin stress vectors to test whether execute/retry query-collapse is caused by insufficient drive/separability in the signed-first-lane target-contract route.",
+    "shape": "Scale stress vectors across a small ladder such as 1.0x, 1.5x, 2.0x and 3.0x, score stress_train_scaled and original stress_holdout/control splits separately, and report query-collapse rates plus constant-action baselines."
+  },
+  "sample_count": 180,
+  "source_artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+  "source_runtime": {
+    "compute_capability": "12.0",
+    "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "eval_steps": 24,
+    "generations": 16,
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+    "population_size": 32,
+    "seed_offsets": [
+      137,
+      138,
+      139,
+      140,
+      141
+    ],
+    "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+  },
+  "split_action_summary": {
+    "augmented_train:execute": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.54,
+      "mean_first_lane_drive": 0.35,
+      "mean_l2_norm": 0.37974723716442754,
+      "normalized_action_distribution": {
+        "execute": 10
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[1, -1, 0]": 1,
+        "[1, -1, 1]": 1,
+        "[1, 0, 0]": 4,
+        "[1, 0, 1]": 4
+      },
+      "sample_count": 10
+    },
+    "augmented_train:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.21999999999999997,
+      "mean_first_lane_drive": 0.01999999999999999,
+      "mean_l2_norm": 0.14288566391855562,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "augmented_train:retry": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.54,
+      "mean_first_lane_drive": -0.35,
+      "mean_l2_norm": 0.37974723716442754,
+      "normalized_action_distribution": {
+        "retry": 10
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, 0, 0]": 7,
+        "[-1, 1, -1]": 2,
+        "[-1, 1, 0]": 1
+      },
+      "sample_count": 10
+    },
+    "counterfactual_control:execute": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 1.1,
+      "mean_first_lane_drive": -0.8,
+      "mean_l2_norm": 0.8306623862918074,
+      "normalized_action_distribution": {
+        "retry": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, 0, 0]": 2,
+        "[-1, 1, -1]": 2,
+        "[-1, 1, 0]": 1
+      },
+      "sample_count": 5
+    },
+    "counterfactual_control:query": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 1.1,
+      "mean_first_lane_drive": 0.8,
+      "mean_l2_norm": 0.8306623862918074,
+      "normalized_action_distribution": {
+        "execute": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[1, -1, 0]": 1,
+        "[1, 0, 0]": 1,
+        "[1, 0, 1]": 3
+      },
+      "sample_count": 5
+    },
+    "counterfactual_control:retry": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.1,
+      "mean_first_lane_drive": 0.05,
+      "mean_l2_norm": 0.07071067811865477,
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "sample_count": 5
+    },
+    "hard_holdout:execute": {
+      "accuracy": 0.8,
+      "mean_abs_sum": 0.85,
+      "mean_first_lane_drive": 0.475,
+      "mean_l2_norm": 0.5578774693861324,
+      "normalized_action_distribution": {
+        "execute": 8,
+        "retry": 2
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, 1, -1]": 1,
+        "[-1, 1, 1]": 1,
+        "[1, -1, 0]": 3,
+        "[1, -1, 1]": 2,
+        "[1, 0, 0]": 1,
+        "[1, 0, 1]": 2
+      },
+      "sample_count": 10
+    },
+    "hard_holdout:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.225,
+      "mean_first_lane_drive": 0.025000000000000005,
+      "mean_l2_norm": 0.1362372435695795,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "hard_holdout:retry": {
+      "accuracy": 0.8,
+      "mean_abs_sum": 0.8999999999999998,
+      "mean_first_lane_drive": -0.475,
+      "mean_l2_norm": 0.5772666987932931,
+      "normalized_action_distribution": {
+        "execute": 2,
+        "retry": 8
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, -1, 0]": 1,
+        "[-1, 0, 0]": 2,
+        "[-1, 1, -1]": 2,
+        "[-1, 1, 0]": 3,
+        "[1, -1, -1]": 1,
+        "[1, 0, 1]": 1
+      },
+      "sample_count": 10
+    },
+    "holdout:execute": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 1.1,
+      "mean_first_lane_drive": 0.8,
+      "mean_l2_norm": 0.8306623862918074,
+      "normalized_action_distribution": {
+        "execute": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[1, -1, 0]": 2,
+        "[1, -1, 1]": 2,
+        "[1, 0, 1]": 1
+      },
+      "sample_count": 5
+    },
+    "holdout:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.1,
+      "mean_first_lane_drive": 0.05,
+      "mean_l2_norm": 0.07071067811865477,
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "sample_count": 5
+    },
+    "holdout:retry": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 1.1,
+      "mean_first_lane_drive": -0.8,
+      "mean_l2_norm": 0.8306623862918074,
+      "normalized_action_distribution": {
+        "retry": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, 0, 0]": 3,
+        "[-1, 1, -1]": 1,
+        "[-1, 1, 0]": 1
+      },
+      "sample_count": 5
+    },
+    "permuted_control:execute": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.0,
+      "mean_first_lane_drive": 0.0,
+      "mean_l2_norm": 0.0,
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "sample_count": 5
+    },
+    "permuted_control:query": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 1.25,
+      "mean_first_lane_drive": -1.0,
+      "mean_l2_norm": 1.0307764064044151,
+      "normalized_action_distribution": {
+        "retry": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, 0, -1]": 1,
+        "[-1, 0, 0]": 2,
+        "[-1, 0, 1]": 1,
+        "[-1, 1, 1]": 1
+      },
+      "sample_count": 5
+    },
+    "permuted_control:retry": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 1.25,
+      "mean_first_lane_drive": 1.0,
+      "mean_l2_norm": 1.0307764064044151,
+      "normalized_action_distribution": {
+        "execute": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[1, -1, -1]": 1,
+        "[1, 0, 0]": 1,
+        "[1, 0, 1]": 1,
+        "[1, 1, -1]": 1,
+        "[1, 1, 0]": 1
+      },
+      "sample_count": 5
+    },
+    "stress_holdout:execute": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.35,
+      "mean_first_lane_drive": 0.15,
+      "mean_l2_norm": 0.20913394114317652,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "stress_holdout:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.35999999999999993,
+      "mean_first_lane_drive": 0.0,
+      "mean_l2_norm": 0.25455844122715715,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "stress_holdout:retry": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.35,
+      "mean_first_lane_drive": -0.15,
+      "mean_l2_norm": 0.20913394114317652,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "stress_train:execute": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.35,
+      "mean_first_lane_drive": 0.15,
+      "mean_l2_norm": 0.20913394114317652,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "stress_train:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.35999999999999993,
+      "mean_first_lane_drive": 0.0,
+      "mean_l2_norm": 0.25455844122715715,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "stress_train:retry": {
+      "accuracy": 0.0,
+      "mean_abs_sum": 0.35,
+      "mean_first_lane_drive": -0.15,
+      "mean_l2_norm": 0.20913394114317652,
+      "normalized_action_distribution": {
+        "query": 10
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 10
+      },
+      "sample_count": 10
+    },
+    "train:execute": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 1.25,
+      "mean_first_lane_drive": 1.0,
+      "mean_l2_norm": 1.0307764064044151,
+      "normalized_action_distribution": {
+        "execute": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[1, -1, -1]": 1,
+        "[1, -1, 1]": 1,
+        "[1, 0, 0]": 2,
+        "[1, 1, 0]": 1
+      },
+      "sample_count": 5
+    },
+    "train:query": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 0.0,
+      "mean_first_lane_drive": 0.0,
+      "mean_l2_norm": 0.0,
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "sample_count": 5
+    },
+    "train:retry": {
+      "accuracy": 1.0,
+      "mean_abs_sum": 1.25,
+      "mean_first_lane_drive": -1.0,
+      "mean_l2_norm": 1.0307764064044151,
+      "normalized_action_distribution": {
+        "retry": 5
+      },
+      "query_collapse_rate": 0.0,
+      "readout_distribution": {
+        "[-1, -1, 1]": 1,
+        "[-1, 0, 0]": 3,
+        "[-1, 1, 1]": 1
+      },
+      "sample_count": 5
+    }
+  },
+  "split_summary": {
+    "augmented_train": {
+      "accuracy": 1.0,
+      "expected_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "max_l2_norm": 0.47244047244070864,
+      "mean_abs_sum": 0.4333333333333333,
+      "mean_l2_norm": 0.30079337941580364,
+      "min_l2_norm": 0.11489125293076058,
+      "normalized_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 30
+    },
+    "counterfactual_control": {
+      "accuracy": 0.0,
+      "expected_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "max_l2_norm": 0.8306623862918076,
+      "mean_abs_sum": 0.7666666666666664,
+      "mean_l2_norm": 0.5773451502340899,
+      "min_l2_norm": 0.07071067811865477,
+      "normalized_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 15
+    },
+    "hard_holdout": {
+      "accuracy": 0.8666666666666667,
+      "expected_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "max_l2_norm": 0.7483314773547883,
+      "mean_abs_sum": 0.6583333333333332,
+      "mean_l2_norm": 0.4237938039163351,
+      "min_l2_norm": 0.12247448713915891,
+      "normalized_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 30
+    },
+    "holdout": {
+      "accuracy": 1.0,
+      "expected_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "max_l2_norm": 0.8306623862918076,
+      "mean_abs_sum": 0.7666666666666664,
+      "mean_l2_norm": 0.5773451502340899,
+      "min_l2_norm": 0.07071067811865477,
+      "normalized_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 15
+    },
+    "permuted_control": {
+      "accuracy": 0.0,
+      "expected_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "max_l2_norm": 1.0307764064044151,
+      "mean_abs_sum": 0.8333333333333334,
+      "mean_l2_norm": 0.6871842709362768,
+      "min_l2_norm": 0.0,
+      "normalized_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 15
+    },
+    "stress_holdout": {
+      "accuracy": 0.3333333333333333,
+      "expected_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "max_l2_norm": 0.2545584412271571,
+      "mean_abs_sum": 0.3533333333333334,
+      "mean_l2_norm": 0.22427544117117015,
+      "min_l2_norm": 0.18761663039293716,
+      "normalized_action_distribution": {
+        "query": 30
+      },
+      "query_collapse_rate": 1.0,
+      "sample_count": 30
+    },
+    "stress_train": {
+      "accuracy": 0.3333333333333333,
+      "expected_action_distribution": {
+        "execute": 10,
+        "query": 10,
+        "retry": 10
+      },
+      "max_l2_norm": 0.2545584412271571,
+      "mean_abs_sum": 0.3533333333333334,
+      "mean_l2_norm": 0.22427544117117015,
+      "min_l2_norm": 0.18761663039293716,
+      "normalized_action_distribution": {
+        "query": 30
+      },
+      "query_collapse_rate": 1.0,
+      "sample_count": 30
+    },
+    "train": {
+      "accuracy": 1.0,
+      "expected_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "max_l2_norm": 1.0307764064044151,
+      "mean_abs_sum": 0.8333333333333334,
+      "mean_l2_norm": 0.6871842709362768,
+      "min_l2_norm": 0.0,
+      "normalized_action_distribution": {
+        "execute": 5,
+        "query": 5,
+        "retry": 5
+      },
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 15
+    }
+  },
+  "status": "stress stimulus geometry audit completed",
+  "stress_execute_retry_accuracy": 0.0,
+  "stress_holdout_query_collapse_rate": 1.0,
+  "stress_train_query_collapse_rate": 1.0,
+  "stress_vs_augmented_geometry": {
+    "augmented_train_mean_abs_sum": 0.433333,
+    "augmented_train_mean_l2_norm": 0.300793,
+    "interpretation": "Stress execute/retry cases use lower-drive vectors than the successful augmented_train execute/retry cases and collapse to neutral/query even when duplicated into the fitness callback.",
+    "stress_holdout_mean_abs_sum": 0.353333,
+    "stress_holdout_mean_l2_norm": 0.224275,
+    "stress_train_mean_abs_sum": 0.353333,
+    "stress_train_mean_l2_norm": 0.224275
+  },
+  "unique_stress_case_summary": [
+    {
+      "abs_sum": 0.38,
+      "accuracy": 0.0,
+      "expected_action": "execute",
+      "input_vector": [
+        0.18,
+        -0.12,
+        0.08
+      ],
+      "l2_norm": 0.230651,
+      "name": "execute-stress-low-margin-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.32,
+      "accuracy": 0.0,
+      "expected_action": "execute",
+      "input_vector": [
+        0.12,
+        0.08,
+        -0.12
+      ],
+      "l2_norm": 0.187617,
+      "name": "execute-stress-near-neutral-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.36,
+      "accuracy": 1.0,
+      "expected_action": "query",
+      "input_vector": [
+        -0.18,
+        0.18,
+        0.0
+      ],
+      "l2_norm": 0.254558,
+      "name": "query-stress-negative-positive-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.36,
+      "accuracy": 1.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.18,
+        -0.18,
+        0.0
+      ],
+      "l2_norm": 0.254558,
+      "name": "query-stress-positive-negative-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.38,
+      "accuracy": 0.0,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.18,
+        0.12,
+        -0.08
+      ],
+      "l2_norm": 0.230651,
+      "name": "retry-stress-low-margin-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.32,
+      "accuracy": 0.0,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.12,
+        -0.08,
+        0.12
+      ],
+      "l2_norm": 0.187617,
+      "name": "retry-stress-near-neutral-train-injected",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_train"
+    },
+    {
+      "abs_sum": 0.38,
+      "accuracy": 0.0,
+      "expected_action": "execute",
+      "input_vector": [
+        0.18,
+        -0.12,
+        0.08
+      ],
+      "l2_norm": 0.230651,
+      "name": "execute-stress-low-margin",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    },
+    {
+      "abs_sum": 0.32,
+      "accuracy": 0.0,
+      "expected_action": "execute",
+      "input_vector": [
+        0.12,
+        0.08,
+        -0.12
+      ],
+      "l2_norm": 0.187617,
+      "name": "execute-stress-near-neutral",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    },
+    {
+      "abs_sum": 0.36,
+      "accuracy": 1.0,
+      "expected_action": "query",
+      "input_vector": [
+        -0.18,
+        0.18,
+        0.0
+      ],
+      "l2_norm": 0.254558,
+      "name": "query-stress-negative-positive",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    },
+    {
+      "abs_sum": 0.36,
+      "accuracy": 1.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.18,
+        -0.18,
+        0.0
+      ],
+      "l2_norm": 0.254558,
+      "name": "query-stress-positive-negative",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    },
+    {
+      "abs_sum": 0.38,
+      "accuracy": 0.0,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.18,
+        0.12,
+        -0.08
+      ],
+      "l2_norm": 0.230651,
+      "name": "retry-stress-low-margin",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    },
+    {
+      "abs_sum": 0.32,
+      "accuracy": 0.0,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.12,
+        -0.08,
+        0.12
+      ],
+      "l2_norm": 0.187617,
+      "name": "retry-stress-near-neutral",
+      "normalized_action_distribution": {
+        "query": 5
+      },
+      "query_collapse_rate": 1.0,
+      "readout_distribution": {
+        "[0, 0, 0]": 5
+      },
+      "split": "stress_holdout"
+    }
+  ],
+  "verdict": "The current stress bottleneck is consistent with low-margin stimulus/readout separability failure: injected stress_train and original stress_holdout both collapse to query on every sample, while augmented_train execute/retry cases remain separable."
+}
