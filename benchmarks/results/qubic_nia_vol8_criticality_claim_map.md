@@ -36,6 +36,7 @@ NIA Vol. 8 makes branching ratio / criticality a concrete measurement target for
 | `benchmarks/results/cunxon_stress_geometry_audit.json` | Post-hoc audit of 180 live stress-injection cases. Both injected `stress_train` and original `stress_holdout` had query-collapse rate `1.000000`; stress execute/retry accuracy was `0.000000`, while augmented_train execute/retry accuracy remained `1.000000`. | Separability/geometry diagnostic. The low-margin stress vectors have lower drive than successful augmented vectors, suggesting an amplitude/readout-geometry bottleneck rather than an intelligence or generalization result. |
 | `benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json` | Bounded live amplitude ladder over fresh seeds (`142..144`). Original `stress_holdout` accuracy stayed `0.333333` with query-collapse `1.000000`; scaled `stress_holdout` at `3.0x` reached `0.833333`, execute/retry accuracy `0.833333`, query-collapse `0.388889`, and 3/3 seeds beat the best constant baseline. | Separability upper-bound, not intelligence evidence. The prior low-margin bottleneck has an amplitude/readout-geometry component, but scaled `stress_train` labels were optimized and original stress still fails. |
 | `benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json` | Target-aligned stress objective over fresh seeds (`147..149`) with `3.0x` scaled stress. Original `stress_holdout` stayed `0.333333`, query-collapse `1.000000`, execute/retry `0.000000`; scaled `stress_holdout` reached `0.888889`, execute/retry `1.000000`, query-collapse `0.222222`. | Objective-shaping diagnostic, not intelligence evidence. It preserves scaled separability but fails the original low-margin stress/control boundary, so the next question is decoder/readout geometry rather than a longer identical objective. |
+| `benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json` | Post-hoc issue #89 geometry artifact: original `stress_holdout` stays `0.333333` with query-collapse `1.000000`, while scaled `stress_holdout` at `3.0x` stays `0.888889` with execute/retry accuracy `1.000000`; execute/retry first-lane abs mean changes `0.150000 -> 0.450000`. | Decoder/readout geometry diagnostic, not intelligence evidence. It narrows the bottleneck but does not improve original stress/control task quality. |
 
 ## Interpretation
 
@@ -62,9 +63,19 @@ Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88 now has a bound
 3. The original low-margin split still fails: original `stress_holdout` accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`; counterfactual/permuted controls stay below constants.
 4. Interpretation: objective shaping preserved the high-amplitude signal but did not solve the original stress/control boundary. This is not intelligence or generalization evidence; it points to decoder/readout geometry or low-margin separability as the next diagnostic question.
 
+## Stress objective decoder/readout geometry follow-up
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89 now has a post-hoc artifact in `benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.*`:
+
+1. The artifact compares the original low-margin `stress_holdout` split against the `3.0x` scaled split from the latest stress objective.
+2. Original `stress_holdout` remains exactly at the best constant baseline: accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`.
+3. The scaled split remains separable: accuracy `0.888889`, query-collapse `0.222222`, execute/retry accuracy `1.000000`.
+4. The explicit geometry difference is a `3.0x` first-lane gain: execute/retry first-lane abs mean `0.150000 -> 0.450000`.
+5. Interpretation: this narrows the bottleneck to low-margin decoder/readout geometry, but does not improve original stress/control task quality and is not intelligence or generalization evidence.
+
 ## Proposed next probe
 
-`stress_objective_decoder_geometry_followup` is tracked as https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89. It should diagnose why the signed-first-lane route preserves `3.0x` scaled stress separability while original stress vectors still collapse to `query`. Prefer a post-hoc margin/action-lane geometry analysis or a minimal probe over original vs scaled stress readouts before launching another live objective sweep.
+`stress_objective_decoder_geometry_followup` is tracked as https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89 and now has a post-hoc margin/action-lane geometry artifact. The next concrete hypothesis should change the lower-level readout geometry or normalization route; do not launch another longer copy of the same `3.0x` stress objective.
 
 ## Conservative verdict
 

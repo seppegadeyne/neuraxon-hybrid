@@ -54,6 +54,12 @@ STRESS_OBJECTIVE_JSON_PATH = (
 STRESS_OBJECTIVE_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.md"
 )
+STRESS_OBJECTIVE_GEOMETRY_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json"
+)
+STRESS_OBJECTIVE_GEOMETRY_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -529,3 +535,54 @@ def test_cunxon_stress_objective_preserves_scaled_separability_but_original_stre
     )
     assert claim_data["recommended_next_probe"]["status"] == "open"
     assert "cunxon_aigarth_action_target_contract_stress_objective_probe" in claim_markdown
+
+
+def test_cunxon_stress_objective_geometry_followup_records_boundary() -> None:
+    data = json.loads(STRESS_OBJECTIVE_GEOMETRY_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_OBJECTIVE_GEOMETRY_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "stress objective decoder geometry follow-up completed"
+    assert data["hypothesis_for_this_slice"] == "original_vs_scaled_stress_readout_geometry"
+    assert data["issue"] == "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89"
+    assert data["source_artifacts"] == [
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+        "benchmarks/results/cunxon_stress_geometry_audit.json",
+    ]
+    assert data["original_stress_holdout"]["accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout"]["query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout"]["execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_3_0x"]["accuracy_mean"] > 0.88
+    assert data["scaled_stress_holdout_3_0x"]["execute_retry_accuracy"] == 1.0
+    assert data["scaled_stress_holdout_3_0x"]["query_collapse_rate"] < 0.25
+    assert data["target_lane_geometry"]["original_execute_retry_first_lane_abs_mean"] == 0.15
+    assert data["target_lane_geometry"]["scaled_execute_retry_first_lane_abs_mean"] == 0.45
+    assert data["target_lane_geometry"]["first_lane_gain"] == 3.0
+    assert data["baseline_delta"]["original_vs_best_constant"] == 0.0
+    assert data["baseline_delta"]["scaled_vs_best_constant"] > 0.55
+    assert data["evidence_boundary"].startswith("Post-hoc decoder/readout geometry")
+    assert data["recommended_next_probe"]["id"] == "low_margin_readout_geometry_probe"
+
+    assert "# cuNxon stress objective decoder/readout geometry follow-up" in markdown
+    assert "Original stress_holdout accuracy: `0.333333`" in markdown
+    assert "Scaled stress_holdout accuracy: `0.888889`" in markdown
+    assert "first-lane gain: `3.000000`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_objective_decoder_geometry_followup"]
+    assert summary["hypothesis"] == "original_vs_scaled_stress_readout_geometry"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert summary["first_lane_gain"] == 3.0
+    assert "cuNxon stress objective decoder/readout geometry" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-objective-decoder-geometry"
+        for item in claim_data["evidence_map"]
+    )
+    assert "cunxon_stress_objective_decoder_geometry_followup" in claim_markdown
