@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline and no drive regime beats stress baselines. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. The decoder-separation follow-up explains the latest stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases despite estimator movement. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -107,6 +107,13 @@
       "evidence_status": "Estimator-calibration evidence, negative for robust decision quality: drive changes move runtime metrics and action distributions, but stress/control quality does not beat constants.",
       "id": "cunxon-controlled-regime-calibration",
       "observation": "Three controlled input-drive regimes over fresh seeds 133..134 produced 288 samples. Mean branching estimate rose from low-drive 0.030866 to high-drive 0.128423, neutral occupancy dropped from 0.978481 to 0.873544, and entropy rose from 0.274261 to 1.374276. Holdout and hard_holdout reached 0.416667, but stress_holdout stayed 0.333333 and no regime beat the stress baseline."
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_criticality_decoder_separation.json",
+      "id": "cunxon-criticality-decoder-separation",
+      "interpretation": "The repeated stress bottleneck is better explained as decoder/action collapse on low-margin execute/retry cases than as complete estimator collapse; this remains negative/diagnostic evidence, not intelligence evidence.",
+      "observed": "Post-hoc analysis of the 288-sample controlled-regime calibration found stress_holdout accuracy=0.333333, query_collapse_rate=0.902778, execute/retry stress accuracy=0.041667, query stress accuracy=0.916667, and estimator movement present but not task-sufficient.",
+      "status": "completed estimator/decoder separation follow-up for the NIA Vol. 8 regime lane"
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
@@ -115,10 +122,10 @@
     "Would a controlled estimator-calibration probe with known low/high-drive regimes distinguish genuine branching sensitivity from occupancy/readout artifacts?",
     "Why do all five near-critical proxy seeds keep stress_holdout at the best constant baseline despite perfect standard holdout?",
     "Does a near-1 branching/activity ratio in cuNxon predict anything about action quality, or is it only an occupancy statistic in the current tiny networks?",
-    "Can the stress_holdout baseline failure be explained by regime metrics such as subcritical collapse, supercritical saturation, or insufficient readout diversity?",
     "Do Aigarth-evolved networks land in a measurably different activity regime than flat StepTrain/StepInfer resident networks?",
     "Can a source-level or CUDA-level branching estimator be added without conflating readout ports, input-class drive, and hidden-state snapshots?",
-    "Does controlled_regime_calibration show estimator movement without stress_holdout improvement because of decoder collapse, lack of task signal, or both?"
+    "Does controlled_regime_calibration show estimator movement without stress_holdout improvement because of decoder collapse, lack of task signal, or both?",
+    "What target-contract or objective-level change can reduce low-margin execute/retry stress query collapse without using stress/control labels for optimization?"
   ],
   "recommended_next_probe": {
     "acceptance_criteria": [
@@ -127,11 +134,13 @@
       "Keep stress/control labels outside optimization.",
       "Do not claim useful computation unless stress/control task quality beats constant baselines robustly."
     ],
+    "completed_artifact": "benchmarks/results/cunxon_criticality_decoder_separation.json",
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
     "id": "estimator_decoder_separation_followup",
     "purpose": "Use the controlled-regime calibration result to separate estimator movement from decoder/action-contract bottlenecks before adding task complexity.",
+    "result": "stress bottleneck classified as decoder/action collapse despite observable estimator movement",
     "shape": "Analyze per-regime readout/action distributions and stress cases, then test a smaller decoder/objective diagnostic only if it targets the stress_holdout bottleneck without using stress/control labels in optimization.",
-    "status": "next hypothesis after controlled_regime_calibration result"
+    "status": "completed"
   },
   "source": {
     "captured_with": "dokobot local read",

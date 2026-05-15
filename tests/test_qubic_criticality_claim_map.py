@@ -32,6 +32,12 @@ CONTROLLED_REGIME_CALIBRATION_JSON_PATH = (
 CONTROLLED_REGIME_CALIBRATION_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_controlled_regime_calibration.md"
 )
+CRITICALITY_DECODER_SEPARATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_criticality_decoder_separation.json"
+)
+CRITICALITY_DECODER_SEPARATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_criticality_decoder_separation.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -87,7 +93,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "estimator_decoder_separation_followup"
+        "criticality_decoder_separation_completed"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -282,3 +288,47 @@ def test_cunxon_controlled_regime_calibration_records_estimator_boundaries() -> 
     assert summary["stress_holdout_accuracy"] == data["stress_holdout_accuracy"]
     assert "cuNxon controlled-regime criticality calibration" in comparison_markdown
     assert "controlled_regime_calibration" in claim_markdown
+
+
+def test_cunxon_criticality_decoder_separation_explains_stress_bottleneck() -> None:
+    data = json.loads(CRITICALITY_DECODER_SEPARATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = CRITICALITY_DECODER_SEPARATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "criticality_decoder_separation"
+    assert data["source_artifact"] == "benchmarks/results/cunxon_controlled_regime_calibration.json"
+    assert data["sample_count"] == 288
+    assert data["stress_holdout"]["sample_count"] == 72
+    assert data["stress_holdout"]["accuracy"] == 0.333333
+    assert data["stress_holdout"]["best_constant_baseline"] == 0.333333
+    assert data["stress_holdout"]["query_collapse_rate"] >= 0.9
+    assert data["stress_holdout"]["execute_retry_accuracy"] < 0.1
+    assert data["stress_holdout"]["query_accuracy"] > 0.9
+    assert data["diagnosis"] == "decoder_action_collapse_on_low_margin_execute_retry_stress_cases"
+    assert data["estimator_movement_status"] == "present_but_not_task_sufficient"
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon criticality/decoder separation" in markdown
+    assert "query_collapse_rate=0.902778" in markdown
+    assert "execute/retry stress accuracy=0.041667" in markdown
+    assert "estimator movement is present" in markdown
+    assert "decoder/action collapse" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_criticality_decoder_separation"]
+    assert summary["hypothesis"] == "criticality_decoder_separation"
+    assert summary["diagnosis"] == data["diagnosis"]
+    assert summary["stress_query_collapse_rate"] == data["stress_holdout"]["query_collapse_rate"]
+    assert "cuNxon criticality/decoder separation" in comparison_markdown
+    assert "stress query collapse" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-criticality-decoder-separation"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "completed"
+    assert "cunxon_criticality_decoder_separation" in claim_markdown
