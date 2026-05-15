@@ -1,0 +1,255 @@
+{
+  "accuracy_by_split": {
+    "holdout": 0.3333333333333333,
+    "overall": 0.3333333333333333,
+    "train": 0.3333333333333333
+  },
+  "baseline_accuracy_by_split": {
+    "always_execute": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_query": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_retry": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    }
+  },
+  "case_count": 6,
+  "cases": [
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.782503704903302,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "split": "train",
+      "target_alignment": 0.6666666666666666,
+      "target_readout": [
+        1,
+        0,
+        0
+      ],
+      "teacher_readout": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.78250475633518,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "split": "train",
+      "target_alignment": 0.6666666666666666,
+      "target_readout": [
+        -1,
+        0,
+        0
+      ],
+      "teacher_readout": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.78250553291606,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "split": "train",
+      "target_alignment": 1.0,
+      "target_readout": [
+        0,
+        0,
+        0
+      ],
+      "teacher_readout": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.782506374087166,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "split": "holdout",
+      "target_alignment": 0.6666666666666666,
+      "target_readout": [
+        1,
+        0,
+        0
+      ],
+      "teacher_readout": []
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.78250721978366,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.1
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "split": "holdout",
+      "target_alignment": 0.6666666666666666,
+      "target_readout": [
+        -1,
+        0,
+        0
+      ],
+      "teacher_readout": []
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 30.782507931635433,
+      "eval_readout": [
+        0,
+        0,
+        0
+      ],
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "split": "holdout",
+      "target_alignment": 1.0,
+      "target_readout": [
+        0,
+        0,
+        0
+      ],
+      "teacher_readout": []
+    }
+  ],
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 16,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "single motor sphere with sensory inputs plus teacher-forced absolute output-neuron target ports",
+    "training uses StepTrain and expected-action neuromodulator pulses; evaluation uses StepInfer without target drive",
+    "holdout accuracy must beat trivial baselines before this becomes useful adapter evidence"
+  ],
+  "status": "supervised motor-target probe viable",
+  "target_alignment_by_split": {
+    "holdout": 0.7777777777777777,
+    "overall": 0.7777777777777777,
+    "train": 0.7777777777777777
+  },
+  "target_port_ids": [
+    8,
+    9,
+    10
+  ],
+  "train_epochs": 8,
+  "train_steps_per_case": 16,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

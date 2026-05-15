@@ -1,0 +1,4268 @@
+{
+  "case_count": 255,
+  "cases": [
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        -1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 82,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 83,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        -1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 84,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        -1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 85,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 86,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 87,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 88,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 89,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 90,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        -1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        -1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 91,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 92,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 93,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 94,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        -1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 95,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 96,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 97,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        0
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 98,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "assertive",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        1,
+        1
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 99,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        0,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 100,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-train",
+      "original_normalized_action": "execute",
+      "original_outcome": "success",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-train",
+      "original_normalized_action": "retry",
+      "original_outcome": "success",
+      "readout": [
+        -1,
+        0,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-train",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "train"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-holdout-noisy",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-holdout-noisy",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-holdout-low-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-low-positive",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "execute",
+      "name": "execute-hard-conflict",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        0
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-low-negative",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "retry-hard-conflict",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-balanced",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "query",
+      "name": "query-hard-weak-drive",
+      "original_normalized_action": "query",
+      "original_outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "success",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "hard_holdout"
+    },
+    {
+      "expected_action": "retry",
+      "name": "execute-train-permuted-as-retry",
+      "original_normalized_action": "execute",
+      "original_outcome": "failure",
+      "readout": [
+        1,
+        -1,
+        1
+      ],
+      "remapped_action": "execute",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "query",
+      "name": "retry-train-permuted-as-query",
+      "original_normalized_action": "retry",
+      "original_outcome": "failure",
+      "readout": [
+        -1,
+        0,
+        -1
+      ],
+      "remapped_action": "retry",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    },
+    {
+      "expected_action": "execute",
+      "name": "query-train-permuted-as-execute",
+      "original_normalized_action": "query",
+      "original_outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "remapped_action": "query",
+      "remapped_outcome": "failure",
+      "seed_offset": 101,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "split": "permuted_control"
+    }
+  ],
+  "notes": [
+    "post-hoc diagnostic over existing live cuNxon Aigarth artifacts",
+    "signed-first-lane remap follows the project target_readout contract: + first lane=execute, - first lane=retry, neutral=query",
+    "does not create new cuNxon learning evidence; it only isolates decoder vocabulary effects"
+  ],
+  "original_accuracy_by_split": {
+    "hard_holdout": 0.5555555555555556,
+    "holdout": 0.5833333333333334,
+    "overall": 0.5490196078431373,
+    "permuted_control": 0.0,
+    "train": 0.9166666666666666
+  },
+  "original_action_distribution": {
+    "assertive": 13,
+    "execute": 60,
+    "query": 118,
+    "retry": 64
+  },
+  "original_unexpected_action_count": 13,
+  "remap_accuracy_delta_by_split": {
+    "hard_holdout": -0.011111111111111183,
+    "holdout": 0.016666666666666607,
+    "overall": -0.01176470588235301,
+    "permuted_control": 0.06666666666666667,
+    "train": -0.09999999999999998
+  },
+  "remap_strategy": "signed-first-lane",
+  "remapped_accuracy_by_split": {
+    "hard_holdout": 0.5444444444444444,
+    "holdout": 0.6,
+    "overall": 0.5372549019607843,
+    "permuted_control": 0.06666666666666667,
+    "train": 0.8166666666666667
+  },
+  "remapped_action_distribution": {
+    "execute": 71,
+    "query": 110,
+    "retry": 74
+  },
+  "remapped_unexpected_action_count": 0,
+  "source_count": 4,
+  "source_paths": [
+    "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json"
+  ],
+  "source_summaries": [
+    {
+      "case_count": 30,
+      "fitness_variant": "unknown",
+      "original_accuracy_by_split": {
+        "holdout": 0.5333333333333333,
+        "overall": 0.6,
+        "train": 0.6666666666666666
+      },
+      "original_action_distribution": {
+        "assertive": 4,
+        "execute": 3,
+        "query": 16,
+        "retry": 7
+      },
+      "original_unexpected_action_count": 4,
+      "remapped_accuracy_by_split": {
+        "holdout": 0.7333333333333333,
+        "overall": 0.7666666666666667,
+        "train": 0.8
+      },
+      "remapped_action_distribution": {
+        "execute": 7,
+        "query": 16,
+        "retry": 7
+      },
+      "remapped_unexpected_action_count": 0,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "status": "aigarth action seed sweep completed"
+    },
+    {
+      "case_count": 75,
+      "fitness_variant": "unknown",
+      "original_accuracy_by_split": {
+        "hard_holdout": 0.5,
+        "holdout": 0.6,
+        "overall": 0.52,
+        "permuted_control": 0.0,
+        "train": 1.0
+      },
+      "original_action_distribution": {
+        "assertive": 1,
+        "execute": 22,
+        "query": 32,
+        "retry": 20
+      },
+      "original_unexpected_action_count": 1,
+      "remapped_accuracy_by_split": {
+        "hard_holdout": 0.5,
+        "holdout": 0.6,
+        "overall": 0.5066666666666667,
+        "permuted_control": 0.0,
+        "train": 0.9333333333333333
+      },
+      "remapped_action_distribution": {
+        "execute": 20,
+        "query": 33,
+        "retry": 22
+      },
+      "remapped_unexpected_action_count": 0,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "status": "aigarth hard-holdout audit completed"
+    },
+    {
+      "case_count": 75,
+      "fitness_variant": "strict_label_margin",
+      "original_accuracy_by_split": {
+        "hard_holdout": 0.7,
+        "holdout": 0.7333333333333333,
+        "overall": 0.6266666666666667,
+        "permuted_control": 0.0,
+        "train": 1.0
+      },
+      "original_action_distribution": {
+        "assertive": 5,
+        "execute": 18,
+        "query": 31,
+        "retry": 21
+      },
+      "original_unexpected_action_count": 5,
+      "remapped_accuracy_by_split": {
+        "hard_holdout": 0.7,
+        "holdout": 0.6,
+        "overall": 0.5866666666666667,
+        "permuted_control": 0.06666666666666667,
+        "train": 0.8666666666666667
+      },
+      "remapped_action_distribution": {
+        "execute": 22,
+        "query": 32,
+        "retry": 21
+      },
+      "remapped_unexpected_action_count": 0,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "status": "aigarth strict-label action audit completed"
+    },
+    {
+      "case_count": 75,
+      "fitness_variant": "strict_label_heavy_penalty",
+      "original_accuracy_by_split": {
+        "hard_holdout": 0.4666666666666667,
+        "holdout": 0.4666666666666667,
+        "overall": 0.48,
+        "permuted_control": 0.0,
+        "train": 1.0
+      },
+      "original_action_distribution": {
+        "assertive": 3,
+        "execute": 17,
+        "query": 39,
+        "retry": 16
+      },
+      "original_unexpected_action_count": 3,
+      "remapped_accuracy_by_split": {
+        "hard_holdout": 0.43333333333333335,
+        "holdout": 0.4666666666666667,
+        "overall": 0.4266666666666667,
+        "permuted_control": 0.13333333333333333,
+        "train": 0.6666666666666666
+      },
+      "remapped_action_distribution": {
+        "execute": 22,
+        "query": 29,
+        "retry": 24
+      },
+      "remapped_unexpected_action_count": 0,
+      "source_path": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "status": "aigarth contract-penalty action audit completed"
+    }
+  ],
+  "status": "aigarth action remap audit completed",
+  "strict_expected_actions": [
+    "execute",
+    "query",
+    "retry"
+  ]
+}

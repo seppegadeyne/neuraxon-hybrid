@@ -1,0 +1,395 @@
+{
+  "action_change_count_by_stimulus": {
+    "execute-positive-drive": 1,
+    "query-neutral-drive": 0,
+    "retry-negative-drive": 0
+  },
+  "action_distribution_by_mode": {
+    "infer": {
+      "query": 8,
+      "retry": 1
+    },
+    "train": {
+      "query": 9
+    }
+  },
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "fresh one-sphere network per mode/seed/stimulus sample",
+    "infer uses frozen cunxonNetworkStepInfer; train uses paper-canonical StepTrain",
+    "sensitivity/diversity is diagnostic evidence, not benchmark success"
+  ],
+  "sample_count": 18,
+  "samples": [
+    {
+      "confidence": 0.3333,
+      "decoded_action": "RETRY",
+      "elapsed_ms": 111.5243670064956,
+      "energy": 708.5816450119019,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "retry",
+      "readout": [
+        0,
+        0,
+        -1
+      ],
+      "seed_offset": 79,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 113.58426098013297,
+      "energy": 719.9179968833923,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 115.54381099995226,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 0.3333,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 117.53061198396608,
+      "energy": 583.8191504478455,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 119.49166195699945,
+      "energy": 631.8581824302673,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 121.43990100594237,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 0.3333,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 123.35539900232106,
+      "energy": 626.7323007583618,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        1,
+        -1,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 125.28975697932765,
+      "energy": 635.5942134857178,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 127.22562596900389,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "infer",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 129.4311870005913,
+      "energy": 46.2179791033268,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 131.62735698278993,
+      "energy": 47.43915057182312,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 133.8211979600601,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 79,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 136.02930901106447,
+      "energy": 24.56634896993637,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 138.22083896957338,
+      "energy": 23.07277376949787,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 140.40435897186399,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 80,
+      "stimulus": "query-neutral-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 142.59214897174388,
+      "energy": 29.694859743118286,
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "execute-positive-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 144.77638999233022,
+      "energy": 30.162799030542374,
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "retry-negative-drive"
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 146.91043697530404,
+      "energy": 0.0,
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode": "train",
+      "normalized_action": "query",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "seed_offset": 81,
+      "stimulus": "query-neutral-drive"
+    }
+  ],
+  "status": "sensitivity probe viable",
+  "steps": 32,
+  "unique_readouts_by_mode": {
+    "infer": 3,
+    "train": 1
+  },
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

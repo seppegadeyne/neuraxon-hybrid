@@ -1,0 +1,110 @@
+# Qubic NIA Vol. 8 criticality claim map
+
+Source: Qubic Scientific Team, "Brain Criticality and the Branching Ratio in Neural and Artificial Networks: A Bioinspired Principle in Neuraxon", published 2026-05-13.
+
+## Hypothesis for this slice
+
+NIA Vol. 8 makes branching ratio / criticality a concrete measurement target for Neuraxon-Hybrid: treat sigma ≈ 1 as a regime hypothesis to test against cuNxon artifacts, not as evidence of intelligence by itself.
+
+## Extracted technical claims
+
+| Claim | Article position | Measurable repo hypothesis |
+| --- | --- | --- |
+| Branching ratio regimes | sigma < 1 means decay, sigma ≈ 1 means reverberating criticality, sigma > 1 means runaway activity. | cuNxon runs should report active-state propagation/regime labels rather than only readout/action scores. |
+| Slightly subcritical reverberation | Cortex is framed as often slightly below sigma=1 and task-modulable, not exactly balanced forever. | Neuraxon-Hybrid should test a bounded reverberating band rather than equality to sigma=1. |
+| Artificial edge of chaos | Reservoir/recurrent systems are claimed to peak near order-chaos transition or spectral radius near 1. | Regime metrics must be correlated with task scores and baselines; near-critical-looking dynamics alone are not enough. |
+| Neuraxon real-time invariant | Branching ratio is presented as an operational scalar for whether a system is alive, silent, or explosive. | cuNxon diagnostics should include a branching/activity-ratio lane beside energy, occupancy, readout diversity, GPU resources, and task accuracy. |
+| Self-organized criticality | Neuraxon is claimed to self-organize toward criticality without centralized fine-tuning and to gain robustness. | This needs trajectory evidence across seeds/interventions plus held-out task improvement, not only a final scalar. |
+| Functional generalization | The article says internal evaluations/submitted publications show better generalization, perturbation stability, representational richness, and temporal coherence. | In this repo that requires holdout/stress/control splits, trivial baselines, leakage checks, and a strict split between runtime dynamics and decision quality. |
+
+## Evidence map against current artifacts
+
+| Artifact | Observation | Evidence status |
+| --- | --- | --- |
+| `benchmarks/results/analysis/criticality_summary.csv` | CPU/adapter analysis already has `branching_ratio_mean=1.194208`, neutral occupancy `0.757844`, transition entropy `0.332013`, and modulation action-change rate `0.000000`. | Partially relevant historical evidence: the metric exists, but did not imply useful raw-network behavior. |
+| `benchmarks/results/cunxon_vram_resident_run.json` | Four-hour resident cuNxon run completed 16 samples / 4,194,304 infer steps. Readout stayed `[0, 0, 0]`. Coarse active-state sequence was `3,5,5,5,5,3,3,3,3,3,3,3,3,3,3,3`; VRAM-resident active-state ratio mean≈1.017778. | Runtime/dynamics evidence only. The near-1 coarse ratio is not a validated branching estimator and did not produce readout diversity or task evidence. |
+| `benchmarks/results/cunxon_resident_action_probe.json` | Twelve resident train/eval epochs and 72 scored cases all decoded to `query`; train/holdout/overall accuracy stayed `0.333333`, equal to constant-action baselines. | Negative task-coupled residency evidence. Keeping the same process alive did not by itself produce useful action dynamics. |
+| `benchmarks/results/cunxon_aigarth_action_target_contract_augmented_train_probe.json` | Target-contract augmented-train Aigarth audit reached holdout mean `1.000000` and hard-holdout mean `0.866667`, zero unexpected labels, but stress-holdout mean=0.333333 and counterfactual-control mean `0.066667`. | Constructive but brittle toy/evolution evidence. It does not establish self-organized criticality or broad generalization. |
+| `benchmarks/results/cunxon_branching_regime_scan.json` | Five fresh Aorus RTX 5090 seeds (`117..121`) all bucketed as `reverberating/near-critical proxy`; mean branching proxy=0.997701, holdout mean `1.000000`, stress-holdout mean=0.333333, and 0/5 seeds beat the best constant stress baseline. | Negative/diagnostic evidence: the NIA Vol. 8 regime lane is operationalized, but near-critical-looking proxy activity did not predict stress-holdout quality above baseline. |
+| `benchmarks/results/cunxon_avalanche_window_probe.json` | Snapshot windows over seeds (`122..124`) measured full-sphere activation transitions directly; mean branching-ratio estimate `0.154496`, active-count ratio `0.994343`, neutral occupancy `0.908077`, and infer/train action accuracy `0.333333`. | Direct snapshot-estimator evidence, negative for decision quality. Observable avalanche metrics did not beat constant-action baselines. |
+| `benchmarks/results/cunxon_avalanche_window_intervention_matrix.json` | Short-dense, baseline-equivalent and long-sparse windows over seeds (`125..126`) produced branching-estimator range `0.000000..0.483938`; only the short-dense infer mode beat constants (`0.500000` vs `0.333333`) and no configuration beat constants in both infer and train. | Estimator-sensitivity evidence, not robust task evidence. Future criticality claims must report estimator parameters and require robust task-coupled improvement. |
+| `benchmarks/results/cunxon_avalanche_intervention_task_correlation.json` | Two bounded configurations over fresh seeds (`127..128`) produced 192 held-out/stress/control samples. Aggregate holdout and hard_holdout reached `0.458333` against `0.333333` constants, but stress_holdout stayed `0.333333`, counterfactual_control was `0.250000`, permuted_control was `0.208333`, and 0 configurations beat the stress baseline. | Task-coupled negative/diagnostic evidence. Split-specific bumps do not validate functional criticality because the low-margin stress split remains baseline-level and the main branching/accuracy correlation is negative. |
+| `benchmarks/results/cunxon_avalanche_intervention_seed_replication.json` | Fresh-seed replication over seeds (`129..132`) produced 384 samples. Aggregate holdout `0.437500` and hard_holdout `0.447917` stayed above constants, but stress_holdout remained `0.333333`, counterfactual_control was `0.333333`, permuted_control was `0.250000`, and 0 configurations beat the stress baseline. | Fresh-seed replication strengthens the negative stress/control boundary: avalanche/regime metrics are observable and split-specific bumps repeat, but this is still not intelligence evidence. |
+| `benchmarks/results/cunxon_controlled_regime_calibration.json` | Controlled low/medium/high input-drive calibration over seeds (`133..134`) produced 288 samples. Mean branching estimate rose `0.030866 -> 0.086529 -> 0.128423`, neutral occupancy dropped `0.978481 -> 0.925696 -> 0.873544`, entropy rose `0.274261 -> 0.846045 -> 1.374276`, but stress_holdout stayed `0.333333` and no drive regime beat the stress baseline. | Estimator-calibration evidence, negative for robust decision quality. Runtime metrics and action distributions move with drive, but stress/control quality does not beat constants. |
+| `benchmarks/results/cunxon_criticality_decoder_separation.json` | Post-hoc analysis of the controlled-regime artifact found stress query collapse `0.902778`, execute/retry stress accuracy `0.041667`, query stress accuracy `0.916667`, and stress_holdout `0.333333`. | Decoder/action-collapse evidence: estimator movement exists, but low-margin execute/retry stress cases collapse to query. |
+| `benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json` | Five fresh seeds (`137..141`) deliberately duplicated the six `stress_holdout` cases as optimized `stress_train` cases. Holdout stayed `1.000000` and hard_holdout `0.866667`, but `stress_train` and original `stress_holdout` both stayed `0.333333` with `0/5` seeds beating constants. | Negative upper-bound/debugging evidence. Because stress-like labels were optimized directly, this is not generalization evidence; the stress bottleneck persisted even under injection. |
+| `benchmarks/results/cunxon_stress_geometry_audit.json` | Post-hoc audit of 180 live stress-injection cases. Both injected `stress_train` and original `stress_holdout` had query-collapse rate `1.000000`; stress execute/retry accuracy was `0.000000`, while augmented_train execute/retry accuracy remained `1.000000`. | Separability/geometry diagnostic. The low-margin stress vectors have lower drive than successful augmented vectors, suggesting an amplitude/readout-geometry bottleneck rather than an intelligence or generalization result. |
+| `benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json` | Bounded live amplitude ladder over fresh seeds (`142..144`). Original `stress_holdout` accuracy stayed `0.333333` with query-collapse `1.000000`; scaled `stress_holdout` at `3.0x` reached `0.833333`, execute/retry accuracy `0.833333`, query-collapse `0.388889`, and 3/3 seeds beat the best constant baseline. | Separability upper-bound, not intelligence evidence. The prior low-margin bottleneck has an amplitude/readout-geometry component, but scaled `stress_train` labels were optimized and original stress still fails. |
+| `benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json` | Target-aligned stress objective over fresh seeds (`147..149`) with `3.0x` scaled stress. Original `stress_holdout` stayed `0.333333`, query-collapse `1.000000`, execute/retry `0.000000`; scaled `stress_holdout` reached `0.888889`, execute/retry `1.000000`, query-collapse `0.222222`. | Objective-shaping diagnostic, not intelligence evidence. It preserves scaled separability but fails the original low-margin stress/control boundary, so the next question is decoder/readout geometry rather than a longer identical objective. |
+| `benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json` | Post-hoc issue #89 geometry artifact: original `stress_holdout` stays `0.333333` with query-collapse `1.000000`, while scaled `stress_holdout` at `3.0x` stays `0.888889` with execute/retry accuracy `1.000000`; execute/retry first-lane abs mean changes `0.150000 -> 0.450000`. | Decoder/readout geometry diagnostic, not intelligence evidence. It narrows the bottleneck but does not improve original stress/control task quality. |
+| `benchmarks/results/cunxon_low_margin_readout_geometry_probe.json` | Post-hoc issue #89 boundary artifact: original stress execute/retry first-lane margin is `-0.150000` and original `stress_holdout` remains `0.333333` with query-collapse `1.000000`; scaled `3.0x` stress margin is `0.150000` and scaled accuracy remains `0.888889`. | Readout-geometry diagnostic, not intelligence evidence. It supports a supervised/normalized low-margin target-objective follow-up rather than another longer copy of the same `3.0x` objective. |
+| `benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json` | Fresh seeds (`150..152`) with `target_contract_supervised_low_margin` reached `supervised_low_margin_train=1.000000`, `holdout=1.000000`, and `hard_holdout=1.000000`, but original `stress_holdout` stayed `0.333333` with query-collapse `1.000000` and execute/retry `0.000000`; counterfactual/permuted controls were `0.000000`. | Completed objective/readout diagnostic. Normalized low-margin train cases are learnable, but original stress/control quality still does not beat constants; not intelligence evidence. |
+
+## Interpretation
+
+The NIA Vol. 8 article is useful because it turns a broad brain-inspired claim into a measurable lane: branching/activity regime should be tracked directly. However, current Neuraxon-Hybrid evidence does not let sigma ≈ 1 stand in for intelligence. A coarse near-1 active-state ratio in the completed VRAM-resident cuNxon run coexisted with flat `[0, 0, 0]` readouts and no task score. The task-coupled resident action probe stayed exactly at constant-action baselines. The first bounded branching-regime scan added task-coupled evidence: five fresh Aigarth source seeds looked near-critical by the coarse readout proxy and kept standard holdout perfect, but the harder low-margin stress split remained exactly at the best constant baseline. The snapshot avalanche probe then measured full-sphere activation transitions directly and still stayed baseline-level for action quality. The intervention matrix shows that the direct estimator is sensitive to bounded window/sample settings; one short-dense infer-mode slice rose above constants, but this did not repeat in train mode or longer windows. The task-coupled avalanche intervention/correlation probe adds held-out, stress and control splits: holdout and hard_holdout beat constants modestly, but stress_holdout remains exactly baseline-level and no configuration beats the stress baseline. The fresh-seed replication over seeds `129..132` repeats that shape with 384 samples: holdout/hard_holdout remain above constants while stress_holdout remains at `0.333333` and the branching/accuracy correlation stays weakly negative. The controlled-regime calibration over seeds `133..134` shows the estimator and action distribution move under low/medium/high drive, but stress_holdout still stays at `0.333333` and no drive regime beats the stress baseline. The follow-up `cunxon_criticality_decoder_separation` artifact explains that stress bottleneck more narrowly: stress query collapse is `0.902778`, execute/retry stress accuracy is `0.041667`, and query stress accuracy is `0.916667`, so estimator movement is present but decoder/action collapse dominates low-margin execute/retry stress cases. The best current cuNxon action evidence still comes from explicit Aigarth objective shaping, not from demonstrated self-organized criticality.
+
+Current boundary: branching ratio is a necessary diagnostic, not a sufficient success criterion. Any future report should say "near-critical dynamics observed" only when the estimator and sampling parameters are explicit, and should say "useful computation" only when held-out/stress task quality beats trivial baselines robustly. The current sequence of scans is evidence against treating near-1 proxy activity, a mode-specific estimator bump, split-specific holdout bumps, controlled-drive estimator movement, or stress-label injection as sufficient: stress-holdout stayed baseline-level in the task-correlation, seed-replication, controlled-regime calibration, decoder-separation, and stress-injection artifacts.
+
+## Stress amplitude-ladder follow-up
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/87 now has a bounded live result:
+
+1. The run used fresh seeds `142..144` and amplitudes `1.0x`, `1.5x`, `2.0x`, `3.0x` over the same low-margin stress vectors.
+2. Original `stress_holdout` stayed at `0.333333` and query-collapse `1.000000`, preserving the previous negative boundary.
+3. Scaling made the same stress geometry separable in the current signed-first-lane route: scaled `stress_holdout` reached `0.833333` at `3.0x`, execute/retry accuracy `0.833333`, query-collapse `0.388889`, and `3/3` seeds beat the best constant baseline.
+4. Interpretation: this is useful separability evidence and it supports the amplitude/readout-geometry hypothesis, but it is not generalization or intelligence evidence because scaled `stress_train` labels are inside the Aigarth fitness callback and original low-margin stress still fails.
+5. Follow-up issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88 tracks one narrow target-aligned stress-objective diagnostic.
+
+## Stress objective follow-up result
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88 now has a bounded live result in `benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.*`:
+
+1. The run used fresh seeds `147..149`, fitness variant `target_contract_stress_margin_weighted`, and the `3.0x` stress amplitude from the ladder.
+2. The scaled split remains separable: scaled `stress_holdout` accuracy `0.888889`, execute/retry accuracy `1.000000`, query-collapse `0.222222`.
+3. The original low-margin split still fails: original `stress_holdout` accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`; counterfactual/permuted controls stay below constants.
+4. Interpretation: objective shaping preserved the high-amplitude signal but did not solve the original stress/control boundary. This is not intelligence or generalization evidence; it points to decoder/readout geometry or low-margin separability as the next diagnostic question.
+
+## Stress objective decoder/readout geometry follow-up
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89 now has a post-hoc artifact in `benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.*`:
+
+1. The artifact compares the original low-margin `stress_holdout` split against the `3.0x` scaled split from the latest stress objective.
+2. Original `stress_holdout` remains exactly at the best constant baseline: accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`.
+3. The scaled split remains separable: accuracy `0.888889`, query-collapse `0.222222`, execute/retry accuracy `1.000000`.
+4. The explicit geometry difference is a `3.0x` first-lane gain: execute/retry first-lane abs mean `0.150000 -> 0.450000`.
+5. Interpretation: this narrows the bottleneck to low-margin decoder/readout geometry, but does not improve original stress/control task quality and is not intelligence or generalization evidence.
+
+## Low-margin readout geometry follow-up
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89 now also has a post-hoc low-margin boundary artifact in `benchmarks/results/cunxon_low_margin_readout_geometry_probe.*`:
+
+1. Original execute/retry stress lanes remain on the wrong side of the observed query boundary: first-lane margin `-0.150000`, accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`.
+2. The `3.0x` scaled split remains on the right side: first-lane margin `0.150000`, accuracy `0.888889`, query-collapse `0.222222`, execute/retry accuracy `1.000000`.
+3. Interpretation: this is a readout/decoder geometry boundary and not intelligence evidence. The next useful hypothesis is a supervised or normalized low-margin target objective that keeps original stress/control splits as unseen evaluation data.
+
+## Supervised low-margin target-objective follow-up
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/90 now has a bounded live result in `benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.*`:
+
+1. The run used fresh seeds `150..152`, fitness variant `target_contract_supervised_low_margin`, and normalized low-margin train-only target cases.
+2. The optimized/nearby train surfaces are learnable in this route: `supervised_low_margin_train=1.000000`, standard `holdout=1.000000`, and `hard_holdout=1.000000`.
+3. The original low-margin split still fails: original `stress_holdout` accuracy `0.333333`, query-collapse `1.000000`, execute/retry accuracy `0.000000`; counterfactual/permuted controls are `0.000000`.
+4. Interpretation: objective shaping can learn normalized low-margin examples, but this did not move original stress/control evaluation above constants. It is not intelligence or generalization evidence and points to lower-level readout geometry/objective expressivity before another longer objective sweep.
+
+## Low-margin objective expressivity audit
+
+Issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80 now has a post-hoc source-and-artifact boundary in `benchmarks/results/cunxon_low_margin_objective_expressivity_audit.*`:
+
+1. The normalized low-margin surrogate is learnable inside the current scalar Aigarth route: `supervised_low_margin_train=1.000000`.
+2. Original `stress_holdout` remains `0.333333` with query-collapse `1.000000` and execute/retry accuracy `0.000000`.
+3. Source inspection confirms Aigarth is scalar black-box selection and the desired-output API is absent; external drive remains input-class-only, not a hidden/output teacher channel.
+4. Interpretation: the bottleneck is now lower-level objective/readout expressivity or CTSN/readout semantics, not a need for another longer identical supervised objective.
+
+## Proposed next probe
+
+`readout_margin_objective_or_ctsn_semantics_audit` is now proposed under issue https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80: the supervised/normalized low-margin objective has been reviewed, original stress/control still fails baselines, and source-level Aigarth/StepTrain semantics point to readout-margin/objective expressivity or CTSN/readout semantics rather than another longer copy of the same objective.
+
+## Conservative verdict
+
+NIA Vol. 8 is now mapped into concrete cuNxon research lanes: a regime scan, a direct snapshot avalanche probe, an estimator-sensitivity matrix, a task-coupled avalanche intervention/correlation probe, a fresh-seed replication probe, a controlled-regime calibration probe, a criticality/decoder separation report, a stress-injection upper-bound diagnostic, `cunxon_stress_geometry_audit`, `cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe`, `cunxon_low_margin_readout_geometry_probe`, and `cunxon_aigarth_action_target_contract_supervised_low_margin_probe`, plus the source-level `cunxon_low_margin_objective_expressivity_audit`. Existing cuNxon artifacts still support an evidence-first conclusion: runtime diagnostics are viable, Aigarth objective shaping is a promising toy route for standard/hard holdout, low-margin stress remains baseline-level even with injected stress-like labels, the amplitude ladder and stress-objective follow-up show scaled stress separability but original stress still fails, and branching/criticality metrics are not intelligence evidence until they predict or improve held-out/stress task performance across robust baselines and controls.

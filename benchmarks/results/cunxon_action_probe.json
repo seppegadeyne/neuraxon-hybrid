@@ -1,0 +1,79 @@
+{
+  "accuracy": 0.3333333333333333,
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "sequential one-sphere task-coupled probe completed",
+    "readouts are decoded with the existing ActionDecoder/action-contract mapping",
+    "flat or baseline-level accuracy is negative evidence, not intelligence evidence"
+  ],
+  "status": "task-coupled action probe viable",
+  "success_count": 1,
+  "trial_count": 3,
+  "trial_steps": 32,
+  "trials": [
+    {
+      "confidence": 0.3333,
+      "decoded_action": "RETRY",
+      "elapsed_ms": 103.47019601613283,
+      "energy": 708.5816555023193,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "name": "execute-positive-drive",
+      "normalized_action": "retry",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 105.25998601224273,
+      "energy": 1144.2611212730408,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "name": "retry-negative-drive",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 108.20787696866319,
+      "energy": 1356.2747049331665,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "query-neutral-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

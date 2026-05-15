@@ -12,15 +12,15 @@ def test_benchmark_report_publishes_required_sections_and_assets() -> None:
 
     required_headings = [
         "# Neuraxon Agent Benchmark Report",
-        "## 1. Samenvatting",
-        "## 2. Benchmarkopzet",
-        "## 3. Resultaten",
+        "## 1. Summary",
+        "## 2. Benchmark setup",
+        "## 3. Results",
         "## 4. Per scenario type",
-        "## 5. Interpretatie",
-        "## 6. Statistische vergelijking",
-        "## 7. Wat dit wel en niet bewijst",
+        "## 5. Interpretation",
+        "## 6. Statistical comparison",
+        "## 7. What this does and does not prove",
         "## 8. Verdict",
-        "## 9. Artefacten",
+        "## 9. Artifacts",
     ]
     for heading in required_headings:
         assert heading in report
@@ -52,17 +52,17 @@ def test_benchmark_report_contains_concise_proven_not_proven_summary() -> None:
 def test_benchmark_report_states_go_and_baseline_comparison() -> None:
     report = REPORT_PATH.read_text(encoding="utf-8")
 
-    assert "GO voor de semantische adapter" in report
-    assert "NO-GO voor raw Neuraxon-generalisatieclaims" in report
+    assert "GO for the semantic adapter" in report
+    assert "NO-GO for raw Neuraxon generalization claims" in report
     assert "pass_temporal_context_bridge_evidence" in report
     assert "semantic_policy_coverage=100%" in report
     assert "100.00%" in report
     assert "15.71%" in report
     assert "28.57%" in report
     assert "700" in report
-    assert "significant beter" in report
+    assert "significantly better" in report
 
-    comparison_headers = ["Agent", "Runs", "Correct", "Accuracy", "Gem. confidence"]
+    comparison_headers = ["Agent", "Runs", "Correct", "Accuracy", "Avg. confidence"]
     for header in comparison_headers:
         assert header in report
 
@@ -71,9 +71,9 @@ def test_benchmark_report_keeps_memory_and_visual_perception_out_of_scope() -> N
     report = REPORT_PATH.read_text(encoding="utf-8")
 
     assert "memory persistence" in report.lower()
-    assert "visuele" in report.lower() or "visual" in report.lower()
-    assert "niet bewezen" in report.lower()
-    assert "generalisatie" in report.lower()
+    assert "visual" in report.lower()
+    assert "not proven" in report.lower()
+    assert "generalization" in report.lower()
     assert "holdout/noisy" in report.lower()
     assert "benchmarks/results/holdout_noisy_generalization.json" in report
 
@@ -98,7 +98,7 @@ def test_benchmark_report_states_expanded_temporal_dataset_and_separation() -> N
     assert "semantic-policy-only" in report.lower()
     assert "semantic-policy success" in report.lower()
     assert "temporal_context_bridge" in report
-    assert "expliciete temporal context adapter" in report.lower()
+    assert "explicit temporal context adapter" in report.lower()
     assert "raw neuraxon network dynamics" in report.lower()
 
 

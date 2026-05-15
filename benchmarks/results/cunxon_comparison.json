@@ -1,0 +1,1776 @@
+{
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality/decoder separation showed query/action collapse on low-margin execute/retry stress cases despite observable estimator movement. A new stress-injection upper-bound diagnostic deliberately put duplicated stress-like labels into Aigarth fitness, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Criticality metrics and stress-label injection are useful diagnostics, not intelligence or generalization evidence. The stress geometry audit post-processes the live stress-injection artifact and shows both injected stress_train and original stress_holdout collapse to query on every sample; stress execute/retry accuracy is 0.000000 while augmented_train execute/retry remains 1.000000. This supports a low-margin separability/readout-geometry hypothesis, not an intelligence or generalization claim. The stress amplitude-ladder probe then shows the geometry hypothesis is actionable as separability evidence: original stress_holdout still stays 0.333333 with query-collapse 1.000000, but scaled stress_holdout reaches 0.833333 at 3.0x over fresh seeds 142..144. This is a label-injected/separability upper-bound, not intelligence or generalization evidence. The target-aligned stress objective follow-up preserves the 3.0x scaled-stress signal (scaled stress_holdout=0.888889, execute/retry=1.000000) but leaves original stress_holdout=0.333333, query-collapse=1.000000, and execute/retry=0.000000; this shifts the next question toward decoder/readout geometry, not longer runtime. The stress objective decoder/readout geometry follow-up is post-hoc: it confirms a 3.0x target-lane gain separates scaled stress while original stress remains at the constant baseline, so it narrows the bottleneck without improving task quality. The low-margin readout geometry probe makes that boundary explicit: original stress execute/retry lanes have a negative margin to the observed query boundary and remain at baseline, while 3.0x scaled stress crosses the boundary. This is a readout-geometry diagnostic, not intelligence evidence. The supervised low-margin target-objective follow-up optimized normalized low-margin train cases and reached perfect train/standard/hard holdout on this tiny route, but original stress_holdout remained 0.333333 with query-collapse 1.000000 and execute/retry accuracy 0.000000; counterfactual and permuted controls stayed 0.000000, so the evidence boundary remains negative for original stress/control generalization. The low-margin objective expressivity audit confirms that normalized surrogate cases can be learned while original stress/control stays baseline-level; source semantics point to scalar Aigarth selection and absent desired-output API rather than a longer identical objective.",
+  "comparison_lanes": [
+    {
+      "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
+      "lane": "Qubic NIA Vol. 8 criticality claim map",
+      "metric": "source-claim evidence map",
+      "value": "branching-ratio/criticality claims mapped to current artifacts; controlled-regime calibration completed; next separates estimator movement from decoder/action bottlenecks; no intelligence claim"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_branching_regime_scan.json",
+      "lane": "cuNxon branching-ratio regime scan",
+      "metric": "regime proxy vs action quality",
+      "value": "5/5 seeds bucketed as reverberating/near-critical proxy; mean branching proxy=0.997701; holdout=1.000000; stress_holdout=0.333333; 0/5 beat best constant stress baseline"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_avalanche_window_probe.json",
+      "lane": "cuNxon avalanche-window snapshot probe",
+      "metric": "snapshot-level branching estimate vs action quality",
+      "value": "3 seeds / 18 action samples; mean branching-ratio estimate 0.154496, active-count ratio mean=0.994343, neutral occupancy mean=0.908077; infer/train accuracy=0.333333, equal to constant baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_avalanche_window_intervention_matrix.json",
+      "lane": "cuNxon avalanche-window intervention matrix",
+      "metric": "estimator sensitivity vs mode action quality",
+      "value": "3 configs / 36 samples; branching estimator range 0.000000..0.483938; one short-dense infer-mode bump but no config had both infer/train beat constant baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_avalanche_intervention_task_correlation.json",
+      "lane": "cuNxon avalanche intervention/task correlation",
+      "metric": "task-coupled avalanche metrics vs held-out/stress/control split quality",
+      "value": "2 configs / 192 samples over fresh seeds 127..128; holdout=0.458333 and hard_holdout=0.458333 beat constants, but stress_holdout=0.333333 equals the best constant baseline and no configuration beat stress baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_avalanche_intervention_seed_replication.json",
+      "lane": "cuNxon avalanche intervention seed replication",
+      "metric": "fresh-seed replication of task-coupled avalanche metrics vs split quality",
+      "value": "2 configs / 384 samples over fresh seeds 129..132; holdout=0.437500 and hard_holdout=0.447917 beat constants, but stress_holdout=0.333333 equals the best constant baseline, permuted_control=0.250000, and no configuration beat stress baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_controlled_regime_calibration.json",
+      "lane": "cuNxon controlled-regime criticality calibration",
+      "metric": "low/medium/high drive estimator calibration vs split quality",
+      "value": "3 drive regimes / 288 samples over fresh seeds 133..134; branching mean rises 0.030866->0.128423, neutral occupancy drops 0.978481->0.873544; holdout/hard_holdout=0.416667 beat constants, but stress_holdout=0.333333 equals the best constant baseline and no drive regime beats stress baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_criticality_decoder_separation.json",
+      "lane": "cuNxon criticality/decoder separation",
+      "metric": "stress query collapse vs estimator movement",
+      "value": "post-hoc analysis of controlled calibration: stress query collapse=0.902778, execute/retry stress accuracy=0.041667, query stress accuracy=0.916667; estimator movement is present but not task-sufficient"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_smoke.json",
+      "lane": "cuNxon raw CUDA smoke",
+      "metric": "decision-quality score",
+      "value": "no decision-quality score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_vram_resident_run.json",
+      "lane": "cuNxon VRAM-resident dynamics run",
+      "metric": "wall-clock resident runtime samples",
+      "value": "4h run completed with 16 samples/4194304 steps; resident readout stayed [0, 0, 0]; active occupancy returned to 3/15; no decision-quality score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_resident_action_probe.json",
+      "lane": "cuNxon resident task-coupled action probe",
+      "metric": "epoch task accuracy vs trivial baselines",
+      "value": "12 epochs / 72 scored cases; every epoch/split accuracy=0.333333; motor readouts flat query; equals constant-action baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_readout_probe.json",
+      "lane": "cuNxon Aigarth readout semantics probe",
+      "metric": "two-pattern classification margin, relative demo vs absolute output ports",
+      "value": "relative demo margin improved 1.000000->1.500000; absolute output readout margin improved 0.625000->1.500000; no holdout/action score measured"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_probe.json",
+      "lane": "cuNxon Aigarth holdout/action probe",
+      "metric": "train/holdout action accuracy vs trivial baselines",
+      "value": "holdout=0.666667; overall=0.666667; beats constant-action baselines on this toy train/holdout set; unique_readouts=4; actions={'execute': 2, 'query': 4}"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_seed_sweep.json",
+      "lane": "cuNxon Aigarth action seed sweep",
+      "metric": "5-seed train/holdout action accuracy vs trivial baselines",
+      "value": "holdout mean=0.533333 (min=0.333333, max=0.666667); 3/5 seeds beat the best constant baseline on holdout; 5/5 beat it overall; unexpected normalized labels: assertive"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+      "lane": "cuNxon Aigarth action hard-holdout audit",
+      "metric": "5-seed hard-holdout/permuted-control action accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.500000 (min=0.333333, max=0.833333); holdout mean=0.600000; train=1.000000; permuted-control mean=0.000000; 2/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_strict_label_probe.json",
+      "lane": "cuNxon Aigarth strict-label action audit",
+      "metric": "5-seed strict-label hard-holdout/permuted-control accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.700000 (min=0.333333, max=1.000000); holdout mean=0.733333; train=1.000000; permuted-control mean=0.000000; 4/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_contract_penalty_probe.json",
+      "lane": "cuNxon Aigarth contract-penalty action audit",
+      "metric": "5-seed heavy-penalty hard-holdout/permuted-control accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.466667 (min=0.333333, max=0.833333); holdout mean=0.466667; train=1.000000; permuted-control mean=0.000000; 2/5 seeds beat the best constant baseline on hard_holdout; unexpected normalized labels: assertive at 0.040000 rate"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_remap_audit.json",
+      "lane": "cuNxon Aigarth action remap audit",
+      "metric": "post-hoc signed-first-lane replay over existing Aigarth action artifacts",
+      "value": "remap removes assertive labels but does not improve aggregate accuracy: original overall=0.549020, remapped overall=0.537255; original unexpected=13, remapped unexpected=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_stress_geometry_audit.json",
+      "lane": "cuNxon stress stimulus geometry audit",
+      "metric": "low-margin stress query collapse vs stimulus drive",
+      "value": "180 cases from the live stress-injection artifact; stress_train and stress_holdout query-collapse=1.000000; stress execute/retry accuracy=0.000000; augmented_train execute/retry accuracy=1.000000; next probe is an amplitude ladder, not another long sweep"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress amplitude-ladder",
+      "metric": "scaled low-margin stress separability vs original stress boundary",
+      "value": "fresh seeds 142..144; original stress_holdout=0.333333/query-collapse=1.000000; scaled stress_holdout at 3.0x=0.833333 with execute/retry accuracy=0.833333; label-injected separability evidence only"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress objective",
+      "metric": "margin-weighted scaled-stress objective vs original stress boundary",
+      "value": "fresh seeds 147..149; original stress_holdout=0.333333/query-collapse=1.000000/execute-retry=0.000000; scaled stress_holdout at 3.0x=0.888889 with execute/retry accuracy=1.000000; controls stay below constants; objective-shaping evidence only"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json",
+      "lane": "cuNxon stress objective decoder/readout geometry",
+      "metric": "original vs scaled stress action-lane geometry",
+      "value": "post-hoc issue #89 artifact; original stress_holdout=0.333333/query-collapse=1.000000, scaled stress_holdout 3.0x=0.888889/query-collapse=0.222222, first-lane gain=3.0; geometry evidence only"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json",
+      "lane": "cuNxon low-margin readout geometry",
+      "metric": "original vs scaled stress query-boundary margin",
+      "value": "post-hoc issue #89 artifact; original stress_holdout=0.333333/query-collapse=1.000000 with first-lane margin -0.150000, scaled stress_holdout 3.0x=0.888889 with first-lane margin 0.150000; geometry evidence only"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json",
+      "lane": "cuNxon Aigarth target-contract supervised low-margin objective",
+      "metric": "normalized low-margin objective vs original stress/control boundary",
+      "value": "fresh seeds 150..152; supervised_low_margin_train=1.000000 and holdout/hard_holdout=1.000000, but original stress_holdout=0.333333/query-collapse=1.000000/execute-retry=0.000000; counterfactual_control=0.000000 and permuted_control=0.000000; objective-shaping evidence only"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_low_margin_objective_expressivity_audit.json",
+      "lane": "cuNxon low-margin objective expressivity audit",
+      "metric": "source semantics plus normalized surrogate vs original stress boundary",
+      "value": "supervised_low_margin_train=1.000000, but original stress_holdout=0.333333/query-collapse=1.000000; Aigarth is scalar black-box selection and desired-output API is absent; not intelligence evidence"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_probe.json",
+      "lane": "cuNxon Aigarth target-contract action audit",
+      "metric": "5-seed target-contract hard-holdout/permuted-control accuracy vs trivial baselines",
+      "value": "hard-holdout mean=0.666667 (min=0.333333, max=1.000000); holdout mean=0.866667; train=1.000000; permuted-control mean=0.000000; 4/5 seeds beat the best constant baseline on hard_holdout; unexpected labels=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress audit",
+      "metric": "5-seed target-contract stress/control accuracy vs trivial baselines",
+      "value": "stress-holdout mean=0.333333 (all 5 seeds at constant-baseline level); hard-holdout mean=0.533333; holdout mean=0.666667; counterfactual-control mean=0.266667; permuted-control mean=0.000000; unexpected labels=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_augmented_train_probe.json",
+      "lane": "cuNxon Aigarth target-contract augmented-train audit",
+      "metric": "5-seed augmented-train target-contract stress/control accuracy vs trivial baselines",
+      "value": "augmented_train mean=1.000000; holdout mean=1.000000; hard-holdout mean=0.866667; stress-holdout mean=0.333333; counterfactual-control mean=0.066667; permuted-control mean=0.000000; unexpected labels=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress-injection upper-bound audit",
+      "metric": "5-seed injected-stress action accuracy vs trivial baselines",
+      "value": "stress_train mean=0.333333 and stress_holdout mean=0.333333 with 0/5 seeds beating constants, despite holdout=1.000000 and hard_holdout=0.866667; unexpected labels=0; this is negative upper-bound/debugging evidence, not generalization evidence"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
+      "lane": "cuNxon source semantics audit",
+      "metric": "desired-output API surface",
+      "value": "no desired-output API surface; output-port teacher forcing through sensory inputs unsupported"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_input_proxy_target_probe.json",
+      "lane": "cuNxon input-proxy target route",
+      "metric": "target-proxy alignment and holdout success_rate vs trivial baselines",
+      "value": "target proxy train alignment=1.000000; holdout=0.333333; overall=0.333333; motor readouts flat query"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_external_drive_window_probe.json",
+      "lane": "cuNxon external-drive port-window probe",
+      "metric": "input/hidden/output sensory-id drive response",
+      "value": "input-class windows active in infer/train; hidden/output windows stayed zero; output-window drive remains non-teacher-forcing"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_long_horizon.json",
+      "lane": "cuNxon long-horizon raw dynamics",
+      "metric": "continuous runtime samples",
+      "value": "65536 steps; 1 unique readout(s); 0 readout changes"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_long_sweep.json",
+      "lane": "cuNxon long sweep action diagnostic",
+      "metric": "success_rate vs trivial baselines",
+      "value": "108 samples; all mode/horizon accuracies=0.333333; train/train_rewarded flat query"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_action_probe.json",
+      "lane": "cuNxon task-coupled action probe",
+      "metric": "success_rate",
+      "value": 0.333333
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_sensitivity_probe.json",
+      "lane": "cuNxon infer-vs-train sensitivity probe",
+      "metric": "readout/action diversity",
+      "value": "infer unique=3; train unique=1; train-mode flat/query=9"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_snapshot_pattern_probe.json",
+      "lane": "cuNxon snapshot/pattern probe",
+      "metric": "hidden-state and recall signal",
+      "value": "snapshots active=0,8,2; patterns=2\u21920; recall hamming=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_multisphere_action_probe.json",
+      "lane": "cuNxon multi-sphere/action adapter",
+      "metric": "holdout success_rate vs trivial baselines",
+      "value": "holdout=0.333333; overall=0.333333; flat query motor readouts"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_interface_semantics_probe.json",
+      "lane": "cuNxon interface semantics probe",
+      "metric": "readout/relay port mapping",
+      "value": "same-sphere readouts match snapshot slices; input-port relay activates downstream; output-port relay stays neutral in this setup"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_supervised_motor_probe.json",
+      "lane": "cuNxon supervised motor-target adapter",
+      "metric": "holdout success_rate vs trivial baselines",
+      "value": "holdout=0.333333; overall=0.333333; target_alignment=0.777778; eval readouts flat query"
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal mode",
+      "lane": "raw_network",
+      "metric": "success_rate",
+      "value": 0.145833
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal baseline",
+      "lane": "random",
+      "metric": "success_rate",
+      "value": 0.104167
+    },
+    {
+      "evidence": "holdout_noisy_generalization anti-oracle temporal baseline",
+      "lane": "always_execute",
+      "metric": "success_rate",
+      "value": 0.166667
+    },
+    {
+      "evidence": "holdout_noisy_generalization semantic bridge mode",
+      "lane": "semantic_bridge",
+      "metric": "success_rate",
+      "value": 1.0
+    },
+    {
+      "evidence": "holdout_noisy_generalization temporal adapter mode",
+      "lane": "temporal_context_adapter",
+      "metric": "success_rate",
+      "value": 1.0
+    }
+  ],
+  "cunxon_action_probe": {
+    "accuracy": 0.3333333333333333,
+    "decision_quality_measured": true,
+    "status": "task-coupled action probe viable",
+    "success_count": 1,
+    "trial_count": 3,
+    "trial_steps": 32,
+    "verdict": "task-coupled but not above baselines"
+  },
+  "cunxon_aigarth_action_contract_penalty_probe": {
+    "aggregate_action_distribution": {
+      "assertive": 3,
+      "execute": 17,
+      "query": 39,
+      "retry": 16
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed heavy unexpected-label penalty audit; train-only Aigarth fitness; hard-holdout/permuted-control labels never optimized; no intelligence/generalization claim",
+    "fitness_variant": "strict_label_heavy_penalty",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.4666666666666667,
+    "mean_holdout": 0.4666666666666667,
+    "mean_overall": 0.48,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      97,
+      98,
+      99,
+      100,
+      101
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 2,
+      "holdout": 1,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth contract-penalty action audit completed",
+    "unexpected_action_count": 3,
+    "unexpected_action_rate": 0.04
+  },
+  "cunxon_aigarth_action_hard_holdout_probe": {
+    "accuracy_summary_by_split": {
+      "hard_holdout": {
+        "max": 0.8333333333333334,
+        "mean": 0.5,
+        "min": 0.3333333333333333
+      },
+      "holdout": {
+        "max": 1.0,
+        "mean": 0.6,
+        "min": 0.3333333333333333
+      },
+      "overall": {
+        "max": 0.7333333333333333,
+        "mean": 0.52,
+        "min": 0.4
+      },
+      "permuted_control": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0
+      },
+      "train": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0
+      }
+    },
+    "aggregate_action_distribution": {
+      "assertive": 1,
+      "execute": 22,
+      "query": 32,
+      "retry": 20
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed hard/noisy holdout and permuted-control audit; train-only Aigarth fitness; no intelligence/generalization claim",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.5,
+    "mean_holdout": 0.6,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      87,
+      88,
+      89,
+      90,
+      91
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 2,
+      "holdout": 2,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth hard-holdout audit completed",
+    "train_to_hard_holdout_gap_mean": 0.5,
+    "unexpected_action_rate": 0.013333333333333334,
+    "unexpected_actions": [
+      "assertive"
+    ],
+    "verdict": "hard-holdout audit keeps the Aigarth route promising but shows a large train-to-hard-holdout gap and only partial seed-level robustness"
+  },
+  "cunxon_aigarth_action_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.6666666666666666,
+      "overall": 0.6666666666666666,
+      "train": 0.6666666666666666
+    },
+    "action_distribution": {
+      "execute": 2,
+      "query": 4
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "small toy train/holdout Aigarth action slice; no broad intelligence/generalization claim",
+    "generation_train_scores": [
+      0.861111111111111,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.25,
+      1.25,
+      1.25,
+      1.1944444444444444,
+      0.5277777777777777,
+      1.2222222222222223,
+      0.861111111111111,
+      1.2222222222222223,
+      1.1388888888888888,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.1666666666666667,
+      1.1388888888888888,
+      1.1666666666666667,
+      1.1944444444444444
+    ],
+    "generations": 18,
+    "holdout_measured": true,
+    "population_size": 36,
+    "readout_ids": [
+      35,
+      36,
+      37
+    ],
+    "status": "aigarth action probe viable",
+    "target_alignment_by_split": {
+      "holdout": 0.5555555555555555,
+      "overall": 0.5555555555555555,
+      "train": 0.5555555555555555
+    },
+    "unique_readouts": 4,
+    "verdict": "Aigarth action probe beats constant-action baselines on this small train/holdout set, but remains a toy evidence slice"
+  },
+  "cunxon_aigarth_action_remap_audit": {
+    "case_count": 255,
+    "decision_quality_measured": false,
+    "evidence_boundary": "post-hoc replay over existing live cuNxon Aigarth artifacts; no new GPU learning run; isolates decoder vocabulary/remap effects only",
+    "original_accuracy_by_split": {
+      "hard_holdout": 0.5555555555555556,
+      "holdout": 0.5833333333333334,
+      "overall": 0.5490196078431373,
+      "permuted_control": 0.0,
+      "train": 0.9166666666666666
+    },
+    "original_unexpected_action_count": 13,
+    "remap_strategy": "signed-first-lane",
+    "remapped_accuracy_by_split": {
+      "hard_holdout": 0.5444444444444444,
+      "holdout": 0.6,
+      "overall": 0.5372549019607843,
+      "permuted_control": 0.06666666666666667,
+      "train": 0.8166666666666667
+    },
+    "remapped_unexpected_action_count": 0,
+    "source_count": 4,
+    "status": "aigarth action remap audit completed",
+    "strict_expected_actions": [
+      "execute",
+      "query",
+      "retry"
+    ],
+    "verdict": "signed-first-lane remap removes out-of-contract assertive labels, but remapped aggregate accuracy is slightly lower than the original decoder replay; decoder vocabulary was not the only bottleneck"
+  },
+  "cunxon_aigarth_action_seed_sweep": {
+    "accuracy_summary_by_split": {
+      "holdout": {
+        "max": 0.6666666666666666,
+        "mean": 0.5333333333333333,
+        "min": 0.3333333333333333
+      },
+      "overall": {
+        "max": 0.8333333333333334,
+        "mean": 0.6,
+        "min": 0.5
+      },
+      "train": {
+        "max": 1.0,
+        "mean": 0.6666666666666666,
+        "min": 0.3333333333333333
+      }
+    },
+    "aggregate_action_distribution": {
+      "assertive": 4,
+      "execute": 3,
+      "query": 16,
+      "retry": 7
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed repeatability audit; small engineered train/holdout set; no intelligence/generalization claim",
+    "generations": 16,
+    "holdout_measured": true,
+    "mean_holdout": 0.5333333333333333,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      82,
+      83,
+      84,
+      85,
+      86
+    ],
+    "seeds_beating_baseline_by_split": {
+      "holdout": 3,
+      "overall": 5,
+      "train": 4
+    },
+    "status": "aigarth action seed sweep completed",
+    "unexpected_actions": [
+      "assertive"
+    ],
+    "verdict": "Aigarth action seed sweep partially repeats the baseline-beating toy signal but remains brittle"
+  },
+  "cunxon_aigarth_action_strict_label_probe": {
+    "accuracy_summary_by_split": {
+      "hard_holdout": {
+        "max": 1.0,
+        "mean": 0.7000000000000001,
+        "min": 0.3333333333333333
+      },
+      "holdout": {
+        "max": 1.0,
+        "mean": 0.7333333333333333,
+        "min": 0.3333333333333333
+      },
+      "overall": {
+        "max": 0.8,
+        "mean": 0.6266666666666666,
+        "min": 0.4
+      },
+      "permuted_control": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0
+      },
+      "train": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0
+      }
+    },
+    "aggregate_action_distribution": {
+      "assertive": 5,
+      "execute": 18,
+      "query": 31,
+      "retry": 21
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed strict-label hard/noisy holdout and permuted-control audit; train-only Aigarth fitness with unexpected-label penalty; no intelligence/generalization claim",
+    "fitness_variant": "strict_label_margin",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.7000000000000001,
+    "mean_holdout": 0.7333333333333333,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      92,
+      93,
+      94,
+      95,
+      96
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 4,
+      "holdout": 3,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth strict-label action audit completed",
+    "train_to_hard_holdout_gap_mean": 0.3,
+    "unexpected_action_rate": 0.06666666666666667,
+    "unexpected_actions": [
+      "assertive"
+    ],
+    "verdict": "strict-label fitness improved hard-holdout robustness but did not eliminate out-of-contract labels or brittleness"
+  },
+  "cunxon_aigarth_action_target_contract_augmented_train_probe": {
+    "aggregate_action_distribution": {
+      "execute": 40,
+      "query": 73,
+      "retry": 37
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed augmented-train target-contract stress audit; train plus augmented_train Aigarth fitness only; hard/stress/control labels never optimized; no intelligence/generalization claim",
+    "fitness_variant": "target_contract_augmented_train",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_augmented_train": 1.0,
+    "mean_counterfactual_control": 0.06666666666666667,
+    "mean_hard_holdout": 0.8666666666666668,
+    "mean_holdout": 1.0,
+    "mean_overall": 0.64,
+    "mean_stress_holdout": 0.3333333333333333,
+    "mean_train": 0.9333333333333332,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      112,
+      113,
+      114,
+      115,
+      116
+    ],
+    "seeds_beating_baseline_by_split": {
+      "augmented_train": 5,
+      "counterfactual_control": 0,
+      "hard_holdout": 5,
+      "holdout": 5,
+      "overall": 5,
+      "permuted_control": 0,
+      "stress_holdout": 0,
+      "train": 5
+    },
+    "status": "aigarth target-contract augmented-train audit completed",
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0,
+    "verdict": "augmented low-margin training improves holdout/hard-holdout but stress-holdout remains baseline-level, so the target-contract route is still brittle"
+  },
+  "cunxon_aigarth_action_target_contract_probe": {
+    "aggregate_action_distribution": {
+      "execute": 20,
+      "query": 35,
+      "retry": 20
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed target-contract Aigarth fitness audit; signed-first-lane decoder used during train-only fitness; hard-holdout/permuted-control labels never optimized; no intelligence/generalization claim",
+    "fitness_variant": "target_contract_margin",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_hard_holdout": 0.6666666666666666,
+    "mean_holdout": 0.8666666666666666,
+    "mean_overall": 0.6399999999999999,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      102,
+      103,
+      104,
+      105,
+      106
+    ],
+    "seeds_beating_baseline_by_split": {
+      "hard_holdout": 4,
+      "holdout": 4,
+      "overall": 5,
+      "permuted_control": 0,
+      "train": 5
+    },
+    "status": "aigarth target-contract action audit completed",
+    "train_to_hard_holdout_gap_mean": 0.33333333333333337,
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0,
+    "verdict": "target-contract fitness removes out-of-contract labels and improves holdout versus the post-hoc remap/heavy-penalty lanes, but remains brittle tiny Aigarth toy evidence with one hard-holdout baseline-level seed"
+  },
+  "cunxon_aigarth_action_target_contract_stress_injection_probe": {
+    "artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "counterfactual_control_mean": 0.0,
+    "evidence_boundary": "Deliberately optimizes stress-like labels as stress_train; negative upper-bound/debugging evidence because even injected low-margin stress cases stay at constant baseline. Not generalization, useful-computation, or intelligence evidence.",
+    "fitness_variant": "target_contract_stress_injection",
+    "hard_holdout_mean": 0.866667,
+    "holdout_mean": 1.0,
+    "hypothesis": "stress_label_injection_upper_bound",
+    "permuted_control_mean": 0.0,
+    "seed_count": 5,
+    "seed_offsets": [
+      137,
+      138,
+      139,
+      140,
+      141
+    ],
+    "stress_holdout_mean": 0.333333,
+    "stress_holdout_seeds_beating_baseline": 0,
+    "stress_train_mean": 0.333333,
+    "stress_train_seeds_beating_baseline": 0,
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0
+  },
+  "cunxon_aigarth_action_target_contract_stress_probe": {
+    "aggregate_action_distribution": {
+      "execute": 28,
+      "query": 68,
+      "retry": 24
+    },
+    "decision_quality_measured": true,
+    "eval_steps": 24,
+    "evidence_boundary": "five-seed target-contract stress audit; target-contract train-only fitness reused, but stress_holdout and counterfactual_control labels were never optimized; no intelligence/generalization claim",
+    "fitness_variant": "target_contract_margin",
+    "generations": 16,
+    "holdout_measured": true,
+    "leakage_control_accuracy_mean": 0.0,
+    "mean_counterfactual_control": 0.26666666666666666,
+    "mean_hard_holdout": 0.5333333333333333,
+    "mean_holdout": 0.6666666666666666,
+    "mean_overall": 0.45833333333333337,
+    "mean_permuted_control": 0.0,
+    "mean_stress_holdout": 0.3333333333333333,
+    "mean_train": 1.0,
+    "population_size": 32,
+    "seed_count": 5,
+    "seed_offsets": [
+      107,
+      108,
+      109,
+      110,
+      111
+    ],
+    "seeds_beating_baseline_by_split": {
+      "counterfactual_control": 0,
+      "hard_holdout": 3,
+      "holdout": 3,
+      "overall": 5,
+      "permuted_control": 0,
+      "stress_holdout": 0,
+      "train": 5
+    },
+    "status": "aigarth target-contract stress audit completed",
+    "train_to_hard_holdout_gap_mean": 0.4666666666666667,
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0,
+    "verdict": "target-contract fitness keeps zero unexpected labels under harder stress/control splits, but stress_holdout falls to constant-baseline level and counterfactual_control is non-zero; this weakens broad generalization claims while keeping the route diagnostically useful"
+  },
+  "cunxon_aigarth_readout_probe": {
+    "absolute_output_final_margin": 1.5,
+    "absolute_output_improvement": 0.875,
+    "decision_quality_measured": false,
+    "eval_steps": 25,
+    "generations": 12,
+    "holdout_measured": false,
+    "population_size": 24,
+    "relative_demo_final_margin": 1.5,
+    "relative_demo_improvement": 0.5,
+    "status": "aigarth readout semantics probe viable",
+    "verdict": "Aigarth can improve absolute output margins on the two-pattern fitness task, but this is not holdout/action evidence"
+  },
+  "cunxon_avalanche_intervention_seed_replication": {
+    "config_count": 2,
+    "configurations_beating_stress_baseline": [],
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.13988315851772185,
+      "accuracy_vs_branching_ratio_estimate": -0.08206152319908176,
+      "accuracy_vs_neutral_occupancy": 0.11808323197297431
+    },
+    "evidence_boundary": "fresh-seed replication of the task-coupled avalanche intervention lane; normal/hard holdout bumps repeated, but stress_holdout stayed at the best constant baseline and the branching/accuracy correlation was weakly negative; not intelligence evidence",
+    "hypothesis": "avalanche_intervention_seed_replication",
+    "mean_branching_ratio_estimate": 0.11242,
+    "permuted_control_accuracy": 0.25,
+    "sample_count": 384,
+    "seed_offsets": [
+      129,
+      130,
+      131,
+      132
+    ],
+    "source_artifact": "benchmarks/results/cunxon_avalanche_intervention_seed_replication.json",
+    "split_accuracy": {
+      "counterfactual_control": 0.3333333333333333,
+      "hard_holdout": 0.4479166666666667,
+      "holdout": 0.4375,
+      "permuted_control": 0.25,
+      "stress_holdout": 0.3333333333333333,
+      "train": 0.4375
+    },
+    "stress_holdout_accuracy": 0.3333333333333333
+  },
+  "cunxon_avalanche_intervention_task_correlation": {
+    "best_constant_baseline_by_split": {
+      "counterfactual_control": 0.333333,
+      "hard_holdout": 0.333333,
+      "holdout": 0.333333,
+      "permuted_control": 0.333333,
+      "stress_holdout": 0.333333,
+      "train": 0.333333
+    },
+    "branching_ratio_estimate_range": [
+      0.0,
+      0.501736
+    ],
+    "config_count": 2,
+    "configurations_beating_stress_baseline": [],
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.044276,
+      "accuracy_vs_branching_ratio_estimate": -0.176464,
+      "accuracy_vs_neutral_occupancy": 0.18379
+    },
+    "evidence_boundary": "This is task-coupled regime instrumentation from bounded cuNxon snapshot windows; avalanche movement or branching-ratio estimates are not intelligence evidence unless held-out/stress task quality beats constant baselines under controls.",
+    "hypothesis": "avalanche_intervention_task_correlation",
+    "mean_branching_ratio_estimate": 0.110748,
+    "mean_neutral_occupancy": 0.93487,
+    "sample_count": 192,
+    "split_accuracy": {
+      "counterfactual_control": 0.25,
+      "hard_holdout": 0.458333,
+      "holdout": 0.458333,
+      "permuted_control": 0.208333,
+      "stress_holdout": 0.333333,
+      "train": 0.333333
+    }
+  },
+  "cunxon_avalanche_window_intervention_matrix": {
+    "branching_ratio_estimate_range": [
+      0.0,
+      0.483938
+    ],
+    "config_count": 3,
+    "configurations_with_all_modes_beating_baseline": [],
+    "evidence_boundary": "This matrix tests whether the NIA Vol. 8 criticality/branching metric is stable under bounded window-length/sample-interval changes. It is not intelligence evidence: useful computation would require robust held-out/control task quality above baselines, not only movement in a snapshot estimator or one mode-specific bump.",
+    "hypothesis": "avalanche_window_estimator_sensitivity",
+    "max_mode_accuracy_delta_vs_constant_baseline": 0.166667,
+    "mean_active_count_ratio": 0.986828,
+    "mean_branching_ratio_estimate": 0.151814,
+    "mean_neutral_occupancy": 0.894234,
+    "sample_count": 36
+  },
+  "cunxon_avalanche_window_probe": {
+    "accuracy_by_mode": {
+      "infer": 0.333333,
+      "train": 0.333333
+    },
+    "active_count_ratio_mean": 0.994343,
+    "baseline_accuracy": {
+      "always_execute": 0.333333,
+      "always_query": 0.333333,
+      "always_retry": 0.333333
+    },
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.168834,
+      "accuracy_vs_branching_ratio_estimate": -0.663921,
+      "accuracy_vs_neutral_occupancy": 0.697874
+    },
+    "evidence_boundary": "snapshot-level avalanche metrics from full-sphere states; diagnostics only because action accuracy remains at constant-action baselines",
+    "mean_branching_ratio_estimate": 0.154496,
+    "mean_neutral_occupancy": 0.908077,
+    "sample_count": 18,
+    "sample_interval": 16,
+    "seed_count": 3,
+    "seed_offsets": [
+      122,
+      123,
+      124
+    ],
+    "status": "avalanche-window probe completed",
+    "steps": 256,
+    "verdict": "Snapshot-level avalanche metrics are measurable, but neither infer nor train mode beats trivial baselines; criticality remains instrumentation rather than sufficient evidence."
+  },
+  "cunxon_branching_regime_scan": {
+    "beats_stress_baseline_count": 0,
+    "correlation_summary": {
+      "holdout_accuracy_vs_branching_proxy": 0.0,
+      "stress_holdout_accuracy_vs_branching_proxy": 0.0
+    },
+    "evidence_boundary": "coarse action-readout branching/activity proxy; near-critical-looking dynamics are diagnostic only and did not beat stress_holdout baselines",
+    "mean_branching_activity_ratio_proxy": 0.997701,
+    "mean_holdout": 1.0,
+    "mean_stress_holdout": 0.333333,
+    "regime_bucket": "reverberating/near-critical proxy",
+    "seed_count": 5,
+    "seed_offsets": [
+      117,
+      118,
+      119,
+      120,
+      121
+    ],
+    "source_probe": "target_contract_augmented_train",
+    "status": "branching-regime scan completed"
+  },
+  "cunxon_controlled_regime_calibration": {
+    "action_distribution_by_regime": {
+      "high-drive": {
+        "assertive": 2,
+        "execute": 22,
+        "query": 69,
+        "retry": 3
+      },
+      "low-drive": {
+        "assertive": 2,
+        "execute": 2,
+        "query": 90,
+        "retry": 2
+      },
+      "medium-drive": {
+        "assertive": 4,
+        "execute": 11,
+        "query": 78,
+        "retry": 3
+      }
+    },
+    "best_constant_baseline_by_split": {
+      "counterfactual_control": 0.3333333333333333,
+      "hard_holdout": 0.3333333333333333,
+      "holdout": 0.3333333333333333,
+      "permuted_control": 0.3333333333333333,
+      "stress_holdout": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "config_count": 3,
+    "configurations_beating_stress_baseline": [],
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.1786983050497875,
+      "accuracy_vs_branching_ratio_estimate": -0.07411232271418595,
+      "accuracy_vs_neutral_occupancy": 0.07410624320922846
+    },
+    "evidence_boundary": "This is controlled-regime estimator calibration for Qubic NIA Vol. 8 style criticality diagnostics; drive-dependent branching or occupancy movement is not intelligence evidence unless stress/control task quality beats constant baselines.",
+    "hypothesis": "controlled_regime_calibration",
+    "mean_branching_by_regime": {
+      "high-drive": 0.12842308224708449,
+      "low-drive": 0.03086572587951265,
+      "medium-drive": 0.08652948111233073
+    },
+    "mean_neutral_occupancy_by_regime": {
+      "high-drive": 0.8735437225877197,
+      "low-drive": 0.9784813596491229,
+      "medium-drive": 0.9256955866228073
+    },
+    "regime_drive_scales": {
+      "high-drive": 2.0,
+      "low-drive": 0.25,
+      "medium-drive": 1.0
+    },
+    "sample_count": 288,
+    "seed_offsets": [
+      133,
+      134
+    ],
+    "split_accuracy": {
+      "counterfactual_control": 0.25,
+      "hard_holdout": 0.4166666666666667,
+      "holdout": 0.4166666666666667,
+      "permuted_control": 0.2777777777777778,
+      "stress_holdout": 0.3333333333333333,
+      "train": 0.4722222222222222
+    },
+    "status": "controlled-regime calibration completed",
+    "stress_holdout_accuracy": 0.3333333333333333
+  },
+  "cunxon_criticality_decoder_separation": {
+    "diagnosis": "decoder_action_collapse_on_low_margin_execute_retry_stress_cases",
+    "estimator_movement_status": "present_but_not_task_sufficient",
+    "evidence_boundary": "This is post-hoc separation of estimator movement from decoder/action behavior over an existing live RTX 5090 calibration artifact. It uses no stress/control labels for optimization and is not intelligence evidence; useful-computation claims still require stress/control task quality above constant baselines across seeds and settings.",
+    "execute_retry_stress_accuracy": 0.041667,
+    "hypothesis": "criticality_decoder_separation",
+    "query_stress_accuracy": 0.916667,
+    "sample_count": 288,
+    "source_artifact": "benchmarks/results/cunxon_controlled_regime_calibration.json",
+    "stress_accuracy": 0.333333,
+    "stress_best_constant_baseline": 0.333333,
+    "stress_query_collapse_rate": 0.902778
+  },
+  "cunxon_external_drive_window_probe": {
+    "decision_quality_measured": false,
+    "hidden_output_window_total_active": 0,
+    "input_samples": [
+      {
+        "energy": 63.93302011489868,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          1,
+          -1,
+          1,
+          -1
+        ]
+      },
+      {
+        "energy": 16.807759523391724,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          1,
+          -1,
+          1,
+          -1
+        ]
+      }
+    ],
+    "input_vector": [
+      1.0,
+      -1.0,
+      0.5,
+      -0.5
+    ],
+    "input_window_total_active": 8,
+    "non_input_samples": [
+      {
+        "driven_port_class": "hidden",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "output",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "infer",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "hidden",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "driven_port_class": "output",
+        "energy": 0.0,
+        "matches_snapshot_slice": true,
+        "mode": "train",
+        "readout": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "sample_count": 6,
+    "status": "external-drive window probe viable",
+    "steps": 5,
+    "verdict": "input-class direct drive observable; hidden/output windows are not desired-output channels"
+  },
+  "cunxon_input_proxy_target_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "decision_quality_measured": true,
+    "eval_steps": 32,
+    "motor_readout_port_ids": [
+      11,
+      12,
+      13
+    ],
+    "status": "input-proxy target probe viable",
+    "target_proxy_alignment_by_split": {
+      "holdout": 0.0,
+      "overall": 0.5,
+      "train": 1.0
+    },
+    "target_proxy_port_ids": [
+      3,
+      4,
+      5
+    ],
+    "train_epochs": 12,
+    "train_steps_per_case": 32,
+    "unique_motor_readouts": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "verdict": "input-proxy route confirms target drive but motor readout remains baseline-level"
+  },
+  "cunxon_interface_semantics_probe": {
+    "decision_quality_measured": false,
+    "readout_mappings": {
+      "absolute-output-readout": {
+        "matches_snapshot_slice": true,
+        "neuron_class": "output",
+        "port_ids": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "readout": [
+          -1,
+          0,
+          1,
+          0
+        ]
+      },
+      "relative-input-readout": {
+        "matches_snapshot_slice": true,
+        "neuron_class": "input",
+        "port_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "readout": [
+          1,
+          -1,
+          1,
+          1
+        ]
+      }
+    },
+    "relay_mappings": {
+      "input-neuron-relay": {
+        "downstream_active_state_count": 4,
+        "downstream_input_readout": [
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "source_neuron_class": "input",
+        "source_port_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "source_relay_readout": [
+          1,
+          -1,
+          1,
+          1
+        ]
+      },
+      "output-neuron-relay": {
+        "downstream_active_state_count": 0,
+        "downstream_input_readout": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "source_neuron_class": "output",
+        "source_port_ids": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "source_relay_readout": [
+          -1,
+          0,
+          1,
+          0
+        ]
+      }
+    },
+    "sample_count": 4,
+    "status": "interface semantics probe viable",
+    "verdict": "absolute neuron-index readout semantics confirmed; relay behavior differs by source port class, not a learning result"
+  },
+  "cunxon_long_horizon": {
+    "decision_quality_measured": false,
+    "energy_delta": 1119554.053346634,
+    "readout_change_count": 0,
+    "sample_interval": 8192,
+    "samples": 8,
+    "status": "long-horizon probe viable",
+    "total_steps": 65536,
+    "unique_readouts": 1,
+    "verdict": "long-horizon runtime viable, not benchmark-integrated"
+  },
+  "cunxon_long_sweep": {
+    "accuracy_by_mode_and_steps": {
+      "infer": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      },
+      "train": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      },
+      "train_rewarded": {
+        "32": 0.3333333333333333,
+        "32768": 0.3333333333333333,
+        "4096": 0.3333333333333333,
+        "512": 0.3333333333333333
+      }
+    },
+    "action_distribution_by_mode_and_steps": {
+      "infer": {
+        "32": {
+          "query": 8,
+          "retry": 1
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "execute": 1,
+          "query": 8
+        }
+      },
+      "train": {
+        "32": {
+          "query": 9
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "query": 9
+        }
+      },
+      "train_rewarded": {
+        "32": {
+          "query": 9
+        },
+        "32768": {
+          "query": 9
+        },
+        "4096": {
+          "query": 9
+        },
+        "512": {
+          "query": 9
+        }
+      }
+    },
+    "baseline_accuracy": {
+      "always_execute": 0.3333333333333333,
+      "always_query": 0.3333333333333333,
+      "always_retry": 0.3333333333333333
+    },
+    "decision_quality_measured": true,
+    "sample_count": 108,
+    "seed_offsets": [
+      79,
+      80,
+      81
+    ],
+    "status": "long-sweep probe viable",
+    "step_horizons": [
+      32,
+      512,
+      4096,
+      32768
+    ],
+    "unique_readouts_by_mode_and_steps": {
+      "infer": {
+        "32": 3,
+        "32768": 1,
+        "4096": 1,
+        "512": 2
+      },
+      "train": {
+        "32": 1,
+        "32768": 1,
+        "4096": 1,
+        "512": 1
+      },
+      "train_rewarded": {
+        "32": 1,
+        "32768": 1,
+        "4096": 1,
+        "512": 1
+      }
+    },
+    "verdict": "longer action sweep remains baseline-level"
+  },
+  "cunxon_low_margin_objective_expressivity_audit": {
+    "aigarth_fitness_surface": "scalar_black_box_selection",
+    "desired_output_api": "absent",
+    "diagnosis": "normalized_surrogate_learned_original_low_margin_boundary_unchanged",
+    "evidence_boundary": "This is a post-hoc source-and-artifact audit, not intelligence evidence. It narrows the next question to lower-level readout margin/objective expressivity or CTSN/readout semantics; it does not improve original stress/control task quality above constant baselines.",
+    "hypothesis": "low_margin_objective_expressivity_boundary",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "supervised_low_margin_train_accuracy_mean": 1.0
+  },
+  "cunxon_low_margin_readout_geometry_probe": {
+    "evidence": "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json",
+    "hypothesis": "low_margin_readout_geometry_separability_boundary",
+    "original_first_lane_margin_to_query": -0.15,
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "scaled_first_lane_margin_to_query": 0.15,
+    "scaled_stress_holdout_accuracy_mean": 0.888888888888889,
+    "status": "geometry diagnostic, not intelligence evidence"
+  },
+  "cunxon_multisphere_action_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "motor_readouts": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "sphere_count": 3,
+    "status": "multi-sphere action probe viable",
+    "verdict": "three-sphere adapter runs but is flat query and does not beat trivial baselines"
+  },
+  "cunxon_resident_action_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "all_epoch_accuracy": 0.3333333333333333,
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 72,
+    "decision_quality_measured": true,
+    "eval_steps": 64,
+    "motor_readouts": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "status": "resident action probe viable",
+    "train_epochs": 12,
+    "train_steps_per_case": 128,
+    "unique_motor_readouts": 1,
+    "verdict": "resident task-coupled action loop remains flat query and does not beat trivial baselines"
+  },
+  "cunxon_sensitivity_probe": {
+    "action_change_count_by_stimulus": {
+      "execute-positive-drive": 1,
+      "query-neutral-drive": 0,
+      "retry-negative-drive": 0
+    },
+    "action_distribution_by_mode": {
+      "infer": {
+        "query": 8,
+        "retry": 1
+      },
+      "train": {
+        "query": 9
+      }
+    },
+    "sample_count": 18,
+    "status": "sensitivity probe viable",
+    "unique_readouts_by_mode": {
+      "infer": 3,
+      "train": 1
+    },
+    "verdict": "sensitivity diagnostic train-mode flat"
+  },
+  "cunxon_smoke": {
+    "decision_quality_measured": false,
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "readout": [
+      0,
+      0,
+      0
+    ],
+    "status": "smoke-test viable"
+  },
+  "cunxon_snapshot_pattern_probe": {
+    "pattern_count_after_clear": 0,
+    "pattern_count_after_store": 2,
+    "recall_hamming_distance": 0,
+    "recall_readouts": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "snapshot_active_state_counts": [
+      0,
+      8,
+      2
+    ],
+    "status": "snapshot-pattern probe viable",
+    "verdict": "snapshot channels viable; pattern recall callable but flat zero in this setup"
+  },
+  "cunxon_source_semantics_audit": {
+    "decision_quality_measured": false,
+    "desired_output_api_present": false,
+    "live_runtime_check": {
+      "chance_accuracy": 0.5,
+      "command": "./example_4sphere 3000 400 0",
+      "online_testing_steps": 400,
+      "overall_accuracy": 0.4825,
+      "warmup_steps": 3000
+    },
+    "status": "source semantics audited",
+    "teacher_forcing_output_ports_supported_by_step_input": false,
+    "verdict": "source-level semantics explain why output-port teacher forcing is unsupported"
+  },
+  "cunxon_stress_amplitude_ladder_probe": {
+    "amplitude_factors": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "best_scaled_stress_holdout_accuracy_mean": 0.8333333333333334,
+    "best_scaled_stress_holdout_amplitude_factor": 3.0,
+    "evidence_boundary": "This is a label-injected separability upper-bound over scaled low-margin stress vectors. Scaled stress_train cases are inside the fitness callback, so any improvement is diagnostic adapter-capability evidence, not intelligence evidence and not generalization evidence unless stress/control holdouts beat constant baselines.",
+    "hypothesis": "stress_amplitude_ladder_separability",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "recommended_next_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88",
+    "recommended_next_probe": "target_aligned_stress_objective_followup",
+    "seed_offsets": [
+      142,
+      143,
+      144
+    ],
+    "status": "aigarth target-contract stress amplitude-ladder completed"
+  },
+  "cunxon_stress_geometry_audit": {
+    "augmented_train_execute_retry_accuracy": 1.0,
+    "augmented_train_mean_abs_sum": 0.433333,
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/87",
+    "hypothesis": "stress_stimulus_geometry_separability",
+    "recommended_next_probe": "stress_amplitude_ladder_probe",
+    "sample_count": 180,
+    "source_artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "stress_execute_retry_accuracy": 0.0,
+    "stress_holdout_query_collapse_rate": 1.0,
+    "stress_train_mean_abs_sum": 0.353333,
+    "stress_train_query_collapse_rate": 1.0,
+    "verdict": "Low-margin stress execute/retry vectors collapsed to neutral/query even when duplicated into fitness; run an amplitude ladder before adding more labels or longer runtime."
+  },
+  "cunxon_stress_objective_decoder_geometry_followup": {
+    "artifact": "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json",
+    "evidence_boundary": "Post-hoc decoder/readout geometry explains the latest stress-objective boundary but does not improve it: original low-margin stress_holdout still equals the best constant baseline, while the same cases become separable only after 3.0x scaling that was represented in the label-injected fitness path. This is not intelligence evidence and not generalization evidence.",
+    "first_lane_gain": 3.0,
+    "hypothesis": "original_vs_scaled_stress_readout_geometry",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_execute_retry_accuracy": 0.0,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "recommended_next_probe": "low_margin_readout_geometry_probe",
+    "scaled_stress_holdout_accuracy_mean": 0.888888888888889,
+    "scaled_stress_holdout_execute_retry_accuracy": 1.0,
+    "scaled_stress_holdout_query_collapse_rate": 0.2222222222222222,
+    "source_artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+    "status": "stress objective decoder geometry follow-up completed"
+  },
+  "cunxon_stress_objective_probe": {
+    "amplitude_factor": 3.0,
+    "counterfactual_control_accuracy_mean": 0.1111111111111111,
+    "evidence_boundary": "objective-shaping diagnostic; original low-margin stress remains baseline-level, so not intelligence or generalization evidence",
+    "fitness_variant": "target_contract_stress_margin_weighted",
+    "hypothesis": "target_aligned_stress_objective",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_execute_retry_accuracy": 0.0,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "permuted_control_accuracy_mean": 0.0,
+    "recommended_next_probe": "stress_objective_decoder_geometry_followup",
+    "scaled_stress_holdout_accuracy_mean": 0.888888888888889,
+    "scaled_stress_holdout_execute_retry_accuracy": 1.0,
+    "scaled_stress_holdout_query_collapse_rate": 0.2222222222222222,
+    "seed_offsets": [
+      147,
+      148,
+      149
+    ],
+    "status": "aigarth target-contract stress objective completed"
+  },
+  "cunxon_supervised_low_margin_objective_probe": {
+    "aggregate_action_distribution": {
+      "execute": 30,
+      "query": 48,
+      "retry": 30
+    },
+    "counterfactual_control_accuracy_mean": 0.0,
+    "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json",
+    "fitness_variant": "target_contract_supervised_low_margin",
+    "hypothesis": "supervised_low_margin_target_objective",
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_execute_retry_accuracy": 0.0,
+    "original_stress_holdout_query_collapse_rate": 1.0,
+    "permuted_control_accuracy_mean": 0.0,
+    "seed_offsets": [
+      150,
+      151,
+      152
+    ],
+    "status": "aigarth target-contract supervised low-margin objective completed",
+    "supervised_low_margin_train_accuracy_mean": 1.0,
+    "verdict": "normalized low-margin train cases are learnable, but original stress_holdout remains at the constant baseline and controls remain below constants; objective-shaping diagnostic only"
+  },
+  "cunxon_supervised_motor_probe": {
+    "accuracy_by_split": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "baseline_accuracy_by_split": {
+      "always_execute": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_query": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      },
+      "always_retry": {
+        "holdout": 0.3333333333333333,
+        "overall": 0.3333333333333333,
+        "train": 0.3333333333333333
+      }
+    },
+    "case_count": 6,
+    "decision_quality_measured": true,
+    "eval_readouts": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "eval_steps": 16,
+    "status": "supervised motor-target probe viable",
+    "target_alignment_by_split": {
+      "holdout": 0.7777777777777777,
+      "overall": 0.7777777777777777,
+      "train": 0.7777777777777777
+    },
+    "target_port_ids": [
+      8,
+      9,
+      10
+    ],
+    "train_epochs": 8,
+    "train_steps_per_case": 16,
+    "verdict": "supervised motor-target adapter remains flat query and does not beat trivial baselines"
+  },
+  "cunxon_vram_resident_run": {
+    "active_state_count_sequence": [
+      3,
+      5,
+      5,
+      5,
+      5,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "decision_quality_measured": false,
+    "gpu_memory_used_mb_range": [
+      2924,
+      3207
+    ],
+    "sample_count": 16,
+    "state_artifact": "benchmarks/results/cunxon_vram_resident_run_state.json",
+    "status": "completed 4h run",
+    "steps_per_second_between_samples_avg": 291.320825,
+    "total_steps": 4194304,
+    "unique_readouts": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "verdict": "four-hour resident process completed without observed GPU resource failure, but readout stayed flat zero and no decision-quality score was measured"
+  },
+  "observed_files": [
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md",
+    "benchmarks/results/cunxon_aigarth_action_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_probe.md",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.md"
+  ],
+  "qubic_nia_vol8_criticality_claim_map": {
+    "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
+    "evidence_boundary": "hypothesis source only; supervised low-margin target objective is diagnostic and original stress/control task quality still does not beat baselines",
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
+    "hypothesis": "branching_ratio_as_measured_regime_gate",
+    "latest_evidence": "cunxon_supervised_low_margin_objective_probe",
+    "recommended_next_probe": "readout_margin_objective_or_ctsn_semantics_audit",
+    "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
+    "summary": "branching-ratio/criticality claims mapped to current artifacts; supervised low-margin objective completed and original stress/control remains baseline-or-below; no intelligence claim"
+  },
+  "sources": [
+    "benchmarks/results/cunxon_smoke.json",
+    "benchmarks/results/cunxon_resident_action_probe.json",
+    "benchmarks/results/cunxon_source_semantics_audit.json",
+    "benchmarks/results/cunxon_avalanche_intervention_task_correlation.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+    "benchmarks/results/cunxon_input_proxy_target_probe.json",
+    "benchmarks/results/cunxon_long_horizon.json",
+    "benchmarks/results/cunxon_long_sweep.json",
+    "benchmarks/results/cunxon_action_probe.json",
+    "benchmarks/results/cunxon_sensitivity_probe.json",
+    "benchmarks/results/cunxon_snapshot_pattern_probe.json",
+    "benchmarks/results/cunxon_multisphere_action_probe.json",
+    "benchmarks/results/cunxon_interface_semantics_probe.json",
+    "benchmarks/results/cunxon_supervised_motor_probe.json",
+    "benchmarks/results/holdout_noisy_generalization.json",
+    "benchmarks/results/analysis/benchmark_summary.csv",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+    "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json"
+  ],
+  "verdict": "Supervised low-margin target objective trains normalized low-margin cases but original stress/control remain baseline-or-below; not intelligence evidence"
+}

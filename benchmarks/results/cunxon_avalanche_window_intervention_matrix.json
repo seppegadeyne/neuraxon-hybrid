@@ -1,0 +1,172 @@
+{
+  "aggregate_normalized_action_distribution": {
+    "assertive": 3,
+    "execute": 4,
+    "query": 29
+  },
+  "branching_ratio_estimate_range": [
+    0.0,
+    0.483938
+  ],
+  "config_count": 3,
+  "configurations": [
+    {
+      "accuracy_by_mode": {
+        "infer": 0.5,
+        "train": 0.333333
+      },
+      "all_modes_beat_best_constant_baseline": false,
+      "artifact_json": "benchmarks/results/cunxon_avalanche_window_short_dense.json",
+      "artifact_markdown": "benchmarks/results/cunxon_avalanche_window_short_dense.md",
+      "best_constant_baseline": 0.333333,
+      "constant_baselines": {
+        "always_execute": 0.333333,
+        "always_query": 0.333333,
+        "always_retry": 0.333333
+      },
+      "correlation_summary": {
+        "accuracy_vs_active_count_ratio_mean": 0.96869,
+        "accuracy_vs_branching_ratio_estimate": -0.539597,
+        "accuracy_vs_neutral_occupancy": 0.393795
+      },
+      "id": "short-dense",
+      "label": "short dense window",
+      "max_branching_ratio_estimate": 0.342796,
+      "mean_active_count_ratio": 0.957002,
+      "mean_branching_ratio_estimate": 0.121067,
+      "mean_neutral_occupancy": 0.868284,
+      "mean_transition_entropy_bits": 1.388397,
+      "min_branching_ratio_estimate": 0.0,
+      "mode_accuracy_delta_vs_best_constant_baseline": {
+        "infer": 0.166667,
+        "train": 0.0
+      },
+      "modes": [
+        "infer",
+        "train"
+      ],
+      "sample_count": 12,
+      "sample_interval": 8,
+      "seed_offsets": [
+        125,
+        126
+      ],
+      "steps": 128
+    },
+    {
+      "accuracy_by_mode": {
+        "infer": 0.333333,
+        "train": 0.333333
+      },
+      "all_modes_beat_best_constant_baseline": false,
+      "artifact_json": "benchmarks/results/cunxon_avalanche_window_baseline_equivalent.json",
+      "artifact_markdown": "benchmarks/results/cunxon_avalanche_window_baseline_equivalent.md",
+      "best_constant_baseline": 0.333333,
+      "constant_baselines": {
+        "always_execute": 0.333333,
+        "always_query": 0.333333,
+        "always_retry": 0.333333
+      },
+      "correlation_summary": {
+        "accuracy_vs_active_count_ratio_mean": 0.366361,
+        "accuracy_vs_branching_ratio_estimate": -0.674629,
+        "accuracy_vs_neutral_occupancy": 0.688052
+      },
+      "id": "baseline-equivalent",
+      "label": "baseline-equivalent window",
+      "max_branching_ratio_estimate": 0.426655,
+      "mean_active_count_ratio": 0.9855,
+      "mean_branching_ratio_estimate": 0.157171,
+      "mean_neutral_occupancy": 0.901042,
+      "mean_transition_entropy_bits": 1.159832,
+      "min_branching_ratio_estimate": 0.0,
+      "mode_accuracy_delta_vs_best_constant_baseline": {
+        "infer": 0.0,
+        "train": 0.0
+      },
+      "modes": [
+        "infer",
+        "train"
+      ],
+      "sample_count": 12,
+      "sample_interval": 16,
+      "seed_offsets": [
+        125,
+        126
+      ],
+      "steps": 256
+    },
+    {
+      "accuracy_by_mode": {
+        "infer": 0.333333,
+        "train": 0.333333
+      },
+      "all_modes_beat_best_constant_baseline": false,
+      "artifact_json": "benchmarks/results/cunxon_avalanche_window_long_sparse.json",
+      "artifact_markdown": "benchmarks/results/cunxon_avalanche_window_long_sparse.md",
+      "best_constant_baseline": 0.333333,
+      "constant_baselines": {
+        "always_execute": 0.333333,
+        "always_query": 0.333333,
+        "always_retry": 0.333333
+      },
+      "correlation_summary": {
+        "accuracy_vs_active_count_ratio_mean": -0.498688,
+        "accuracy_vs_branching_ratio_estimate": -0.651809,
+        "accuracy_vs_neutral_occupancy": 0.70284
+      },
+      "id": "long-sparse",
+      "label": "long sparse window",
+      "max_branching_ratio_estimate": 0.483938,
+      "mean_active_count_ratio": 1.017984,
+      "mean_branching_ratio_estimate": 0.177203,
+      "mean_neutral_occupancy": 0.913377,
+      "mean_transition_entropy_bits": 1.036948,
+      "min_branching_ratio_estimate": 0.0,
+      "mode_accuracy_delta_vs_best_constant_baseline": {
+        "infer": 0.0,
+        "train": 0.0
+      },
+      "modes": [
+        "infer",
+        "train"
+      ],
+      "sample_count": 12,
+      "sample_interval": 32,
+      "seed_offsets": [
+        125,
+        126
+      ],
+      "steps": 512
+    }
+  ],
+  "configurations_with_all_modes_beating_baseline": [],
+  "evidence_boundary": "This matrix tests whether the NIA Vol. 8 criticality/branching metric is stable under bounded window-length/sample-interval changes. It is not intelligence evidence: useful computation would require robust held-out/control task quality above baselines, not only movement in a snapshot estimator or one mode-specific bump.",
+  "hypothesis_for_this_slice": "avalanche_window_estimator_sensitivity",
+  "max_mode_accuracy_delta_vs_constant_baseline": 0.166667,
+  "mean_active_count_ratio": 0.986828,
+  "mean_branching_ratio_estimate": 0.151814,
+  "mean_neutral_occupancy": 0.894234,
+  "recommended_next_probe": {
+    "acceptance_criteria": [
+      "Use fresh seeds and at least one held-out or stress action split, not only train/infer action stimuli.",
+      "Report branching/avalanche movement beside action quality, constant baselines, and leakage/control checks.",
+      "Treat mode-specific or seed-specific bumps as hypotheses until they repeat across modes/seeds."
+    ],
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/85",
+    "id": "cunxon-avalanche-intervention-task-correlation",
+    "purpose": "Move from estimator sensitivity to causal/intervention evidence by varying runtime parameters or stimuli while requiring regime movement and held-out/stress action quality above baselines."
+  },
+  "sample_count": 36,
+  "source": {
+    "published": "2026-05-13",
+    "title": "Brain Criticality and the Branching Ratio in Neural and Artificial Networks: A Bioinspired Principle in Neuraxon",
+    "url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8"
+  },
+  "source_claim_ids": [
+    "branching-ratio-regimes",
+    "self-organized-criticality",
+    "functional-generalization-claim"
+  ],
+  "verdict": "Window-length/sample-interval changes moved the snapshot branching estimator and produced one short-dense infer-mode accuracy above the constant baseline, but no configuration had both infer and train modes beat the best constant baseline; this is estimator-sensitivity and negative robustness evidence, not intelligence evidence."
+}

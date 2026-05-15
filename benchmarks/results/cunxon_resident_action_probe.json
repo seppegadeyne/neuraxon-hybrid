@@ -1,0 +1,3009 @@
+{
+  "accuracy_by_epoch": {
+    "1": 0.3333333333333333,
+    "10": 0.3333333333333333,
+    "11": 0.3333333333333333,
+    "12": 0.3333333333333333,
+    "2": 0.3333333333333333,
+    "3": 0.3333333333333333,
+    "4": 0.3333333333333333,
+    "5": 0.3333333333333333,
+    "6": 0.3333333333333333,
+    "7": 0.3333333333333333,
+    "8": 0.3333333333333333,
+    "9": 0.3333333333333333
+  },
+  "accuracy_by_split": {
+    "holdout": 0.3333333333333333,
+    "overall": 0.3333333333333333,
+    "train": 0.3333333333333333
+  },
+  "baseline_accuracy_by_split": {
+    "always_execute": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_query": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_retry": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    }
+  },
+  "case_count": 72,
+  "cases": [
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 176.809370983392,
+      "energy": 209.2246102907842,
+      "epoch": 1,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 184.69488294795156,
+      "energy": 209.22464742702152,
+      "epoch": 1,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 192.5493239541538,
+      "energy": 209.22466901301686,
+      "epoch": 1,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 200.2956600044854,
+      "energy": 209.22469960090504,
+      "epoch": 1,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 208.0646069953218,
+      "energy": 209.22474291161507,
+      "epoch": 1,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 3,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 217.56191999884322,
+      "energy": 209.2247664195972,
+      "epoch": 1,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 290.4858939582482,
+      "energy": 209.2247785046274,
+      "epoch": 2,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 298.3730259584263,
+      "energy": 209.22477850463252,
+      "epoch": 2,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 306.1931649572216,
+      "energy": 209.2247785046357,
+      "epoch": 2,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 314.0067039639689,
+      "energy": 209.22477850464054,
+      "epoch": 2,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 321.82148296851665,
+      "energy": 209.22477850464867,
+      "epoch": 2,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 3,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 329.78648896096274,
+      "energy": 209.22477850465248,
+      "epoch": 2,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 399.21218098606914,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 407.1512059890665,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 414.9628239683807,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 422.8232659515925,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 430.7309690047987,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 3,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 438.5160959791392,
+      "energy": 209.22477850465356,
+      "epoch": 3,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 514.2249409691431,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 522.1497049788013,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 529.9391229636967,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 537.7561019849963,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 545.7808699575253,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 3,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 553.6310609895736,
+      "energy": 209.22477850465356,
+      "epoch": 4,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 624.347778968513,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 632.2877839556895,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 640.1220739935525,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 647.9731539729983,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 655.9605609509163,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 3,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 663.8061410048977,
+      "energy": 209.22477850465356,
+      "epoch": 5,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 733.6950739845634,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 741.3600760046393,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 749.0597799769603,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 756.8169969599694,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 764.5666629541665,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 772.3549509537406,
+      "energy": 209.22477850465356,
+      "epoch": 6,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 842.2655339818448,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 850.0558729865588,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 857.6987839769572,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 865.4825720004737,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 873.1487939949147,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 880.8507289504632,
+      "energy": 209.22477850465356,
+      "epoch": 7,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 951.0283839772455,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 958.8643540046178,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 966.8429999728687,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 974.5926460018381,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 982.4075749493204,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 990.2562259812839,
+      "energy": 209.22477850465356,
+      "epoch": 8,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1060.7574549503624,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1068.7459909822792,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1076.703936967533,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1084.5479969866574,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1092.2671419684775,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1100.0860210042447,
+      "energy": 209.22477850465356,
+      "epoch": 9,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1170.147720957175,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1178.0536539736204,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1186.0134399612434,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1193.9910159562714,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1201.9412609515712,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1209.7679799771868,
+      "energy": 209.22477850465356,
+      "epoch": 10,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1279.7524969791993,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1287.482491985429,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1295.6916889525019,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1305.3144659497775,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1313.276861968916,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1321.057358989492,
+      "energy": 209.22477850465356,
+      "epoch": 11,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1391.139569983352,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0,
+        0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1398.946638975758,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.5,
+        -0.1
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1406.5773799666204,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "train"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1414.4097699900158,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1,
+        0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1422.2777809482068,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.6,
+        -0.05
+      ],
+      "motor_active_state_count": 2,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    },
+    {
+      "association_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "elapsed_ms": 1430.2998189814389,
+      "energy": 209.22477850465356,
+      "epoch": 12,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "motor_active_state_count": 0,
+      "motor_readout": [
+        0,
+        0,
+        0
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "sensory_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "split": "holdout"
+    }
+  ],
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 64,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "same three-sphere cuNxon network/context remains resident across all epochs",
+    "training uses StepTrain plus expected-action neuromodulator pulses; evaluation uses StepInfer without target labels",
+    "holdout accuracy must beat trivial baselines before any adapter claim"
+  ],
+  "sphere_count": 3,
+  "status": "resident action probe viable",
+  "train_epochs": 12,
+  "train_steps_per_case": 128,
+  "unique_motor_readouts": 1,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

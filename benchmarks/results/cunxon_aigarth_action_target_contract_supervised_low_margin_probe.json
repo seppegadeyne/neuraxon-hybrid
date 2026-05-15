@@ -1,0 +1,163 @@
+{
+  "aggregate_action_distribution": {
+    "execute": 30,
+    "query": 48,
+    "retry": 30
+  },
+  "amplitude_factor": 1.0,
+  "compute_capability": "12.0",
+  "counterfactual_control_accuracy_mean": 0.0,
+  "cunxon_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 24,
+  "evidence_boundary": "This is one supervised low-margin target-objective diagnostic. Normalized supervised_low_margin_train examples are optimized, while original stress_holdout and controls are reported separately. It is not intelligence evidence and not generalization evidence unless original stress/control splits beat constant baselines.",
+  "fitness_variant": "target_contract_supervised_low_margin",
+  "generations": 16,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so",
+  "notes": [
+    "fresh cuNxon network/context per seed",
+    "fitness callback sees train, augmented_train and normalized supervised_low_margin_train only",
+    "original stress_holdout and controls are never optimized",
+    "objective-shaping diagnostic only; not a long-sweep or intelligence claim"
+  ],
+  "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+  "original_stress_holdout_execute_retry_accuracy": 0.0,
+  "original_stress_holdout_query_collapse_rate": 1.0,
+  "permuted_control_accuracy_mean": 0.0,
+  "population_size": 32,
+  "recommended_next_probe": {
+    "condition": "if original stress_holdout remains baseline-level, inspect decoder/readout geometry before another objective sweep",
+    "id": "low_margin_target_objective_decision"
+  },
+  "scaled_stress_holdout_accuracy_mean": 1.0,
+  "scaled_stress_holdout_execute_retry_accuracy": 1.0,
+  "scaled_stress_holdout_query_collapse_rate": 0.3333333333333333,
+  "seed_count": 3,
+  "seed_offsets": [
+    150,
+    151,
+    152
+  ],
+  "split_summaries": [
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 3,
+        "query": 3,
+        "retry": 3
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 9,
+      "seeds_beating_best_baseline": 3,
+      "split": "train"
+    },
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 6,
+        "query": 6,
+        "retry": 6
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "augmented_train"
+    },
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 6,
+        "query": 6,
+        "retry": 6
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "supervised_low_margin_train"
+    },
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 3,
+        "query": 3,
+        "retry": 3
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 9,
+      "seeds_beating_best_baseline": 3,
+      "split": "holdout"
+    },
+    {
+      "accuracy_mean": 1.0,
+      "action_distribution": {
+        "execute": 6,
+        "query": 6,
+        "retry": 6
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 1.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "hard_holdout"
+    },
+    {
+      "accuracy_mean": 0.3333333333333333,
+      "action_distribution": {
+        "query": 18
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 1.0,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 0,
+      "split": "stress_holdout"
+    },
+    {
+      "accuracy_mean": 0.0,
+      "action_distribution": {
+        "execute": 3,
+        "query": 3,
+        "retry": 3
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 9,
+      "seeds_beating_best_baseline": 0,
+      "split": "counterfactual_control"
+    },
+    {
+      "accuracy_mean": 0.0,
+      "action_distribution": {
+        "execute": 3,
+        "query": 3,
+        "retry": 3
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 9,
+      "seeds_beating_best_baseline": 0,
+      "split": "permuted_control"
+    }
+  ],
+  "status": "aigarth target-contract supervised low-margin objective completed",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

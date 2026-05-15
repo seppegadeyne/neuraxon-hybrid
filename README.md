@@ -2,30 +2,30 @@
 
 Intelligence Tissue for CLI AI Agents, powered by [Neuraxon](https://github.com/DavidVivancos/Neuraxon) v2.0.
 
-## Wat is dit?
+## What is this?
 
-`neuraxon-agent` is een agent-integratielaag rond Neuraxon v2.0 — een bio-geinspireerd neuraal netwerk met trinaire toestanden, continue tijd, en 4 neuromodulatoren. Dit project maakt het mogelijk om Neuraxon als "intelligentie weefsel" te gebruiken voor CLI AI agents zoals Hermes.
+`neuraxon-agent` is an agent integration layer around Neuraxon v2.0 — a bio-inspired neural network with trinary states, continuous time, and 4 neuromodulators. This project makes it possible to use Neuraxon as "intelligence tissue" for CLI AI agents such as Hermes.
 
-## Architectuur
+## Architecture
 
 ```
 AgentTissue (wrapper)
-  ├── PerceptionEncoder    → zet observaties om naar trinaire input
-  ├── NeuraxonNetwork      → het bio-neurale netwerk
-  ├── ActionDecoder        → zet output om naar agent acties
-  ├── ModulationFeedback   → dopamine/serotonine feedback loop
-  ├── TissueMemory         → pattern storage en recall
-  ├── AgentEvolution       → Aigarth evolutionaire training
-  └── StreamingLoop        → real-time simulatie loop
+  ├── PerceptionEncoder    → converts observations into trinary input
+  ├── NeuraxonNetwork      → the bio-neural network
+  ├── ActionDecoder        → converts output into agent actions
+  ├── ModulationFeedback   → dopamine/serotonin feedback loop
+  ├── TissueMemory         → pattern storage and recall
+  ├── AgentEvolution       → Aigarth evolutionary training
+  └── StreamingLoop        → real-time simulation loop
 ```
 
-## Snel starten
+## Quick start
 
 ```bash
-# Installeren
+# Install
 pip install -e ".[dev]"
 
-# CLI gebruiken
+# Use the CLI
 neuraxon-agent think -i observation.json -o action.json
 neuraxon-agent modulate -i outcome.json -o result.json
 neuraxon-agent evolve -g 5 -o summary.json
@@ -40,17 +40,17 @@ print(action.actie_type, action.confidence)
 tissue.modulate("success")
 ```
 
-## Projectstructuur
+## Project structure
 
-| Module | Functie |
+| Module | Purpose |
 |--------|---------|
-| `perception.py` | Observaties → trinaire input encoding |
-| `action.py` | Trinaire output → agent acties |
+| `perception.py` | Observations → trinary input encoding |
+| `action.py` | Trinary output → agent actions |
 | `tissue.py` | NeuraxonNetwork wrapper |
 | `modulation.py` | Neuromodulator feedback loop |
-| `memory.py` | Pattern storage en recall |
-| `evolution.py` | Aigarth evolutionaire training |
-| `streaming.py` | Real-time simulatie loop |
+| `memory.py` | Pattern storage and recall |
+| `evolution.py` | Aigarth evolutionary training |
+| `streaming.py` | Real-time simulation loop |
 | `cli.py` | JSON CLI interface |
 | `vendor/` | Neuraxon v2.0 upstream code |
 
@@ -62,7 +62,7 @@ PYTHONPATH=src python -m pytest tests/ -v
 
 ## Status
 
-Dit project is in actieve ontwikkeling. Zie de [GitHub issues](https://github.com/sisutuulenisa/neuraxon-hybrid/issues) voor de roadmap.
+This project is in active development. See the [GitHub issues](https://github.com/sisutuulenisa/neuraxon-hybrid/issues) for the roadmap.
 
 ## Roadmap gate
 

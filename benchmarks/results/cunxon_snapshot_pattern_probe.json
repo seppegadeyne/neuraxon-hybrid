@@ -1,0 +1,90 @@
+{
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "cunxonSphereSnapshot exposed full-neuron state channels",
+    "pattern store/list/recall/clear APIs are callable from ctypes",
+    "pattern recall shape/signal is diagnostic evidence, not decision-quality evidence"
+  ],
+  "pattern_count_after_clear": 0,
+  "pattern_count_after_store": 2,
+  "present_steps": 30,
+  "recall_hamming_distance": 0,
+  "recalls": [
+    {
+      "active_state_count": 0,
+      "mask_fraction": 0.5,
+      "pattern_name": "alpha",
+      "readout": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "signed_sum": 0
+    },
+    {
+      "active_state_count": 0,
+      "mask_fraction": 0.5,
+      "pattern_name": "beta",
+      "readout": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "signed_sum": 0
+    }
+  ],
+  "settle_steps": 20,
+  "snapshots": [
+    {
+      "active_state_count": 0,
+      "energy": 0.0,
+      "mean_abs_complement": 0.0,
+      "mean_abs_membrane": 0.0,
+      "mean_abs_stilde": 0.0,
+      "mean_astrocyte": 0.0,
+      "mean_firing_rate": 0.20000000298023224,
+      "n_neurons": 48,
+      "neutral_state_count": 48,
+      "phase": "after-finalize"
+    },
+    {
+      "active_state_count": 8,
+      "energy": 739.5793085098267,
+      "mean_abs_complement": 0.03373613124858821,
+      "mean_abs_membrane": 0.7406918730509157,
+      "mean_abs_stilde": 0.7405720599927008,
+      "mean_astrocyte": 0.042913236849320434,
+      "mean_firing_rate": 0.170240786857903,
+      "n_neurons": 48,
+      "neutral_state_count": 40,
+      "phase": "after-pattern-store"
+    },
+    {
+      "active_state_count": 2,
+      "energy": 774.764842748642,
+      "mean_abs_complement": 0.016349497131765627,
+      "mean_abs_membrane": 0.5658724588065525,
+      "mean_abs_stilde": 0.5684936115430901,
+      "mean_astrocyte": 0.06358073653730874,
+      "mean_firing_rate": 0.12853326120724282,
+      "n_neurons": 48,
+      "neutral_state_count": 46,
+      "phase": "after-recall"
+    }
+  ],
+  "status": "snapshot-pattern probe viable",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

@@ -1,0 +1,219 @@
+{
+  "baseline_delta": {
+    "best_constant_baseline": 0.3333333333333333,
+    "original_vs_best_constant": 0.0,
+    "scaled_vs_best_constant": 0.555556
+  },
+  "evidence_boundary": "Post-hoc decoder/readout geometry explains the latest stress-objective boundary but does not improve it: original low-margin stress_holdout still equals the best constant baseline, while the same cases become separable only after 3.0x scaling that was represented in the label-injected fitness path. This is not intelligence evidence and not generalization evidence.",
+  "hypothesis_for_this_slice": "original_vs_scaled_stress_readout_geometry",
+  "issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89",
+  "ladder_reference": {
+    "best_scaled_stress_holdout_accuracy_mean": 0.8333333333333334,
+    "best_scaled_stress_holdout_amplitude_factor": 3.0,
+    "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+    "original_stress_holdout_query_collapse_rate": 1.0
+  },
+  "original_stress_holdout": {
+    "accuracy_mean": 0.3333333333333333,
+    "action_distribution": {
+      "query": 18
+    },
+    "amplitude_factor": 1.0,
+    "best_constant_baseline_mean": 0.3333333333333333,
+    "execute_retry_accuracy": 0.0,
+    "query_collapse_rate": 1.0,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 0,
+    "split": "stress_holdout"
+  },
+  "prior_geometry_audit_reference": {
+    "augmented_train_execute_retry_accuracy": 1.0,
+    "source_artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "stress_execute_retry_accuracy": 0.0,
+    "stress_holdout_query_collapse_rate": 1.0,
+    "stress_train_query_collapse_rate": 1.0
+  },
+  "recommended_next_probe": {
+    "acceptance_criteria": [
+      "Keep original stress_holdout and controls outside any optimized labels.",
+      "Report original-vs-scaled action distributions, query-collapse, execute/retry accuracy, and constant baselines.",
+      "State explicitly if the original low-margin split remains baseline-level."
+    ],
+    "condition": "Only run if it changes the target-lane/readout hypothesis; do not repeat the same margin-weighted 3.0x objective longer.",
+    "id": "low_margin_readout_geometry_probe",
+    "purpose": "Inspect whether a lower-level readout/decoder threshold, contrast coding, or normalized low-margin objective can represent original stress execute/retry cases without treating scaled stress success as generalization.",
+    "status": "proposed"
+  },
+  "scaled_stress_holdout_3_0x": {
+    "accuracy_mean": 0.888888888888889,
+    "action_distribution": {
+      "execute": 6,
+      "query": 4,
+      "retry": 8
+    },
+    "amplitude_factor": 3.0,
+    "best_constant_baseline_mean": 0.3333333333333333,
+    "execute_retry_accuracy": 1.0,
+    "query_collapse_rate": 0.2222222222222222,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 3,
+    "split": "stress_holdout_scaled_3_0x"
+  },
+  "source_artifacts": [
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+    "benchmarks/results/cunxon_stress_geometry_audit.json"
+  ],
+  "source_runtime": {
+    "amplitude_factor": 3.0,
+    "compute_capability": "12.0",
+    "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "eval_steps": 24,
+    "fitness_variant": "target_contract_stress_margin_weighted",
+    "generations": 16,
+    "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+    "population_size": 32,
+    "seed_offsets": [
+      147,
+      148,
+      149
+    ],
+    "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+  },
+  "status": "stress objective decoder geometry follow-up completed",
+  "stress_vectors": [
+    {
+      "abs_sum": 0.38,
+      "expected_action": "execute",
+      "first_lane_abs": 0.18,
+      "l2_norm": 0.230651,
+      "name": "execute-stress-low-margin",
+      "scaled_3_0x_abs_sum": 1.14,
+      "scaled_3_0x_first_lane_abs": 0.54,
+      "scaled_3_0x_l2_norm": 0.691954,
+      "scaled_3_0x_vector": [
+        0.54,
+        -0.36,
+        0.24
+      ],
+      "vector": [
+        0.18,
+        -0.12,
+        0.08
+      ]
+    },
+    {
+      "abs_sum": 0.32,
+      "expected_action": "execute",
+      "first_lane_abs": 0.12,
+      "l2_norm": 0.187617,
+      "name": "execute-stress-near-neutral",
+      "scaled_3_0x_abs_sum": 0.96,
+      "scaled_3_0x_first_lane_abs": 0.36,
+      "scaled_3_0x_l2_norm": 0.56285,
+      "scaled_3_0x_vector": [
+        0.36,
+        0.24,
+        -0.36
+      ],
+      "vector": [
+        0.12,
+        0.08,
+        -0.12
+      ]
+    },
+    {
+      "abs_sum": 0.38,
+      "expected_action": "retry",
+      "first_lane_abs": 0.18,
+      "l2_norm": 0.230651,
+      "name": "retry-stress-low-margin",
+      "scaled_3_0x_abs_sum": 1.14,
+      "scaled_3_0x_first_lane_abs": 0.54,
+      "scaled_3_0x_l2_norm": 0.691954,
+      "scaled_3_0x_vector": [
+        -0.54,
+        0.36,
+        -0.24
+      ],
+      "vector": [
+        -0.18,
+        0.12,
+        -0.08
+      ]
+    },
+    {
+      "abs_sum": 0.32,
+      "expected_action": "retry",
+      "first_lane_abs": 0.12,
+      "l2_norm": 0.187617,
+      "name": "retry-stress-near-neutral",
+      "scaled_3_0x_abs_sum": 0.96,
+      "scaled_3_0x_first_lane_abs": 0.36,
+      "scaled_3_0x_l2_norm": 0.56285,
+      "scaled_3_0x_vector": [
+        -0.36,
+        -0.24,
+        0.36
+      ],
+      "vector": [
+        -0.12,
+        -0.08,
+        0.12
+      ]
+    },
+    {
+      "abs_sum": 0.36,
+      "expected_action": "query",
+      "first_lane_abs": 0.18,
+      "l2_norm": 0.254558,
+      "name": "query-stress-positive-negative",
+      "scaled_3_0x_abs_sum": 1.08,
+      "scaled_3_0x_first_lane_abs": 0.54,
+      "scaled_3_0x_l2_norm": 0.763675,
+      "scaled_3_0x_vector": [
+        0.54,
+        -0.54,
+        0.0
+      ],
+      "vector": [
+        0.18,
+        -0.18,
+        0.0
+      ]
+    },
+    {
+      "abs_sum": 0.36,
+      "expected_action": "query",
+      "first_lane_abs": 0.18,
+      "l2_norm": 0.254558,
+      "name": "query-stress-negative-positive",
+      "scaled_3_0x_abs_sum": 1.08,
+      "scaled_3_0x_first_lane_abs": 0.54,
+      "scaled_3_0x_l2_norm": 0.763675,
+      "scaled_3_0x_vector": [
+        -0.54,
+        0.54,
+        0.0
+      ],
+      "vector": [
+        -0.18,
+        0.18,
+        0.0
+      ]
+    }
+  ],
+  "target_lane_geometry": {
+    "execute_retry_vector_count": 4,
+    "first_lane_gain": 3.0,
+    "geometry_interpretation": "The only changed variable between the original and scaled stress cases is amplitude. The margin-weighted objective preserves the 3.0x non-query route, but original low-margin execute/retry cases remain below the current signed-first-lane/readout threshold and decode to query.",
+    "original_execute_retry_first_lane_abs_mean": 0.15,
+    "original_execute_retry_l2_mean": 0.209134,
+    "original_first_lane_abs_mean": 0.16,
+    "scaled_execute_retry_first_lane_abs_mean": 0.45,
+    "scaled_execute_retry_l2_mean": 0.627402,
+    "scaled_first_lane_abs_mean": 0.48,
+    "stress_vector_count": 6
+  }
+}

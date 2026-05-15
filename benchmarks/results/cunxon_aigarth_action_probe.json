@@ -1,0 +1,262 @@
+{
+  "accuracy_by_split": {
+    "holdout": 0.6666666666666666,
+    "overall": 0.6666666666666666,
+    "train": 0.6666666666666666
+  },
+  "action_distribution": {
+    "execute": 2,
+    "query": 4
+  },
+  "baseline_accuracy_by_split": {
+    "always_execute": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_query": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "always_retry": {
+      "holdout": 0.3333333333333333,
+      "overall": 0.3333333333333333,
+      "train": 0.3333333333333333
+    }
+  },
+  "case_count": 6,
+  "cases": [
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 0.6667,
+      "decoded_action": "PROCEED",
+      "energy": 4853.820690155029,
+      "expected_action": "execute",
+      "input_vector": [
+        1.0,
+        0.25,
+        0.0
+      ],
+      "name": "execute-train",
+      "normalized_action": "execute",
+      "outcome": "success",
+      "readout": [
+        1,
+        1,
+        -1
+      ],
+      "split": "train",
+      "target_alignment": 0.3333333333333333,
+      "target_readout": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 5315.2110023498535,
+      "expected_action": "retry",
+      "input_vector": [
+        -1.0,
+        -0.25,
+        0.0
+      ],
+      "name": "retry-train",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "split": "train",
+      "target_alignment": 0.3333333333333333,
+      "target_readout": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "query-train",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "split": "train",
+      "target_alignment": 1.0,
+      "target_readout": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 0.3333,
+      "decoded_action": "PROCEED",
+      "energy": 4348.456534385681,
+      "expected_action": "execute",
+      "input_vector": [
+        0.8,
+        0.2,
+        0.1
+      ],
+      "name": "execute-holdout-noisy",
+      "normalized_action": "execute",
+      "outcome": "success",
+      "readout": [
+        0,
+        1,
+        0
+      ],
+      "split": "holdout",
+      "target_alignment": 0.3333333333333333,
+      "target_readout": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 4129.486198425293,
+      "expected_action": "retry",
+      "input_vector": [
+        -0.8,
+        -0.2,
+        0.1
+      ],
+      "name": "retry-holdout-noisy",
+      "normalized_action": "query",
+      "outcome": "failure",
+      "readout": [
+        -1,
+        -1,
+        -1
+      ],
+      "split": "holdout",
+      "target_alignment": 0.3333333333333333,
+      "target_readout": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "baseline_actions": {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry"
+      },
+      "confidence": 1.0,
+      "decoded_action": "PAUSE",
+      "energy": 0.0,
+      "expected_action": "query",
+      "input_vector": [
+        0.05,
+        0.0,
+        -0.05
+      ],
+      "name": "query-holdout-low-drive",
+      "normalized_action": "query",
+      "outcome": "success",
+      "readout": [
+        0,
+        0,
+        0
+      ],
+      "split": "holdout",
+      "target_alignment": 1.0,
+      "target_readout": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 24,
+  "generation_train_scores": [
+    0.861111111111111,
+    1.1666666666666667,
+    1.1666666666666667,
+    1.25,
+    1.25,
+    1.25,
+    1.1944444444444444,
+    0.5277777777777777,
+    1.2222222222222223,
+    0.861111111111111,
+    1.2222222222222223,
+    1.1388888888888888,
+    1.1666666666666667,
+    1.1666666666666667,
+    1.1666666666666667,
+    1.1388888888888888,
+    1.1666666666666667,
+    1.1944444444444444
+  ],
+  "generations": 18,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "Aigarth fitness callback uses train cases only; holdout labels are not optimized",
+    "final train and holdout readouts are decoded through the existing ActionDecoder",
+    "holdout accuracy must beat trivial baselines before any adapter claim"
+  ],
+  "population_size": 36,
+  "readout_ids": [
+    35,
+    36,
+    37
+  ],
+  "status": "aigarth action probe viable",
+  "target_alignment_by_split": {
+    "holdout": 0.5555555555555555,
+    "overall": 0.5555555555555555,
+    "train": 0.5555555555555555
+  },
+  "unique_readouts": 4,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

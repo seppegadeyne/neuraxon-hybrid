@@ -1,0 +1,655 @@
+{
+  "contrast_splits": {
+    "counterfactual_control": {
+      "accuracy": 0.25,
+      "action_distribution": {
+        "assertive": 1,
+        "execute": 4,
+        "query": 30,
+        "retry": 1
+      },
+      "expected_distribution": {
+        "execute": 12,
+        "query": 12,
+        "retry": 12
+      },
+      "mean_branching_ratio_estimate": 0.075752,
+      "mean_neutral_occupancy": 0.934119,
+      "mean_transition_entropy_bits": 0.709447,
+      "neutral_readout_rate": 0.833333,
+      "sample_count": 36,
+      "top_readouts": [
+        {
+          "count": 30,
+          "readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    "hard_holdout": {
+      "accuracy": 0.416667,
+      "action_distribution": {
+        "assertive": 2,
+        "execute": 6,
+        "query": 61,
+        "retry": 3
+      },
+      "expected_distribution": {
+        "execute": 24,
+        "query": 24,
+        "retry": 24
+      },
+      "mean_branching_ratio_estimate": 0.078364,
+      "mean_neutral_occupancy": 0.930464,
+      "mean_transition_entropy_bits": 0.790751,
+      "neutral_readout_rate": 0.847222,
+      "sample_count": 72,
+      "top_readouts": [
+        {
+          "count": 61,
+          "readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 3,
+          "readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "holdout": {
+      "accuracy": 0.416667,
+      "action_distribution": {
+        "assertive": 1,
+        "execute": 5,
+        "query": 29,
+        "retry": 1
+      },
+      "expected_distribution": {
+        "execute": 12,
+        "query": 12,
+        "retry": 12
+      },
+      "mean_branching_ratio_estimate": 0.078025,
+      "mean_neutral_occupancy": 0.932931,
+      "mean_transition_entropy_bits": 0.756404,
+      "neutral_readout_rate": 0.805556,
+      "sample_count": 36,
+      "top_readouts": [
+        {
+          "count": 29,
+          "readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    "permuted_control": {
+      "accuracy": 0.277778,
+      "action_distribution": {
+        "assertive": 1,
+        "execute": 7,
+        "query": 27,
+        "retry": 1
+      },
+      "expected_distribution": {
+        "execute": 12,
+        "query": 12,
+        "retry": 12
+      },
+      "mean_branching_ratio_estimate": 0.118162,
+      "mean_neutral_occupancy": 0.893914,
+      "mean_transition_entropy_bits": 1.196303,
+      "neutral_readout_rate": 0.75,
+      "sample_count": 36,
+      "top_readouts": [
+        {
+          "count": 27,
+          "readout": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 4,
+          "readout": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "count": 2,
+          "readout": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "count": 1,
+          "readout": [
+            0,
+            0,
+            1
+          ]
+        }
+      ]
+    }
+  },
+  "diagnosis": "decoder_action_collapse_on_low_margin_execute_retry_stress_cases",
+  "diagnostic_conclusion": "Controlled low/medium/high drive changes the cuNxon branching, occupancy, entropy and aggregate action distribution, but the stress bottleneck is dominated by decoder/action collapse: 65/72 stress cases decode to query; execute/retry stress cases score only 2/48, while query stress cases score 22/24.",
+  "estimator_movement": {
+    "branching_ratio_mean_low_to_high": [
+      0.030866,
+      0.128423
+    ],
+    "neutral_occupancy_mean_high_to_low": [
+      0.978481,
+      0.873544
+    ],
+    "query_action_counts_by_regime": {
+      "high-drive": 69,
+      "low-drive": 90,
+      "medium-drive": 78
+    },
+    "transition_entropy_mean_low_to_high": [
+      0.274261,
+      1.374276
+    ]
+  },
+  "estimator_movement_status": "present_but_not_task_sufficient",
+  "evidence_boundary": "This is post-hoc separation of estimator movement from decoder/action behavior over an existing live RTX 5090 calibration artifact. It uses no stress/control labels for optimization and is not intelligence evidence; useful-computation claims still require stress/control task quality above constant baselines across seeds and settings.",
+  "hypothesis_for_this_slice": "criticality_decoder_separation",
+  "notes": [
+    "Preserves benchmarks/results/cunxon_controlled_regime_calibration.* as the live GPU baseline.",
+    "Explains the stress_holdout failure without another seed sweep or longer resident run.",
+    "Classifies the current bottleneck as decoder/action collapse on low-margin execute/retry stress cases, not a lack of observable estimator movement."
+  ],
+  "parent_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/79",
+  "regime_drive_scales": {
+    "high-drive": 2.0,
+    "low-drive": 0.25,
+    "medium-drive": 1.0
+  },
+  "sample_count": 288,
+  "seed_offsets": [
+    133,
+    134
+  ],
+  "source_artifact": "benchmarks/results/cunxon_controlled_regime_calibration.json",
+  "source_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
+  "status": "criticality decoder separation completed",
+  "stress_holdout": {
+    "accuracy": 0.333333,
+    "action_distribution": {
+      "assertive": 2,
+      "execute": 4,
+      "query": 65,
+      "retry": 1
+    },
+    "best_constant_baseline": 0.333333,
+    "by_expected_action": {
+      "execute": {
+        "accuracy": 0.083333,
+        "action_distribution": {
+          "execute": 2,
+          "query": 21,
+          "retry": 1
+        },
+        "expected_distribution": {
+          "execute": 24
+        },
+        "mean_branching_ratio_estimate": 0.057665,
+        "mean_neutral_occupancy": 0.945861,
+        "mean_transition_entropy_bits": 0.605576,
+        "neutral_readout_rate": 0.875,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 21,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              0,
+              0,
+              -1
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              0,
+              1,
+              0
+            ]
+          }
+        ]
+      },
+      "query": {
+        "accuracy": 0.916667,
+        "action_distribution": {
+          "assertive": 1,
+          "execute": 1,
+          "query": 22
+        },
+        "expected_distribution": {
+          "query": 24
+        },
+        "mean_branching_ratio_estimate": 0.053612,
+        "mean_neutral_occupancy": 0.947094,
+        "mean_transition_entropy_bits": 0.613433,
+        "neutral_readout_rate": 0.916667,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 22,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              1,
+              0,
+              1
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "retry": {
+        "accuracy": 0.0,
+        "action_distribution": {
+          "assertive": 1,
+          "execute": 1,
+          "query": 22
+        },
+        "expected_distribution": {
+          "retry": 24
+        },
+        "mean_branching_ratio_estimate": 0.054697,
+        "mean_neutral_occupancy": 0.943668,
+        "mean_transition_entropy_bits": 0.648558,
+        "neutral_readout_rate": 0.916667,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 22,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              1,
+              0,
+              1
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    "by_regime": {
+      "high-drive": {
+        "accuracy": 0.333333,
+        "action_distribution": {
+          "assertive": 2,
+          "execute": 4,
+          "query": 17,
+          "retry": 1
+        },
+        "expected_distribution": {
+          "execute": 8,
+          "query": 8,
+          "retry": 8
+        },
+        "mean_branching_ratio_estimate": 0.165974,
+        "mean_neutral_occupancy": 0.836623,
+        "mean_transition_entropy_bits": 1.867567,
+        "neutral_readout_rate": 0.708333,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 17,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 3,
+            "readout": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "count": 2,
+            "readout": [
+              1,
+              0,
+              1
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              0,
+              0,
+              -1
+            ]
+          },
+          {
+            "count": 1,
+            "readout": [
+              0,
+              1,
+              0
+            ]
+          }
+        ]
+      },
+      "low-drive": {
+        "accuracy": 0.333333,
+        "action_distribution": {
+          "query": 24
+        },
+        "expected_distribution": {
+          "execute": 8,
+          "query": 8,
+          "retry": 8
+        },
+        "mean_branching_ratio_estimate": 0.0,
+        "mean_neutral_occupancy": 1.0,
+        "mean_transition_entropy_bits": 0.0,
+        "neutral_readout_rate": 1.0,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 24,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "medium-drive": {
+        "accuracy": 0.333333,
+        "action_distribution": {
+          "query": 24
+        },
+        "expected_distribution": {
+          "execute": 8,
+          "query": 8,
+          "retry": 8
+        },
+        "mean_branching_ratio_estimate": 0.0,
+        "mean_neutral_occupancy": 1.0,
+        "mean_transition_entropy_bits": 0.0,
+        "neutral_readout_rate": 1.0,
+        "sample_count": 24,
+        "top_readouts": [
+          {
+            "count": 24,
+            "readout": [
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    "execute_retry_accuracy": 0.041667,
+    "expected_distribution": {
+      "execute": 24,
+      "query": 24,
+      "retry": 24
+    },
+    "mean_branching_ratio_estimate": 0.055325,
+    "mean_neutral_occupancy": 0.945541,
+    "mean_transition_entropy_bits": 0.622522,
+    "neutral_readout_rate": 0.902778,
+    "query_accuracy": 0.916667,
+    "query_collapse_rate": 0.902778,
+    "sample_count": 72,
+    "top_readouts": [
+      {
+        "count": 65,
+        "readout": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "count": 3,
+        "readout": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "count": 2,
+        "readout": [
+          1,
+          0,
+          1
+        ]
+      },
+      {
+        "count": 1,
+        "readout": [
+          0,
+          0,
+          -1
+        ]
+      },
+      {
+        "count": 1,
+        "readout": [
+          0,
+          1,
+          0
+        ]
+      }
+    ]
+  }
+}

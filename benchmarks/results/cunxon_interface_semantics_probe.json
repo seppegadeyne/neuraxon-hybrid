@@ -1,0 +1,117 @@
+{
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "same-sphere readouts were compared against full-sphere snapshot slices",
+    "relay samples use identical source inputs but alternate input-vs-output source ports",
+    "absolute output ports are input_count + hidden_count + output offset for this 4/4/4 probe"
+  ],
+  "readout_samples": [
+    {
+      "active_state_count": 4,
+      "mapping": "relative-input-readout",
+      "matches_snapshot_slice": true,
+      "neuron_class": "input",
+      "port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "readout": [
+        1,
+        -1,
+        1,
+        1
+      ],
+      "signed_sum": 2,
+      "snapshot_slice": [
+        1,
+        -1,
+        1,
+        1
+      ]
+    },
+    {
+      "active_state_count": 2,
+      "mapping": "absolute-output-readout",
+      "matches_snapshot_slice": true,
+      "neuron_class": "output",
+      "port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "readout": [
+        -1,
+        0,
+        1,
+        0
+      ],
+      "signed_sum": 0,
+      "snapshot_slice": [
+        -1,
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "relay_samples": [
+    {
+      "downstream_active_state_count": 4,
+      "downstream_energy": 22.40475630760193,
+      "downstream_input_readout": [
+        1,
+        -1,
+        -1,
+        -1
+      ],
+      "mapping": "input-neuron-relay",
+      "source_neuron_class": "input",
+      "source_port_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "source_relay_readout": [
+        1,
+        -1,
+        1,
+        1
+      ]
+    },
+    {
+      "downstream_active_state_count": 0,
+      "downstream_energy": 18.849060535430908,
+      "downstream_input_readout": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mapping": "output-neuron-relay",
+      "source_neuron_class": "output",
+      "source_port_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "source_relay_readout": [
+        -1,
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "sample_count": 4,
+  "status": "interface semantics probe viable",
+  "steps": 3,
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

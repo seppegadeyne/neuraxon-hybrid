@@ -1,0 +1,161 @@
+{
+  "aggregate_action_distribution": {
+    "execute": 48,
+    "query": 145,
+    "retry": 41
+  },
+  "amplitude_factors": [
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "best_scaled_stress_holdout_accuracy_mean": 0.8333333333333334,
+  "best_scaled_stress_holdout_amplitude_factor": 3.0,
+  "compute_capability": "12.0",
+  "cunxon_commit": "b4f6db85f7aff04ddb4e1078d523d514a278521b",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "eval_steps": 24,
+  "evidence_boundary": "This is a label-injected separability upper-bound over scaled low-margin stress vectors. Scaled stress_train cases are inside the fitness callback, so any improvement is diagnostic adapter-capability evidence, not intelligence evidence and not generalization evidence unless stress/control holdouts beat constant baselines.",
+  "generations": 16,
+  "library_path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/build-hermes-issue79-20260513140153/libcunxon.so.0.1.0",
+  "notes": [
+    "fresh cuNxon network/context per seed",
+    "target-contract fitness includes train, augmented_train, and scaled stress_train cases",
+    "original stress_holdout and scaled stress_holdout splits are reported separately",
+    "bounded amplitude ladder; not a long-sweep or intelligence claim"
+  ],
+  "original_stress_holdout_accuracy_mean": 0.3333333333333333,
+  "original_stress_holdout_query_collapse_rate": 1.0,
+  "population_size": 32,
+  "recommended_next_probe": {
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/88",
+    "id": "target_aligned_stress_objective_followup"
+  },
+  "seed_count": 3,
+  "seed_offsets": [
+    142,
+    143,
+    144
+  ],
+  "split_summaries": [
+    {
+      "accuracy_mean": 0.3333333333333333,
+      "action_distribution": {
+        "query": 18
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 1.0,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 0,
+      "split": "stress_train_scaled_1_0x"
+    },
+    {
+      "accuracy_mean": 0.3333333333333333,
+      "action_distribution": {
+        "query": 18
+      },
+      "amplitude_factor": 1.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.0,
+      "query_collapse_rate": 1.0,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 0,
+      "split": "stress_holdout_scaled_1_0x"
+    },
+    {
+      "accuracy_mean": 0.611111111111111,
+      "action_distribution": {
+        "execute": 4,
+        "query": 11,
+        "retry": 3
+      },
+      "amplitude_factor": 1.5,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.5,
+      "query_collapse_rate": 0.6111111111111112,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_train_scaled_1_5x"
+    },
+    {
+      "accuracy_mean": 0.6666666666666666,
+      "action_distribution": {
+        "execute": 3,
+        "query": 12,
+        "retry": 3
+      },
+      "amplitude_factor": 1.5,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.5,
+      "query_collapse_rate": 0.6666666666666666,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_holdout_scaled_1_5x"
+    },
+    {
+      "accuracy_mean": 0.5555555555555555,
+      "action_distribution": {
+        "execute": 3,
+        "query": 14,
+        "retry": 1
+      },
+      "amplitude_factor": 2.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.3333333333333333,
+      "query_collapse_rate": 0.7777777777777778,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_train_scaled_2_0x"
+    },
+    {
+      "accuracy_mean": 0.6666666666666666,
+      "action_distribution": {
+        "execute": 3,
+        "query": 10,
+        "retry": 5
+      },
+      "amplitude_factor": 2.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.5833333333333334,
+      "query_collapse_rate": 0.5555555555555556,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_holdout_scaled_2_0x"
+    },
+    {
+      "accuracy_mean": 0.7777777777777778,
+      "action_distribution": {
+        "execute": 7,
+        "query": 6,
+        "retry": 5
+      },
+      "amplitude_factor": 3.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.8333333333333334,
+      "query_collapse_rate": 0.3333333333333333,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_train_scaled_3_0x"
+    },
+    {
+      "accuracy_mean": 0.8333333333333334,
+      "action_distribution": {
+        "execute": 7,
+        "query": 7,
+        "retry": 4
+      },
+      "amplitude_factor": 3.0,
+      "best_constant_baseline_mean": 0.3333333333333333,
+      "execute_retry_accuracy": 0.8333333333333334,
+      "query_collapse_rate": 0.3888888888888889,
+      "sample_count": 18,
+      "seeds_beating_best_baseline": 3,
+      "split": "stress_holdout_scaled_3_0x"
+    }
+  ],
+  "status": "aigarth target-contract stress amplitude-ladder completed",
+  "upstream_commit": "bd2242fabad08cb73dab2c4170d11fa941030e8c"
+}

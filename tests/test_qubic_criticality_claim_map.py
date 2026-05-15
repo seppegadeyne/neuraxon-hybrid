@@ -1,0 +1,768 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+JSON_PATH = ROOT / "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json"
+MD_PATH = ROOT / "benchmarks/results/qubic_nia_vol8_criticality_claim_map.md"
+COMPARISON_JSON_PATH = ROOT / "benchmarks/results/cunxon_comparison.json"
+COMPARISON_MD_PATH = ROOT / "benchmarks/results/cunxon_comparison.md"
+AVALANCHE_MATRIX_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_window_intervention_matrix.json"
+)
+AVALANCHE_MATRIX_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_window_intervention_matrix.md"
+)
+AVALANCHE_TASK_CORRELATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_task_correlation.json"
+)
+AVALANCHE_TASK_CORRELATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_task_correlation.md"
+)
+AVALANCHE_SEED_REPLICATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_seed_replication.json"
+)
+AVALANCHE_SEED_REPLICATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_seed_replication.md"
+)
+CONTROLLED_REGIME_CALIBRATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_controlled_regime_calibration.json"
+)
+CONTROLLED_REGIME_CALIBRATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_controlled_regime_calibration.md"
+)
+CRITICALITY_DECODER_SEPARATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_criticality_decoder_separation.json"
+)
+CRITICALITY_DECODER_SEPARATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_criticality_decoder_separation.md"
+)
+STRESS_GEOMETRY_AUDIT_JSON_PATH = ROOT / "benchmarks/results/cunxon_stress_geometry_audit.json"
+STRESS_GEOMETRY_AUDIT_MD_PATH = ROOT / "benchmarks/results/cunxon_stress_geometry_audit.md"
+STRESS_AMPLITUDE_LADDER_JSON_PATH = (
+    ROOT
+    / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json"
+)
+STRESS_AMPLITUDE_LADDER_MD_PATH = (
+    ROOT
+    / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.md"
+)
+STRESS_OBJECTIVE_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json"
+)
+STRESS_OBJECTIVE_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.md"
+)
+STRESS_OBJECTIVE_GEOMETRY_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json"
+)
+STRESS_OBJECTIVE_GEOMETRY_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.md"
+)
+LOW_MARGIN_READOUT_GEOMETRY_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_readout_geometry_probe.json"
+)
+LOW_MARGIN_READOUT_GEOMETRY_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_readout_geometry_probe.md"
+)
+SUPERVISED_LOW_MARGIN_OBJECTIVE_JSON_PATH = ROOT / (
+    "benchmarks/results/"
+    "cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json"
+)
+SUPERVISED_LOW_MARGIN_OBJECTIVE_MD_PATH = ROOT / (
+    "benchmarks/results/"
+    "cunxon_aigarth_action_target_contract_supervised_low_margin_probe.md"
+)
+LOW_MARGIN_OBJECTIVE_EXPRESSIVITY_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_objective_expressivity_audit.json"
+)
+LOW_MARGIN_OBJECTIVE_EXPRESSIVITY_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_low_margin_objective_expressivity_audit.md"
+)
+
+
+def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
+    data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    markdown = MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+
+    assert data["source"]["url"].endswith(
+        "brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8"
+    )
+    assert data["source"]["published"] == "2026-05-13"
+    assert data["hypothesis_for_this_slice"] == "branching_ratio_as_measured_regime_gate"
+    assert len(data["claims"]) >= 6
+
+    claim_ids = {claim["id"] for claim in data["claims"]}
+    assert {
+        "branching-ratio-regimes",
+        "slightly-subcritical-reverberating",
+        "artificial-edge-of-chaos",
+        "neuraxon-real-time-invariant",
+        "self-organized-criticality",
+        "functional-generalization-claim",
+    }.issubset(claim_ids)
+
+    evidence_ids = {item["id"] for item in data["evidence_map"]}
+    assert {
+        "hybrid-criticality-summary",
+        "cunxon-vram-resident",
+        "cunxon-resident-action",
+        "cunxon-aigarth-augmented-train",
+        "cunxon-branching-regime-scan",
+    }.issubset(evidence_ids)
+
+    assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
+    assert (
+        data["recommended_next_probe"]["id"]
+        == "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert data["recommended_next_probe"]["status"] == "proposed"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/80")
+    assert data["recommended_next_probe"]["acceptance_criteria"]
+    assert any("stress_holdout" in question for question in data["open_questions"])
+
+    assert "# Qubic NIA Vol. 8 criticality claim map" in markdown
+    assert "sigma ≈ 1" in markdown
+    assert "branching_ratio_mean=1.194208" in markdown
+    assert "VRAM-resident active-state ratio mean≈1.017778" in markdown
+    assert "stress-holdout mean=0.333333" in markdown
+    assert "mean branching proxy=0.997701" in markdown
+    assert "0/5 seeds beat the best constant stress baseline" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "cunxon_branching_regime_scan" in markdown
+    assert "cunxon_avalanche_intervention_task_correlation" in markdown
+    assert "cunxon_controlled_regime_calibration" in markdown
+    assert "cunxon_avalanche_window_intervention_matrix" in comparison_markdown
+    assert "\\n" not in markdown
+
+    assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    scan_summary = comparison_data["cunxon_branching_regime_scan"]
+    assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
+    assert scan_summary["mean_stress_holdout"] == 0.333333
+    assert scan_summary["beats_stress_baseline_count"] == 0
+    assert "Qubic NIA Vol. 8 criticality claim map" in comparison_markdown
+    assert "branching ratio is a necessary diagnostic" in comparison_markdown
+    assert "cuNxon branching-ratio regime scan" in comparison_markdown
+    assert "mean branching proxy=0.997701" in comparison_markdown
+
+
+def test_cunxon_avalanche_window_intervention_matrix_records_estimator_sensitivity() -> None:
+    data = json.loads(AVALANCHE_MATRIX_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = AVALANCHE_MATRIX_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "avalanche_window_estimator_sensitivity"
+    assert data["source_claim_ids"] == [
+        "branching-ratio-regimes",
+        "self-organized-criticality",
+        "functional-generalization-claim",
+    ]
+    assert data["config_count"] >= 3
+    assert data["sample_count"] >= 30
+    assert data["max_mode_accuracy_delta_vs_constant_baseline"] > 0.0
+    assert data["configurations_with_all_modes_beating_baseline"] == []
+    assert data["branching_ratio_estimate_range"][1] > data["branching_ratio_estimate_range"][0]
+    assert data["verdict"].startswith("Window-length/sample-interval changes moved")
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/85")
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    config_ids = {config["id"] for config in data["configurations"]}
+    assert {"short-dense", "baseline-equivalent", "long-sparse"}.issubset(config_ids)
+    for config in data["configurations"]:
+        assert config["artifact_json"].endswith(".json")
+        assert config["sample_count"] == 12
+        assert config["all_modes_beat_best_constant_baseline"] is False
+        assert set(config["accuracy_by_mode"]) == {"infer", "train"}
+
+    assert "# cuNxon avalanche-window intervention matrix" in markdown
+    assert "short-dense" in markdown
+    assert "baseline-equivalent" in markdown
+    assert "long-sparse" in markdown
+    assert "Window-length/sample-interval changes moved" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    matrix_summary = comparison_data["cunxon_avalanche_window_intervention_matrix"]
+    assert matrix_summary["hypothesis"] == "avalanche_window_estimator_sensitivity"
+    assert matrix_summary["sample_count"] == data["sample_count"]
+    assert matrix_summary["configurations_with_all_modes_beating_baseline"] == []
+    assert "cuNxon avalanche-window intervention matrix" in comparison_markdown
+    assert "estimator sensitivity" in comparison_markdown
+
+
+def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() -> None:
+    data = json.loads(AVALANCHE_TASK_CORRELATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = AVALANCHE_TASK_CORRELATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "avalanche_intervention_task_correlation"
+    assert data["source_claim_ids"] == [
+        "branching-ratio-regimes",
+        "self-organized-criticality",
+        "functional-generalization-claim",
+    ]
+    assert data["sample_count"] >= 60
+    assert data["config_count"] >= 2
+    assert "holdout" in data["split_accuracy"]
+    assert "stress_holdout" in data["split_accuracy"]
+    assert "counterfactual_control" in data["split_accuracy"]
+    assert data["configurations_beating_stress_baseline"] == []
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    for config in data["configurations"]:
+        assert "stress_holdout" in config["accuracy_by_split"]
+        assert "stress_holdout" in config["best_constant_baseline_by_split"]
+        assert config["beats_best_constant_baseline_by_split"]["stress_holdout"] is False
+
+    assert "# cuNxon avalanche intervention/task correlation" in markdown
+    assert "stress_holdout" in markdown
+    assert "counterfactual_control" in markdown
+    assert "constant baselines" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_avalanche_intervention_task_correlation"]
+    assert summary["hypothesis"] == "avalanche_intervention_task_correlation"
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
+    assert "stress_holdout" in comparison_markdown
+
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
+
+
+def test_cunxon_avalanche_intervention_seed_replication_records_brittleness() -> None:
+    data = json.loads(AVALANCHE_SEED_REPLICATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = AVALANCHE_SEED_REPLICATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "avalanche_intervention_task_correlation"
+    assert data["seed_offsets"] == [129, 130, 131, 132]
+    assert data["sample_count"] >= 300
+    assert data["config_count"] == 2
+    assert set(data["split_accuracy"]) >= {
+        "holdout",
+        "hard_holdout",
+        "stress_holdout",
+        "counterfactual_control",
+        "permuted_control",
+    }
+    assert data["configurations_beating_stress_baseline"] == []
+    assert data["split_accuracy"]["stress_holdout"] <= data["best_constant_baseline_by_split"][
+        "stress_holdout"
+    ]
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon avalanche intervention/task correlation" in markdown
+    assert "129" in markdown
+    assert "stress_holdout" in markdown
+    assert "permuted_control" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_avalanche_intervention_seed_replication"]
+    assert summary["hypothesis"] == "avalanche_intervention_seed_replication"
+    assert summary["seed_offsets"] == [129, 130, 131, 132]
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert summary["stress_holdout_accuracy"] == data["split_accuracy"]["stress_holdout"]
+    assert "cuNxon avalanche intervention seed replication" in comparison_markdown
+    assert "seed-replication" in comparison_markdown
+    assert "cunxon_avalanche_intervention_seed_replication" in claim_markdown
+
+
+def test_cunxon_controlled_regime_calibration_records_estimator_boundaries() -> None:
+    data = json.loads(CONTROLLED_REGIME_CALIBRATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = CONTROLLED_REGIME_CALIBRATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "controlled_regime_calibration"
+    assert data["source_issue"].endswith("/issues/86")
+    assert data["config_count"] >= 3
+    assert data["sample_count"] >= 100
+    assert data["regime_drive_scales"] == {
+        "low-drive": 0.25,
+        "medium-drive": 1.0,
+        "high-drive": 2.0,
+    }
+    assert set(data["split_accuracy"]) >= {
+        "holdout",
+        "hard_holdout",
+        "stress_holdout",
+        "counterfactual_control",
+        "permuted_control",
+    }
+    assert data["configurations_beating_stress_baseline"] == []
+    assert data["stress_holdout_accuracy"] <= data["best_constant_baseline_by_split"][
+        "stress_holdout"
+    ]
+    assert "not intelligence evidence" in data["evidence_boundary"]
+    assert "estimator calibration" in data["verdict"]
+
+    config_ids = {config["id"] for config in data["configurations"]}
+    assert {"low-drive", "medium-drive", "high-drive"}.issubset(config_ids)
+    for config in data["configurations"]:
+        assert "drive_scale" in config
+        assert "mean_transition_entropy_bits" in config
+        assert "action_distribution" in config
+        assert "stress_holdout" in config["accuracy_by_split"]
+        assert config["beats_best_constant_baseline_by_split"]["stress_holdout"] is False
+
+    assert "# cuNxon controlled-regime criticality calibration" in markdown
+    assert "low-drive" in markdown
+    assert "medium-drive" in markdown
+    assert "high-drive" in markdown
+    assert "stress_holdout" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_controlled_regime_calibration"]
+    assert summary["hypothesis"] == "controlled_regime_calibration"
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert summary["stress_holdout_accuracy"] == data["stress_holdout_accuracy"]
+    assert "cuNxon controlled-regime criticality calibration" in comparison_markdown
+    assert "controlled_regime_calibration" in claim_markdown
+
+
+def test_cunxon_criticality_decoder_separation_explains_stress_bottleneck() -> None:
+    data = json.loads(CRITICALITY_DECODER_SEPARATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = CRITICALITY_DECODER_SEPARATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "criticality_decoder_separation"
+    assert data["source_artifact"] == "benchmarks/results/cunxon_controlled_regime_calibration.json"
+    assert data["sample_count"] == 288
+    assert data["stress_holdout"]["sample_count"] == 72
+    assert data["stress_holdout"]["accuracy"] == 0.333333
+    assert data["stress_holdout"]["best_constant_baseline"] == 0.333333
+    assert data["stress_holdout"]["query_collapse_rate"] >= 0.9
+    assert data["stress_holdout"]["execute_retry_accuracy"] < 0.1
+    assert data["stress_holdout"]["query_accuracy"] > 0.9
+    assert data["diagnosis"] == "decoder_action_collapse_on_low_margin_execute_retry_stress_cases"
+    assert data["estimator_movement_status"] == "present_but_not_task_sufficient"
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon criticality/decoder separation" in markdown
+    assert "query_collapse_rate=0.902778" in markdown
+    assert "execute/retry stress accuracy=0.041667" in markdown
+    assert "estimator movement is present" in markdown
+    assert "decoder/action collapse" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_criticality_decoder_separation"]
+    assert summary["hypothesis"] == "criticality_decoder_separation"
+    assert summary["diagnosis"] == data["diagnosis"]
+    assert summary["stress_query_collapse_rate"] == data["stress_holdout"]["query_collapse_rate"]
+    assert "cuNxon criticality/decoder separation" in comparison_markdown
+    assert "stress query collapse" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-criticality-decoder-separation"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
+    assert "cunxon_criticality_decoder_separation" in claim_markdown
+
+
+def test_cunxon_stress_injection_upper_bound_keeps_stress_baseline_boundary() -> None:
+    artifact_path = ROOT / (
+        "benchmarks/results/"
+        "cunxon_aigarth_action_target_contract_stress_injection_probe.json"
+    )
+    markdown_path = ROOT / (
+        "benchmarks/results/"
+        "cunxon_aigarth_action_target_contract_stress_injection_probe.md"
+    )
+    data = json.loads(artifact_path.read_text(encoding="utf-8"))
+    markdown = markdown_path.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["fitness_variant"] == "target_contract_stress_injection"
+    assert data["seed_count"] == 5
+    assert data["accuracy_summary_by_split"]["stress_train"]["mean"] == 0.3333333333333333
+    assert data["accuracy_summary_by_split"]["stress_holdout"]["mean"] == 0.3333333333333333
+    assert data["seeds_beating_baseline_by_split"]["stress_train"] == 0
+    assert data["seeds_beating_baseline_by_split"]["stress_holdout"] == 0
+    assert data["unexpected_action_count"] == 0
+
+    assert "stress-injection audit" in markdown
+    assert "leaks stress-like labels" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_aigarth_action_target_contract_stress_injection_probe"]
+    assert summary["hypothesis"] == "stress_label_injection_upper_bound"
+    assert summary["stress_train_mean"] == 0.333333
+    assert summary["stress_holdout_mean"] == 0.333333
+    assert "stress-injection upper-bound audit" in comparison_markdown
+    assert "negative upper-bound/debugging evidence" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-injection-upper-bound"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
+    assert "stress-injection upper-bound diagnostic" in claim_markdown
+
+
+def test_cunxon_stress_geometry_audit_identifies_low_margin_query_collapse() -> None:
+    data = json.loads(STRESS_GEOMETRY_AUDIT_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_GEOMETRY_AUDIT_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "stress_stimulus_geometry_separability"
+    assert data["source_artifact"].endswith(
+        "cunxon_aigarth_action_target_contract_stress_injection_probe.json"
+    )
+    assert data["sample_count"] == 180
+    assert data["stress_train_query_collapse_rate"] == 1.0
+    assert data["stress_holdout_query_collapse_rate"] == 1.0
+    assert data["stress_execute_retry_accuracy"] == 0.0
+    assert data["augmented_train_execute_retry_accuracy"] == 1.0
+    assert data["mean_abs_sum_by_split"]["stress_train"] < data["mean_abs_sum_by_split"][
+        "augmented_train"
+    ]
+    assert data["recommended_next_probe"]["id"] == "stress_amplitude_ladder_probe"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/87")
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon stress stimulus geometry audit" in markdown
+    assert "stress_train query-collapse rate=1.000000" in markdown
+    assert "stress_holdout query-collapse rate=1.000000" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_geometry_audit"]
+    assert summary["hypothesis"] == "stress_stimulus_geometry_separability"
+    assert summary["stress_execute_retry_accuracy"] == 0.0
+    assert summary["recommended_next_probe"] == "stress_amplitude_ladder_probe"
+    assert "cuNxon stress stimulus geometry audit" in comparison_markdown
+
+    assert any(item["id"] == "cunxon-stress-geometry-audit" for item in claim_data["evidence_map"])
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert "cunxon_stress_geometry_audit" in claim_markdown
+
+
+def test_cunxon_stress_amplitude_ladder_identifies_drive_threshold_but_not_generalization() -> None:
+    data = json.loads(STRESS_AMPLITUDE_LADDER_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_AMPLITUDE_LADDER_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "aigarth target-contract stress amplitude-ladder completed"
+    assert data["seed_offsets"] == [142, 143, 144]
+    assert data["amplitude_factors"] == [1.0, 1.5, 2.0, 3.0]
+    assert data["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout_query_collapse_rate"] == 1.0
+    assert data["best_scaled_stress_holdout_amplitude_factor"] == 3.0
+    assert data["best_scaled_stress_holdout_accuracy_mean"] > 0.8
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    scaled_holdout = {
+        summary["amplitude_factor"]: summary
+        for summary in data["split_summaries"]
+        if summary["split"].startswith("stress_holdout_scaled_")
+    }
+    assert scaled_holdout[1.0]["query_collapse_rate"] == 1.0
+    assert scaled_holdout[3.0]["execute_retry_accuracy"] > 0.8
+    assert scaled_holdout[3.0]["seeds_beating_best_baseline"] == 3
+
+    assert "# cuNxon Aigarth target-contract stress amplitude-ladder" in markdown
+    assert "Best scaled stress_holdout accuracy: `0.833333` at `3.0x`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_amplitude_ladder_probe"]
+    assert summary["hypothesis"] == "stress_amplitude_ladder_separability"
+    assert summary["best_scaled_stress_holdout_amplitude_factor"] == 3.0
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert "cuNxon Aigarth target-contract stress amplitude-ladder" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-amplitude-ladder"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert "cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe" in claim_markdown
+
+
+def test_cunxon_stress_objective_preserves_scaled_separability_but_original_stress_fails() -> None:
+    data = json.loads(STRESS_OBJECTIVE_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_OBJECTIVE_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "aigarth target-contract stress objective completed"
+    assert data["seed_offsets"] == [147, 148, 149]
+    assert data["fitness_variant"] == "target_contract_stress_margin_weighted"
+    assert data["amplitude_factor"] == 3.0
+    assert data["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout_query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout_execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert data["scaled_stress_holdout_execute_retry_accuracy"] == 1.0
+    assert data["counterfactual_control_accuracy_mean"] < 1 / 3
+    assert data["permuted_control_accuracy_mean"] == 0.0
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon Aigarth target-contract stress objective" in markdown
+    assert "Original stress_holdout accuracy: `0.333333`" in markdown
+    assert "Scaled stress_holdout accuracy: `0.888889`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_objective_probe"]
+    assert summary["hypothesis"] == "target_aligned_stress_objective"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert "cuNxon Aigarth target-contract stress objective" in comparison_markdown
+
+    assert any(item["id"] == "cunxon-stress-objective" for item in claim_data["evidence_map"])
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
+    assert "cunxon_aigarth_action_target_contract_stress_objective_probe" in claim_markdown
+
+
+def test_cunxon_stress_objective_geometry_followup_records_boundary() -> None:
+    data = json.loads(STRESS_OBJECTIVE_GEOMETRY_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = STRESS_OBJECTIVE_GEOMETRY_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "stress objective decoder geometry follow-up completed"
+    assert data["hypothesis_for_this_slice"] == "original_vs_scaled_stress_readout_geometry"
+    assert data["issue"] == "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89"
+    assert data["source_artifacts"] == [
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_amplitude_ladder_probe.json",
+        "benchmarks/results/cunxon_stress_geometry_audit.json",
+    ]
+    assert data["original_stress_holdout"]["accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout"]["query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout"]["execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_3_0x"]["accuracy_mean"] > 0.88
+    assert data["scaled_stress_holdout_3_0x"]["execute_retry_accuracy"] == 1.0
+    assert data["scaled_stress_holdout_3_0x"]["query_collapse_rate"] < 0.25
+    assert data["target_lane_geometry"]["original_execute_retry_first_lane_abs_mean"] == 0.15
+    assert data["target_lane_geometry"]["scaled_execute_retry_first_lane_abs_mean"] == 0.45
+    assert data["target_lane_geometry"]["first_lane_gain"] == 3.0
+    assert data["baseline_delta"]["original_vs_best_constant"] == 0.0
+    assert data["baseline_delta"]["scaled_vs_best_constant"] > 0.55
+    assert data["evidence_boundary"].startswith("Post-hoc decoder/readout geometry")
+    assert data["recommended_next_probe"]["id"] == "low_margin_readout_geometry_probe"
+
+    assert "# cuNxon stress objective decoder/readout geometry follow-up" in markdown
+    assert "Original stress_holdout accuracy: `0.333333`" in markdown
+    assert "Scaled stress_holdout accuracy: `0.888889`" in markdown
+    assert "first-lane gain: `3.000000`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_stress_objective_decoder_geometry_followup"]
+    assert summary["hypothesis"] == "original_vs_scaled_stress_readout_geometry"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["scaled_stress_holdout_accuracy_mean"] > 0.88
+    assert summary["first_lane_gain"] == 3.0
+    assert "cuNxon stress objective decoder/readout geometry" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-objective-decoder-geometry"
+        for item in claim_data["evidence_map"]
+    )
+    assert "cunxon_stress_objective_decoder_geometry_followup" in claim_markdown
+
+
+def test_cunxon_low_margin_readout_geometry_probe_records_no_new_intelligence_claim() -> None:
+    data = json.loads(LOW_MARGIN_READOUT_GEOMETRY_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = LOW_MARGIN_READOUT_GEOMETRY_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "low-margin readout geometry probe completed"
+    assert data["hypothesis_for_this_slice"] == "low_margin_readout_geometry_separability_boundary"
+    assert data["issue"] == "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/89"
+    assert data["source_artifacts"] == [
+        "benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json",
+        "benchmarks/results/cunxon_aigarth_action_target_contract_stress_objective_probe.json",
+    ]
+    assert data["original_stress_holdout"]["accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout"]["query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout"]["execute_retry_accuracy"] == 0.0
+    assert data["scaled_stress_holdout_3_0x"]["accuracy_mean"] > 0.88
+    assert data["readout_geometry"]["original_first_lane_abs_mean"] == 0.15
+    assert data["readout_geometry"]["scaled_first_lane_abs_mean"] == 0.45
+    assert data["readout_geometry"]["original_first_lane_margin_to_query"] < 0
+    assert data["readout_geometry"]["scaled_first_lane_margin_to_query"] > 0
+    assert data["stress_control_separation"]["original_execute_retry_margin_sign"] == "wrong_side"
+    assert data["stress_control_separation"]["scaled_execute_retry_margin_sign"] == "right_side"
+    assert data["baseline_delta"]["original_vs_best_constant"] == 0.0
+    assert data["evidence_boundary"].startswith("Low-margin readout geometry separates")
+    assert data["recommended_next_probe"]["id"] == "supervised_low_margin_target_objective"
+
+    assert "# cuNxon low-margin readout geometry probe" in markdown
+    assert "Original first-lane abs mean: `0.150000`" in markdown
+    assert "Scaled first-lane abs mean: `0.450000`" in markdown
+    assert "wrong side of the query boundary" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_low_margin_readout_geometry_probe"]
+    assert summary["hypothesis"] == "low_margin_readout_geometry_separability_boundary"
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert summary["original_first_lane_margin_to_query"] < 0
+    assert summary["scaled_first_lane_margin_to_query"] > 0
+    assert "cuNxon low-margin readout geometry" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-low-margin-readout-geometry"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert "cunxon_low_margin_readout_geometry_probe" in claim_markdown
+
+
+def test_cunxon_supervised_low_margin_objective_records_original_stress_boundary() -> None:
+    data = json.loads(SUPERVISED_LOW_MARGIN_OBJECTIVE_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = SUPERVISED_LOW_MARGIN_OBJECTIVE_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "aigarth target-contract supervised low-margin objective completed"
+    assert data["fitness_variant"] == "target_contract_supervised_low_margin"
+    assert data["seed_offsets"] == [150, 151, 152]
+    assert data["amplitude_factor"] == 1.0
+    assert data["original_stress_holdout_accuracy_mean"] >= 0.0
+    assert data["original_stress_holdout_execute_retry_accuracy"] >= 0.0
+    assert "counterfactual_control_accuracy_mean" in data
+    assert "permuted_control_accuracy_mean" in data
+    assert "not intelligence evidence" in data["evidence_boundary"]
+    assert data["recommended_next_probe"]["id"] == "low_margin_target_objective_decision"
+
+    split_names = {summary["split"] for summary in data["split_summaries"]}
+    assert "stress_holdout" in split_names
+    assert "supervised_low_margin_train" in split_names
+
+    assert "# cuNxon Aigarth target-contract supervised low-margin objective" in markdown
+    assert "Original stress_holdout accuracy" in markdown
+    assert "Counterfactual control" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_supervised_low_margin_objective_probe"]
+    assert summary["hypothesis"] == "supervised_low_margin_target_objective"
+    assert summary["fitness_variant"] == "target_contract_supervised_low_margin"
+    assert "cuNxon Aigarth target-contract supervised low-margin objective" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-supervised-low-margin-objective"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert claim_data["recommended_next_probe"]["status"] == "proposed"
+    assert "cunxon_aigarth_action_target_contract_supervised_low_margin_probe" in claim_markdown
+
+
+def test_cunxon_low_margin_objective_expressivity_audit_records_lower_level_boundary() -> None:
+    data = json.loads(LOW_MARGIN_OBJECTIVE_EXPRESSIVITY_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = LOW_MARGIN_OBJECTIVE_EXPRESSIVITY_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["status"] == "low-margin objective expressivity audit completed"
+    assert data["hypothesis_for_this_slice"] == "low_margin_objective_expressivity_boundary"
+    assert data["issue"] == "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80"
+    assert data["source_artifacts"] == [
+        "benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json",
+        "benchmarks/results/cunxon_source_semantics_audit.json",
+        "benchmarks/results/cunxon_external_drive_window_probe.json",
+    ]
+    assert data["supervised_low_margin_train"]["accuracy_mean"] == 1.0
+    assert data["original_stress_holdout"]["accuracy_mean"] == 1 / 3
+    assert data["original_stress_holdout"]["query_collapse_rate"] == 1.0
+    assert data["original_stress_holdout"]["execute_retry_accuracy"] == 0.0
+    assert data["controls"]["counterfactual_control_accuracy_mean"] == 0.0
+    assert data["controls"]["permuted_control_accuracy_mean"] == 0.0
+    assert data["source_semantics"]["aigarth_fitness_surface"] == "scalar_black_box_selection"
+    assert data["source_semantics"]["desired_output_api"] == "absent"
+    assert data["source_semantics"]["external_drive_scope"] == "input_class_neurons_only"
+    assert (
+        data["diagnosis"]
+        == "normalized_surrogate_learned_original_low_margin_boundary_unchanged"
+    )
+    assert (
+        data["recommended_next_probe"]["id"]
+        == "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/80")
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    assert "# cuNxon low-margin objective expressivity audit" in markdown
+    assert "scalar black-box selection" in markdown
+    assert "desired-output API is absent" in markdown
+    assert "Original stress_holdout remains `0.333333`" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_low_margin_objective_expressivity_audit"]
+    assert summary["hypothesis"] == "low_margin_objective_expressivity_boundary"
+    assert summary["diagnosis"] == data["diagnosis"]
+    assert summary["original_stress_holdout_accuracy_mean"] == 1 / 3
+    assert "cuNxon low-margin objective expressivity audit" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-low-margin-objective-expressivity"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "readout_margin_objective_or_ctsn_semantics_audit"
+    )
+    assert "cunxon_low_margin_objective_expressivity_audit" in claim_markdown
