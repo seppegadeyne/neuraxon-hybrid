@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct evidence for Neuraxon-Hybrid. Existing repo evidence supports measuring branching/activity regimes. The first bounded branching-regime scan observed near-critical-looking proxy activity (mean branching proxy=0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline. Snapshot avalanche windows made activation-transition estimates observable, and the intervention matrix shows those estimates are sensitive to window/sample settings. The task-coupled avalanche intervention/correlation probe added held-out, stress and control splits over fresh seeds: holdout/hard_holdout beat constants, but stress_holdout remained at 0.333333 and no configuration beat the stress baseline. The fresh-seed replication over seeds 129..132 repeated the same evidence boundary with more samples: normal/hard holdout stayed above constants while stress_holdout remained at 0.333333 and the branching/accuracy correlation stayed weakly negative.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline and no drive regime beats stress baselines. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -101,6 +101,12 @@
       "interpretation": "Replicating the task-coupled avalanche lane on four fresh seeds makes the split-specific boundary more robust: normal/hard holdout bumps repeat, but stress_holdout still does not beat constants, so regime movement is not functional criticality evidence.",
       "observed": "two bounded configurations over fresh seeds 129..132 produced 384 samples, mean branching estimate=0.112420, holdout=0.437500, hard_holdout=0.447917, stress_holdout=0.333333, counterfactual_control=0.333333, permuted_control=0.250000, and 0 configurations beating the stress baseline",
       "status": "fresh-seed replication, still negative on stress/control quality for the NIA Vol. 8 regime lane"
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_controlled_regime_calibration.json",
+      "evidence_status": "Estimator-calibration evidence, negative for robust decision quality: drive changes move runtime metrics and action distributions, but stress/control quality does not beat constants.",
+      "id": "cunxon-controlled-regime-calibration",
+      "observation": "Three controlled input-drive regimes over fresh seeds 133..134 produced 288 samples. Mean branching estimate rose from low-drive 0.030866 to high-drive 0.128423, neutral occupancy dropped from 0.978481 to 0.873544, and entropy rose from 0.274261 to 1.374276. Holdout and hard_holdout reached 0.416667, but stress_holdout stayed 0.333333 and no regime beat the stress baseline."
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
@@ -111,20 +117,21 @@
     "Does a near-1 branching/activity ratio in cuNxon predict anything about action quality, or is it only an occupancy statistic in the current tiny networks?",
     "Can the stress_holdout baseline failure be explained by regime metrics such as subcritical collapse, supercritical saturation, or insufficient readout diversity?",
     "Do Aigarth-evolved networks land in a measurably different activity regime than flat StepTrain/StepInfer resident networks?",
-    "Can a source-level or CUDA-level branching estimator be added without conflating readout ports, input-class drive, and hidden-state snapshots?"
+    "Can a source-level or CUDA-level branching estimator be added without conflating readout ports, input-class drive, and hidden-state snapshots?",
+    "Does controlled_regime_calibration show estimator movement without stress_holdout improvement because of decoder collapse, lack of task signal, or both?"
   ],
   "recommended_next_probe": {
     "acceptance_criteria": [
-      "Preserve the original task-correlation and fresh-seed replication artifacts as baselines.",
-      "Report estimator behavior under at least three controlled drive/regime settings.",
-      "Keep stress/control labels outside any optimization callback.",
-      "Do not claim useful computation unless stress/control task quality beats constant baselines robustly across seeds/configurations."
+      "Preserve controlled-regime calibration as a baseline artifact.",
+      "Explain whether stress_holdout failure is estimator collapse, decoder collapse, or task-signal absence.",
+      "Keep stress/control labels outside optimization.",
+      "Do not claim useful computation unless stress/control task quality beats constant baselines robustly."
     ],
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
-    "id": "controlled_regime_calibration_probe",
-    "purpose": "Before adding more task complexity, calibrate the avalanche/branching estimator on controlled cuNxon drive regimes and report whether low-drive stress cases are estimator collapse, decoder collapse, or true lack of task signal.",
-    "shape": "Use bounded low/medium/high input-drive windows, explicit estimator parameters, per-split action/readout distributions, and constant baselines; treat this as diagnostics only unless stress/control task quality improves.",
-    "status": "opened as GitHub issue #86 after fresh-seed task-correlation replication"
+    "id": "estimator_decoder_separation_followup",
+    "purpose": "Use the controlled-regime calibration result to separate estimator movement from decoder/action-contract bottlenecks before adding task complexity.",
+    "shape": "Analyze per-regime readout/action distributions and stress cases, then test a smaller decoder/objective diagnostic only if it targets the stress_holdout bottleneck without using stress/control labels in optimization.",
+    "status": "next hypothesis after controlled_regime_calibration result"
   },
   "source": {
     "captured_with": "dokobot local read",

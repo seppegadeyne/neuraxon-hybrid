@@ -572,6 +572,77 @@ class CunxonAvalancheInterventionTaskCorrelationResult:
 
 
 @dataclass(frozen=True)
+class CunxonControlledRegimeCalibrationConfigSummary:
+    """Per-drive-regime calibration summary for the snapshot estimator."""
+
+    id: str
+    drive_scale: float
+    steps: int
+    sample_interval: int
+    sample_count: int
+    mean_branching_ratio_estimate: float
+    branching_ratio_estimate_range: list[float]
+    mean_active_count_ratio: float
+    mean_neutral_occupancy: float
+    mean_transition_entropy_bits: float
+    action_distribution: dict[str, int]
+    accuracy_by_split: dict[str, float]
+    best_constant_baseline_by_split: dict[str, float]
+    beats_best_constant_baseline_by_split: dict[str, bool]
+
+
+@dataclass(frozen=True)
+class CunxonControlledRegimeCalibrationResult:
+    """Controlled low/medium/high drive calibration of the cuNxon criticality estimator."""
+
+    status: str
+    hypothesis_for_this_slice: str
+    source_issue: str
+    source_claim_ids: list[str]
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    seed_offsets: list[int]
+    modes: list[str]
+    steps: int
+    sample_interval: int
+    regime_drive_scales: dict[str, float]
+    configurations: list[CunxonControlledRegimeCalibrationConfigSummary]
+    samples: list[CunxonAvalancheWindowSample]
+    split_accuracy: dict[str, float]
+    best_constant_baseline_by_split: dict[str, float]
+    stress_holdout_accuracy: float
+    configurations_beating_stress_baseline: list[str]
+    correlation_summary: dict[str, float]
+    verdict: str
+    evidence_boundary: str
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the total number of calibration windows sampled."""
+        return len(self.samples)
+
+    @property
+    def config_count(self) -> int:
+        """Return the number of controlled regimes."""
+        return len(self.configurations)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        data["config_count"] = self.config_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
 class CunxonAigarthActionRemapCase:
     """One Aigarth action case replayed through a strict motor-lane remap."""
 
@@ -2502,6 +2573,149 @@ def write_avalanche_intervention_task_correlation_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_avalanche_intervention_task_correlation_markdown_report(result),
+        encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
+def render_controlled_regime_calibration_markdown_report(
+    result: CunxonControlledRegimeCalibrationResult,
+) -> str:
+    """Render the controlled-regime criticality calibration report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    config_rows = [
+        (
+            "| Regime | Drive scale | Samples | Mean branching | Branching range | "
+            "Mean active ratio | Mean neutral | Entropy | Actions | Splits beating constants |"
+        ),
+        "| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- | --- |",
+    ]
+    for config in result.configurations:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(config.action_distribution.items())
+        )
+        beating = [
+            split
+            for split, did_beat in sorted(config.beats_best_constant_baseline_by_split.items())
+            if did_beat
+        ]
+        config_rows.append(
+            f"| {config.id} | {config.drive_scale:.2f} | {config.sample_count} | "
+            f"{config.mean_branching_ratio_estimate:.6f} | "
+            f"{config.branching_ratio_estimate_range[0]:.6f}.."
+            f"{config.branching_ratio_estimate_range[1]:.6f} | "
+            f"{config.mean_active_count_ratio:.6f} | {config.mean_neutral_occupancy:.6f} | "
+            f"{config.mean_transition_entropy_bits:.6f} | {actions or 'none'} | "
+            f"{', '.join(beating) or 'none'} |"
+        )
+    split_rows = [
+        "| Split | Accuracy | Best constant baseline | Beats baseline? |",
+        "| --- | ---: | ---: | --- |",
+    ]
+    for split, accuracy in sorted(result.split_accuracy.items()):
+        baseline = result.best_constant_baseline_by_split.get(split, 0.0)
+        split_rows.append(
+            f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |"
+        )
+    correlation_lines = [
+        f"- {name}: {value:.6f}" for name, value in sorted(result.correlation_summary.items())
+    ] or ["- none"]
+    sample_rows = [
+        (
+            "| Mode | Seed | Split | Stimulus | Input vector | Branching | Neutral | "
+            "Action | Expected | Outcome |"
+        ),
+        "| --- | ---: | --- | --- | --- | ---: | ---: | --- | --- | --- |",
+    ]
+    for sample in result.samples[:60]:
+        sample_rows.append(
+            f"| {sample.mode} | {sample.seed_offset} | {sample.split} | {sample.stimulus} | "
+            f"{sample.input_vector} | {sample.branching_ratio_estimate:.6f} | "
+            f"{sample.neutral_occupancy:.6f} | {sample.normalized_action} | "
+            f"{sample.expected_action} | {sample.outcome} |"
+        )
+    if len(result.samples) > 60:
+        remaining = len(result.samples) - 60
+        sample_rows.append(
+            f"| ... | ... | ... | ... | ... | ... | ... | ... | ... | {remaining} more samples |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon controlled-regime criticality calibration",
+            "",
+            f"Status: `{result.status}`",
+            f"Hypothesis: `{result.hypothesis_for_this_slice}`",
+            f"Source issue: {result.source_issue}",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Modes: {', '.join(result.modes)}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Steps / sample interval: {result.steps} / {result.sample_interval}",
+            f"- Samples: {result.sample_count}",
+            "",
+            "## Why this probe exists",
+            "",
+            "This report follows Qubic NIA Vol. 8 by calibrating the snapshot branching/"
+            "avalanche estimator under controlled low, medium and high input-drive regimes. "
+            "The goal is estimator calibration, not an intelligence claim; stress/control "
+            "quality must beat constant baselines before runtime criticality is treated as "
+            "useful computation evidence.",
+            "",
+            "## Controlled regimes",
+            "",
+            *config_rows,
+            "",
+            "## Split accuracy versus constant baselines",
+            "",
+            *split_rows,
+            "",
+            "## Correlation summary",
+            "",
+            *correlation_lines,
+            "",
+            "## Sample excerpt",
+            "",
+            *sample_rows,
+            "",
+            "## Verdict",
+            "",
+            result.verdict,
+            "",
+            "## Evidence boundary",
+            "",
+            result.evidence_boundary,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+        ]
+    )
+
+
+def write_controlled_regime_calibration_artifacts(
+    result: CunxonControlledRegimeCalibrationResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown controlled-regime calibration artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_controlled_regime_calibration_markdown_report(result),
         encoding="utf-8",
     )
     return json_output, markdown_output
@@ -4973,6 +5187,96 @@ def run_ctypes_avalanche_intervention_task_correlation_probe(
             "scores train, holdout, stress_holdout, counterfactual_control and "
             "permuted_control splits",
             "constant-action baselines are computed per split before interpreting regime movement",
+        ],
+    )
+
+
+def run_ctypes_controlled_regime_calibration_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    modes: Sequence[str] = ("infer", "train"),
+    seed_offsets: Sequence[int] = (133, 134),
+    steps: int = 128,
+    sample_interval: int = 8,
+    device_id: int = 0,
+) -> CunxonControlledRegimeCalibrationResult:
+    """Calibrate avalanche/criticality estimator under controlled input-drive regimes."""
+    regime_drive_scales = {"low-drive": 0.25, "medium-drive": 1.0, "high-drive": 2.0}
+    base_specs = _avalanche_intervention_task_specs()
+    probe_results = [
+        (
+            regime_id,
+            drive_scale,
+            run_ctypes_avalanche_window_probe(
+                library_path=library_path,
+                upstream_commit=upstream_commit,
+                cunxon_commit=cunxon_commit,
+                modes=modes,
+                seed_offsets=seed_offsets,
+                steps=steps,
+                sample_interval=sample_interval,
+                device_id=device_id,
+                action_specs=_scaled_avalanche_specs(base_specs, regime_id, drive_scale),
+            ),
+        )
+        for regime_id, drive_scale in regime_drive_scales.items()
+    ]
+    samples = [sample for _, _, probe in probe_results for sample in probe.samples]
+    config_summaries = [
+        _controlled_regime_calibration_config_summary(
+            regime_id,
+            drive_scale,
+            probe.samples,
+            probe.steps,
+            probe.sample_interval,
+        )
+        for regime_id, drive_scale, probe in probe_results
+    ]
+    split_accuracy = _avalanche_accuracy_by_split(samples)
+    best_constant_baseline_by_split = _avalanche_best_constant_baseline_by_split(samples)
+    stress_beaters = [
+        config.id
+        for config in config_summaries
+        if config.beats_best_constant_baseline_by_split.get("stress_holdout", False)
+    ]
+    return CunxonControlledRegimeCalibrationResult(
+        status="controlled-regime calibration completed",
+        hypothesis_for_this_slice="controlled_regime_calibration",
+        source_issue="https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
+        source_claim_ids=[
+            "branching-ratio-regimes",
+            "self-organized-criticality",
+            "functional-generalization-claim",
+        ],
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(library_path),
+        device_name=probe_results[0][2].device_name,
+        compute_capability=probe_results[0][2].compute_capability,
+        seed_offsets=list(seed_offsets),
+        modes=list(modes),
+        steps=steps,
+        sample_interval=sample_interval,
+        regime_drive_scales=regime_drive_scales,
+        configurations=config_summaries,
+        samples=samples,
+        split_accuracy=split_accuracy,
+        best_constant_baseline_by_split=best_constant_baseline_by_split,
+        stress_holdout_accuracy=split_accuracy.get("stress_holdout", 0.0),
+        configurations_beating_stress_baseline=stress_beaters,
+        correlation_summary=_avalanche_correlation_summary(samples),
+        verdict=_controlled_regime_calibration_verdict(config_summaries, samples),
+        evidence_boundary=(
+            "This is controlled-regime estimator calibration for Qubic NIA Vol. 8 style "
+            "criticality diagnostics; drive-dependent branching or occupancy movement is not "
+            "intelligence evidence unless stress/control task quality beats constant baselines."
+        ),
+        notes=[
+            "uses low/medium/high input-drive scales over the same held-out/stress/control cases",
+            "stress_holdout and control labels remain evaluation-only; no fitness callback is used",
+            "reports estimator movement, action distributions and split baselines separately",
         ],
     )
 
@@ -7793,6 +8097,100 @@ def _avalanche_intervention_config_summary(
             split: accuracy > baselines.get(split, 0.0)
             for split, accuracy in sorted(split_accuracy.items())
         },
+    )
+
+
+def _scaled_avalanche_specs(
+    specs: Sequence[tuple[str, str, tuple[float, float, float], str]],
+    regime_id: str,
+    drive_scale: float,
+) -> list[tuple[str, str, tuple[float, float, float], str]]:
+    """Return action specs with input vectors scaled for a controlled drive regime."""
+    scaled_specs: list[tuple[str, str, tuple[float, float, float], str]] = []
+    for stimulus, split, input_vector, expected_action in specs:
+        scaled_vector = (
+            round(input_vector[0] * drive_scale, 6),
+            round(input_vector[1] * drive_scale, 6),
+            round(input_vector[2] * drive_scale, 6),
+        )
+        scaled_specs.append((f"{regime_id}-{stimulus}", split, scaled_vector, expected_action))
+    return scaled_specs
+
+
+def _avalanche_sample_action_distribution(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for sample in samples:
+        distribution[sample.normalized_action] = distribution.get(sample.normalized_action, 0) + 1
+    return dict(sorted(distribution.items()))
+
+
+def _controlled_regime_calibration_config_summary(
+    config_id: str,
+    drive_scale: float,
+    samples: Sequence[CunxonAvalancheWindowSample],
+    steps: int,
+    sample_interval: int,
+) -> CunxonControlledRegimeCalibrationConfigSummary:
+    ratios = [sample.branching_ratio_estimate for sample in samples]
+    split_accuracy = _avalanche_accuracy_by_split(samples)
+    baselines = _avalanche_best_constant_baseline_by_split(samples)
+    return CunxonControlledRegimeCalibrationConfigSummary(
+        id=config_id,
+        drive_scale=drive_scale,
+        steps=steps,
+        sample_interval=sample_interval,
+        sample_count=len(samples),
+        mean_branching_ratio_estimate=_mean_sequence(ratios),
+        branching_ratio_estimate_range=[
+            min(ratios) if ratios else 0.0,
+            max(ratios) if ratios else 0.0,
+        ],
+        mean_active_count_ratio=_mean_sequence(
+            sample.active_count_ratio_mean for sample in samples
+        ),
+        mean_neutral_occupancy=_mean_sequence(sample.neutral_occupancy for sample in samples),
+        mean_transition_entropy_bits=_mean_sequence(
+            sample.transition_entropy_bits for sample in samples
+        ),
+        action_distribution=_avalanche_sample_action_distribution(samples),
+        accuracy_by_split=split_accuracy,
+        best_constant_baseline_by_split=baselines,
+        beats_best_constant_baseline_by_split={
+            split: accuracy > baselines.get(split, 0.0)
+            for split, accuracy in sorted(split_accuracy.items())
+        },
+    )
+
+
+def _controlled_regime_calibration_verdict(
+    configs: Sequence[CunxonControlledRegimeCalibrationConfigSummary],
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> str:
+    if not samples:
+        return "No controlled-regime samples were captured; no claim is supported."
+    stress_beaters = [
+        config.id
+        for config in configs
+        if config.beats_best_constant_baseline_by_split.get("stress_holdout", False)
+    ]
+    branching_range = [
+        min(sample.branching_ratio_estimate for sample in samples),
+        max(sample.branching_ratio_estimate for sample in samples),
+    ]
+    if stress_beaters:
+        return (
+            "Controlled-regime estimator calibration found stress_holdout beaters "
+            f"({', '.join(stress_beaters)}), but this remains bounded toy evidence and "
+            "needs independent controls before any broader claim."
+        )
+    return (
+        "Controlled-regime estimator calibration moved/recorded branching and occupancy "
+        f"metrics across drive settings (branching range {branching_range[0]:.6f}.."
+        f"{branching_range[1]:.6f}), but no drive regime beat the best constant baseline "
+        "on stress_holdout; criticality remains diagnostic instrumentation, not "
+        "intelligence evidence."
     )
 
 

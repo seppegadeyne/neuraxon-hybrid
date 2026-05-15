@@ -1,11 +1,11 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios (mean 0.997701) beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The first task-coupled avalanche intervention/correlation run showed modest holdout/hard_holdout bumps but stress_holdout remained at 0.333333. The fresh-seed replication over seeds 129..132 repeats that boundary: holdout/hard_holdout remain above constants, stress_holdout remains exactly at the best constant baseline, permuted_control stays below baseline, and branching/accuracy correlation is weakly negative. Criticality metrics are useful diagnostics, not intelligence evidence.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration now shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality metrics are useful diagnostics, not intelligence evidence.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
       "lane": "Qubic NIA Vol. 8 criticality claim map",
       "metric": "source-claim evidence map",
-      "value": "branching-ratio/criticality claims mapped to current artifacts; task-coupled avalanche seed replication completed; next recommends controlled_regime_calibration_probe (#86); no intelligence claim"
+      "value": "branching-ratio/criticality claims mapped to current artifacts; controlled-regime calibration completed; next separates estimator movement from decoder/action bottlenecks; no intelligence claim"
     },
     {
       "evidence": "benchmarks/results/cunxon_branching_regime_scan.json",
@@ -36,6 +36,12 @@
       "lane": "cuNxon avalanche intervention seed replication",
       "metric": "fresh-seed replication of task-coupled avalanche metrics vs split quality",
       "value": "2 configs / 384 samples over fresh seeds 129..132; holdout=0.437500 and hard_holdout=0.447917 beat constants, but stress_holdout=0.333333 equals the best constant baseline, permuted_control=0.250000, and no configuration beat stress baselines"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_controlled_regime_calibration.json",
+      "lane": "cuNxon controlled-regime criticality calibration",
+      "metric": "low/medium/high drive estimator calibration vs split quality",
+      "value": "3 drive regimes / 288 samples over fresh seeds 133..134; branching mean rises 0.030866->0.128423, neutral occupancy drops 0.978481->0.873544; holdout/hard_holdout=0.416667 beat constants, but stress_holdout=0.333333 equals the best constant baseline and no drive regime beats stress baselines"
     },
     {
       "evidence": "benchmarks/results/cunxon_smoke.json",
@@ -814,6 +820,75 @@
     "source_probe": "target_contract_augmented_train",
     "status": "branching-regime scan completed"
   },
+  "cunxon_controlled_regime_calibration": {
+    "action_distribution_by_regime": {
+      "high-drive": {
+        "assertive": 2,
+        "execute": 22,
+        "query": 69,
+        "retry": 3
+      },
+      "low-drive": {
+        "assertive": 2,
+        "execute": 2,
+        "query": 90,
+        "retry": 2
+      },
+      "medium-drive": {
+        "assertive": 4,
+        "execute": 11,
+        "query": 78,
+        "retry": 3
+      }
+    },
+    "best_constant_baseline_by_split": {
+      "counterfactual_control": 0.3333333333333333,
+      "hard_holdout": 0.3333333333333333,
+      "holdout": 0.3333333333333333,
+      "permuted_control": 0.3333333333333333,
+      "stress_holdout": 0.3333333333333333,
+      "train": 0.3333333333333333
+    },
+    "config_count": 3,
+    "configurations_beating_stress_baseline": [],
+    "correlation_summary": {
+      "accuracy_vs_active_count_ratio_mean": 0.1786983050497875,
+      "accuracy_vs_branching_ratio_estimate": -0.07411232271418595,
+      "accuracy_vs_neutral_occupancy": 0.07410624320922846
+    },
+    "evidence_boundary": "This is controlled-regime estimator calibration for Qubic NIA Vol. 8 style criticality diagnostics; drive-dependent branching or occupancy movement is not intelligence evidence unless stress/control task quality beats constant baselines.",
+    "hypothesis": "controlled_regime_calibration",
+    "mean_branching_by_regime": {
+      "high-drive": 0.12842308224708449,
+      "low-drive": 0.03086572587951265,
+      "medium-drive": 0.08652948111233073
+    },
+    "mean_neutral_occupancy_by_regime": {
+      "high-drive": 0.8735437225877197,
+      "low-drive": 0.9784813596491229,
+      "medium-drive": 0.9256955866228073
+    },
+    "regime_drive_scales": {
+      "high-drive": 2.0,
+      "low-drive": 0.25,
+      "medium-drive": 1.0
+    },
+    "sample_count": 288,
+    "seed_offsets": [
+      133,
+      134
+    ],
+    "split_accuracy": {
+      "counterfactual_control": 0.25,
+      "hard_holdout": 0.4166666666666667,
+      "holdout": 0.4166666666666667,
+      "permuted_control": 0.2777777777777778,
+      "stress_holdout": 0.3333333333333333,
+      "train": 0.4722222222222222
+    },
+    "status": "controlled-regime calibration completed",
+    "stress_holdout_accuracy": 0.3333333333333333
+  },
   "cunxon_external_drive_window_probe": {
     "decision_quality_measured": false,
     "hidden_output_window_total_active": 0,
@@ -1465,8 +1540,9 @@
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
     "hypothesis": "branching_ratio_as_measured_regime_gate",
     "latest_evidence": "cunxon_avalanche_intervention_seed_replication",
-    "recommended_next_probe": "controlled_regime_calibration_probe",
-    "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8"
+    "recommended_next_probe": "estimator_decoder_separation_followup",
+    "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
+    "summary": "branching-ratio/criticality claims mapped to current artifacts; controlled-regime calibration completed; next separates estimator movement from decoder/action bottlenecks; no intelligence claim"
   },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",

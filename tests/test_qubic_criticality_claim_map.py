@@ -26,6 +26,12 @@ AVALANCHE_SEED_REPLICATION_JSON_PATH = (
 AVALANCHE_SEED_REPLICATION_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_avalanche_intervention_seed_replication.md"
 )
+CONTROLLED_REGIME_CALIBRATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_controlled_regime_calibration.json"
+)
+CONTROLLED_REGIME_CALIBRATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_controlled_regime_calibration.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -61,7 +67,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "controlled_regime_calibration_probe"
+    assert data["recommended_next_probe"]["id"] == "estimator_decoder_separation_followup"
     assert data["recommended_next_probe"]["github_issue"].endswith("/issues/86")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
@@ -76,11 +82,12 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "not intelligence evidence" in markdown
     assert "cunxon_branching_regime_scan" in markdown
     assert "cunxon_avalanche_intervention_task_correlation" in markdown
+    assert "cunxon_controlled_regime_calibration" in markdown
     assert "cunxon_avalanche_window_intervention_matrix" in comparison_markdown
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "controlled_regime_calibration_probe"
+        "estimator_decoder_separation_followup"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -177,7 +184,7 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
     assert "stress_holdout" in comparison_markdown
 
-    assert claim_data["recommended_next_probe"]["id"] == "controlled_regime_calibration_probe"
+    assert claim_data["recommended_next_probe"]["id"] == "estimator_decoder_separation_followup"
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
 
 
@@ -220,3 +227,58 @@ def test_cunxon_avalanche_intervention_seed_replication_records_brittleness() ->
     assert "cuNxon avalanche intervention seed replication" in comparison_markdown
     assert "seed-replication" in comparison_markdown
     assert "cunxon_avalanche_intervention_seed_replication" in claim_markdown
+
+
+def test_cunxon_controlled_regime_calibration_records_estimator_boundaries() -> None:
+    data = json.loads(CONTROLLED_REGIME_CALIBRATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = CONTROLLED_REGIME_CALIBRATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "controlled_regime_calibration"
+    assert data["source_issue"].endswith("/issues/86")
+    assert data["config_count"] >= 3
+    assert data["sample_count"] >= 100
+    assert data["regime_drive_scales"] == {
+        "low-drive": 0.25,
+        "medium-drive": 1.0,
+        "high-drive": 2.0,
+    }
+    assert set(data["split_accuracy"]) >= {
+        "holdout",
+        "hard_holdout",
+        "stress_holdout",
+        "counterfactual_control",
+        "permuted_control",
+    }
+    assert data["configurations_beating_stress_baseline"] == []
+    assert data["stress_holdout_accuracy"] <= data["best_constant_baseline_by_split"][
+        "stress_holdout"
+    ]
+    assert "not intelligence evidence" in data["evidence_boundary"]
+    assert "estimator calibration" in data["verdict"]
+
+    config_ids = {config["id"] for config in data["configurations"]}
+    assert {"low-drive", "medium-drive", "high-drive"}.issubset(config_ids)
+    for config in data["configurations"]:
+        assert "drive_scale" in config
+        assert "mean_transition_entropy_bits" in config
+        assert "action_distribution" in config
+        assert "stress_holdout" in config["accuracy_by_split"]
+        assert config["beats_best_constant_baseline_by_split"]["stress_holdout"] is False
+
+    assert "# cuNxon controlled-regime criticality calibration" in markdown
+    assert "low-drive" in markdown
+    assert "medium-drive" in markdown
+    assert "high-drive" in markdown
+    assert "stress_holdout" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_controlled_regime_calibration"]
+    assert summary["hypothesis"] == "controlled_regime_calibration"
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert summary["stress_holdout_accuracy"] == data["stress_holdout_accuracy"]
+    assert "cuNxon controlled-regime criticality calibration" in comparison_markdown
+    assert "controlled_regime_calibration" in claim_markdown

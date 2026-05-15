@@ -26,6 +26,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_avalanche_intervention_task_correlation_probe,
     run_ctypes_avalanche_window_probe,
     run_ctypes_branching_regime_scan_probe,
+    run_ctypes_controlled_regime_calibration_probe,
     run_ctypes_external_drive_window_probe,
     run_ctypes_input_proxy_target_probe,
     run_ctypes_interface_semantics_probe,
@@ -52,6 +53,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_avalanche_intervention_task_correlation_artifacts,
     write_avalanche_window_artifacts,
     write_branching_regime_scan_artifacts,
+    write_controlled_regime_calibration_artifacts,
     write_external_drive_window_artifacts,
     write_input_proxy_target_artifacts,
     write_interface_semantics_artifacts,
@@ -854,6 +856,37 @@ def cmd_cunxon_avalanche_intervention_task_correlation(args: argparse.Namespace)
             "Status: `unusable`\n\n"
             f"Error: {e}\n\n"
             "Evidence boundary: a failed task-coupled avalanche probe does not support any "
+            "GPU-backed criticality, action-quality, or intelligence claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_controlled_regime_calibration(args: argparse.Namespace) -> int:
+    try:
+        result = run_ctypes_controlled_regime_calibration_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            modes=_parse_modes(args.modes),
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            steps=args.steps,
+            sample_interval=args.sample_interval,
+            device_id=args.device,
+        )
+        write_controlled_regime_calibration_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon controlled-regime criticality calibration\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed controlled-regime calibration does not support any "
             "GPU-backed criticality, action-quality, or intelligence claim.\n",
             encoding="utf-8",
         )
@@ -1924,6 +1957,62 @@ def main(argv: list[str] | None = None) -> int:
     p_cunxon_avalanche_correlation.set_defaults(
         func=cmd_cunxon_avalanche_intervention_task_correlation
     )
+
+    p_cunxon_controlled_regime = sub.add_parser(
+        "cunxon-controlled-regime-calibration",
+        help="Calibrate cuNxon criticality estimator under controlled drive regimes",
+        description=(
+            "Run low/medium/high input-drive snapshot windows over the same held-out, stress "
+            "and control splits to separate estimator calibration from action-quality claims."
+        ),
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--modes",
+        default="infer,train",
+        help="Comma-separated modes to sample: infer,train",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--seed-offsets",
+        default="133,134",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--steps",
+        type=int,
+        default=128,
+        help="Steps per controlled-regime stimulus window",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--sample-interval",
+        type=int,
+        default=8,
+        help="Capture full-sphere snapshots every N steps",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--device", type=int, default=0, help="CUDA device id"
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_controlled_regime_calibration.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_controlled_regime.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_controlled_regime_calibration.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_controlled_regime.set_defaults(func=cmd_cunxon_controlled_regime_calibration)
 
     p_cunxon_aigarth_remap = sub.add_parser(
         "cunxon-aigarth-action-remap-audit",

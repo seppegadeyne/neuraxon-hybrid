@@ -24,6 +24,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAvalancheWindowSample,
     CunxonBranchingRegimeRun,
     CunxonBranchingRegimeScanResult,
+    CunxonControlledRegimeCalibrationConfigSummary,
+    CunxonControlledRegimeCalibrationResult,
     CunxonInputProxyTargetCase,
     CunxonInputProxyTargetProbeResult,
     CunxonInterfaceReadoutSample,
@@ -1819,6 +1821,97 @@ def test_cli_cunxon_avalanche_intervention_task_correlation_writes_artifacts(
     assert '\"status\": \"avalanche intervention/task correlation completed\"' in data
     assert '\"hypothesis_for_this_slice\": \"avalanche_intervention_task_correlation\"' in data
     assert "stress_holdout" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_cli_cunxon_controlled_regime_calibration_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonControlledRegimeCalibrationResult:
+        assert kwargs["seed_offsets"] == [133, 134]
+        assert kwargs["modes"] == ["infer", "train"]
+        return CunxonControlledRegimeCalibrationResult(
+            status="controlled-regime calibration completed",
+            hypothesis_for_this_slice="controlled_regime_calibration",
+            source_issue="https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
+            source_claim_ids=["branching-ratio-regimes", "functional-generalization-claim"],
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            seed_offsets=list(kwargs["seed_offsets"]),
+            modes=list(kwargs["modes"]),
+            steps=64,
+            sample_interval=8,
+            regime_drive_scales={"low-drive": 0.25, "medium-drive": 1.0, "high-drive": 2.0},
+            configurations=[
+                CunxonControlledRegimeCalibrationConfigSummary(
+                    id="low-drive",
+                    drive_scale=0.25,
+                    steps=64,
+                    sample_interval=8,
+                    sample_count=1,
+                    mean_branching_ratio_estimate=0.1,
+                    branching_ratio_estimate_range=[0.1, 0.1],
+                    mean_active_count_ratio=0.5,
+                    mean_neutral_occupancy=0.9,
+                    mean_transition_entropy_bits=0.0,
+                    action_distribution={"query": 1},
+                    accuracy_by_split={"stress_holdout": 0.0},
+                    best_constant_baseline_by_split={"stress_holdout": 1.0},
+                    beats_best_constant_baseline_by_split={"stress_holdout": False},
+                )
+            ],
+            samples=[],
+            split_accuracy={"stress_holdout": 0.0},
+            best_constant_baseline_by_split={"stress_holdout": 1.0},
+            stress_holdout_accuracy=0.0,
+            configurations_beating_stress_baseline=[],
+            correlation_summary={"accuracy_vs_branching_ratio_estimate": 0.0},
+            verdict="Controlled-regime estimator calibration did not beat stress baselines.",
+            evidence_boundary="Controlled-regime calibration is not intelligence evidence.",
+            notes=["fake controlled calibration"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_controlled_regime_calibration_probe",
+        fake_probe,
+    )
+    json_path = tmp_path / "controlled-regime-calibration.json"
+    markdown_path = tmp_path / "controlled-regime-calibration.md"
+
+    rc = main(
+        [
+            "cunxon-controlled-regime-calibration",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "133,134",
+            "--modes",
+            "infer,train",
+            "--steps",
+            "64",
+            "--sample-interval",
+            "8",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '\"status\": \"controlled-regime calibration completed\"' in data
+    assert '\"hypothesis_for_this_slice\": \"controlled_regime_calibration\"' in data
+    assert "cuNxon controlled-regime criticality calibration" in markdown_path.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_cli_cunxon_aigarth_action_remap_audit_writes_artifacts(tmp_path: Path) -> None:
