@@ -26,6 +26,7 @@ from neuraxon_agent.cunxon_smoke import (
     run_ctypes_aigarth_action_target_contract_stress_injection_probe,
     run_ctypes_aigarth_action_target_contract_stress_objective_probe,
     run_ctypes_aigarth_action_target_contract_stress_probe,
+    run_ctypes_aigarth_action_target_contract_supervised_low_margin_probe,
     run_ctypes_aigarth_readout_probe,
     run_ctypes_avalanche_intervention_task_correlation_probe,
     run_ctypes_avalanche_window_probe,
@@ -56,6 +57,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_action_target_contract_stress_injection_artifacts,
     write_aigarth_action_target_contract_stress_objective_artifacts,
+    write_aigarth_action_target_contract_supervised_low_margin_artifacts,
     write_aigarth_readout_artifacts,
     write_avalanche_intervention_task_correlation_artifacts,
     write_avalanche_window_artifacts,
@@ -884,6 +886,41 @@ def cmd_cunxon_aigarth_action_target_contract_stress_objective_probe(
             "Status: `unusable`\n\n"
             f"Error: {e}\n\n"
             "Evidence boundary: a failed target-aligned stress objective diagnostic does not "
+            "support any GPU-backed generalization, holdout, separability, "
+            "or intelligence claim.\n",
+            encoding="utf-8",
+        )
+        return 1
+
+
+def cmd_cunxon_aigarth_action_target_contract_supervised_low_margin_probe(
+    args: argparse.Namespace,
+) -> int:
+    try:
+        result = run_ctypes_aigarth_action_target_contract_supervised_low_margin_probe(
+            library_path=args.library,
+            upstream_commit=args.upstream_commit,
+            cunxon_commit=args.cunxon_commit,
+            seed_offsets=_parse_seed_offsets(args.seed_offsets),
+            generations=args.generations,
+            population_size=args.population_size,
+            eval_steps=args.eval_steps,
+            fitness_variant="target_contract_supervised_low_margin",
+            device_id=args.device,
+        )
+        write_aigarth_action_target_contract_supervised_low_margin_artifacts(
+            result,
+            json_path=args.json_output,
+            markdown_path=args.markdown_output,
+        )
+        return 0
+    except Exception as e:
+        _save_json(args.json_output, {"error": str(e), "status": "unusable"})
+        Path(args.markdown_output).write_text(
+            "# cuNxon Aigarth target-contract supervised low-margin objective\n\n"
+            "Status: `unusable`\n\n"
+            f"Error: {e}\n\n"
+            "Evidence boundary: a failed supervised low-margin objective diagnostic does not "
             "support any GPU-backed generalization, holdout, separability, "
             "or intelligence claim.\n",
             encoding="utf-8",
@@ -2098,6 +2135,66 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_cunxon_aigarth_target_contract_stress_objective.set_defaults(
         func=cmd_cunxon_aigarth_action_target_contract_stress_objective_probe
+    )
+
+    p_cunxon_aigarth_target_contract_supervised_low_margin = sub.add_parser(
+        "cunxon-aigarth-action-target-contract-supervised-low-margin-probe",
+        help="Run a supervised low-margin target-objective diagnostic for cuNxon Aigarth",
+        description=(
+            "Optimize normalized low-margin train-only target examples after the stress "
+            "query-collapse result, while reporting original stress_holdout and controls "
+            "outside the fitness callback. This is objective/interface evidence only."
+        ),
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--library", required=True, help="Path to built libcunxon.so"
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--upstream-commit",
+        required=True,
+        help="Upstream Neuraxon commit",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--cunxon-commit", required=True, help="cuNxon source commit"
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--seed-offsets",
+        default="150,151,152",
+        help="Comma-separated cuNxon random_seed_offset values",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--generations",
+        type=int,
+        default=16,
+        help="Aigarth generations per seed using supervised low-margin fitness",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--population-size",
+        type=int,
+        default=32,
+        help="Aigarth mutation population size per generation",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--eval-steps",
+        type=int,
+        default=24,
+        help="Inference steps per train/holdout/control case evaluation",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--device", type=int, default=0, help="CUDA device id"
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--json-output",
+        default="benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json",
+        help="JSON artifact path",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.add_argument(
+        "--markdown-output",
+        default="benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.md",
+        help="Markdown artifact path",
+    )
+    p_cunxon_aigarth_target_contract_supervised_low_margin.set_defaults(
+        func=cmd_cunxon_aigarth_action_target_contract_supervised_low_margin_probe
     )
 
     p_cunxon_branching_regime = sub.add_parser(

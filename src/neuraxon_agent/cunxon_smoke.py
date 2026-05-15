@@ -16,7 +16,7 @@ import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Iterable, Sequence
 
 from neuraxon_agent.action import ActionDecoder
 from neuraxon_agent.action_contract import normalize_benchmark_action
@@ -2725,6 +2725,115 @@ def write_aigarth_action_target_contract_stress_objective_artifacts(
     return json_output, markdown_output
 
 
+def render_aigarth_action_target_contract_supervised_low_margin_markdown_report(
+    result: CunxonAigarthStressObjectiveResult,
+) -> str:
+    """Render the supervised low-margin target-objective diagnostic report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    distribution = ", ".join(
+        f"{action}={count}"
+        for action, count in sorted(result.aggregate_action_distribution.items())
+    )
+    split_rows = [
+        (
+            "| Split | Samples | Accuracy | Best constant baseline | "
+            "Seeds > baseline | Query collapse | Execute/retry accuracy | Actions |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for summary in result.split_summaries:
+        actions = ", ".join(
+            f"{action}={count}" for action, count in sorted(summary.action_distribution.items())
+        )
+        split_rows.append(
+            "| "
+            f"`{summary.split}` | {summary.sample_count} | {summary.accuracy_mean:.6f} | "
+            f"{summary.best_constant_baseline_mean:.6f} | "
+            f"{summary.seeds_beating_best_baseline} | "
+            f"{summary.query_collapse_rate:.6f} | "
+            f"{summary.execute_retry_accuracy:.6f} | {actions} |"
+        )
+    return "\n".join(
+        [
+            "# cuNxon Aigarth target-contract supervised low-margin objective",
+            "",
+            f"Status: `{result.status}`",
+            "",
+            "## Hypothesis",
+            "",
+            "The low-margin readout geometry probe showed that original execute/retry "
+            "stress lanes sit on the wrong side of the observed query boundary. This "
+            "diagnostic tests a supervised low-margin objective: train cases include "
+            "normalized low-margin target examples, while original stress_holdout and controls "
+            "stay outside the fitness callback.",
+            "",
+            "## Runtime",
+            "",
+            f"- Device: `{result.device_name}` / compute capability `{result.compute_capability}`",
+            f"- Library: `{result.library_path}`",
+            f"- Seeds: `{result.seed_offsets}`",
+            f"- Generations/population/eval steps: `{result.generations}` / "
+            f"`{result.population_size}` / `{result.eval_steps}`",
+            f"- Fitness variant: `{result.fitness_variant}`",
+            "",
+            "## Core result",
+            "",
+            "- Original stress_holdout accuracy: "
+            f"`{result.original_stress_holdout_accuracy_mean:.6f}`",
+            "- Original stress_holdout query-collapse rate: "
+            f"`{result.original_stress_holdout_query_collapse_rate:.6f}`",
+            "- Original stress_holdout execute/retry accuracy: "
+            f"`{result.original_stress_holdout_execute_retry_accuracy:.6f}`",
+            "- Counterfactual control accuracy: "
+            f"`{result.counterfactual_control_accuracy_mean:.6f}`",
+            "- Permuted control accuracy: "
+            f"`{result.permuted_control_accuracy_mean:.6f}`",
+            f"- Aggregate actions: {distribution}",
+            "",
+            "## Split summaries",
+            "",
+            *split_rows,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+            "## Evidence boundary",
+            "",
+            result.evidence_boundary,
+            "",
+            "This supervised low-margin objective is an adapter/objective diagnostic, "
+            "not intelligence evidence and not generalization evidence. Original stress/control "
+            "quality must beat constant baselines across fresh seeds before any useful-computation "
+            "claim changes.",
+            "",
+            "## Recommended next probe",
+            "",
+            f"- Probe id: `{result.recommended_next_probe.get('id', 'unknown')}`",
+            "",
+        ]
+    )
+
+
+def write_aigarth_action_target_contract_supervised_low_margin_artifacts(
+    result: CunxonAigarthStressObjectiveResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON/Markdown supervised low-margin target objective artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_supervised_low_margin_markdown_report(result),
+        encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
 def render_avalanche_window_markdown_report(
     result: CunxonAvalancheWindowProbeResult,
 ) -> str:
@@ -4667,6 +4776,12 @@ def run_ctypes_aigarth_action_probe(
                 if spec[1] in {"train", "augmented_train"}
                 or spec[1].startswith("stress_train_scaled_")
             ]
+        elif fitness_variant == "target_contract_supervised_low_margin":
+            train_specs = [
+                spec
+                for spec in specs
+                if spec[1] in {"train", "augmented_train", "supervised_low_margin_train"}
+            ]
         else:
             train_splits = {"train"}
             train_specs = [spec for spec in specs if spec[1] in train_splits]
@@ -4683,6 +4798,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_stress_injection",
                     "target_contract_stress_amplitude_ladder",
                     "target_contract_stress_margin_weighted",
+                    "target_contract_supervised_low_margin",
                 }
                 else "action_decoder"
             )
@@ -4706,6 +4822,7 @@ def run_ctypes_aigarth_action_probe(
                 "target_contract_augmented_train",
                 "target_contract_stress_injection",
                 "target_contract_stress_amplitude_ladder",
+                "target_contract_supervised_low_margin",
             }:
                 margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
                 return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
@@ -4780,6 +4897,7 @@ def run_ctypes_aigarth_action_probe(
                     "target_contract_stress_injection",
                     "target_contract_stress_amplitude_ladder",
                     "target_contract_stress_margin_weighted",
+                    "target_contract_supervised_low_margin",
                 }
                 else "action_decoder"
             ),
@@ -5605,13 +5723,38 @@ def run_ctypes_aigarth_action_target_contract_stress_amplitude_ladder_probe(
 
 
 def _split_summary_by_name(
-    summaries: Sequence[CunxonAigarthStressAmplitudeSplitSummary],
-    split: str,
+    summaries: Iterable[CunxonAigarthStressAmplitudeSplitSummary], split: str
 ) -> CunxonAigarthStressAmplitudeSplitSummary | None:
     for summary in summaries:
         if summary.split == split:
             return summary
     return None
+
+
+def _aigarth_source_split_summary(
+    source_summary: CunxonAigarthActionHardHoldoutResult,
+    split: str,
+    *,
+    amplitude_factor: float = 1.0,
+) -> CunxonAigarthStressAmplitudeSplitSummary:
+    cases = [case for run in source_summary.runs for case in run.cases if case.split == split]
+    return CunxonAigarthStressAmplitudeSplitSummary(
+        split=split,
+        amplitude_factor=amplitude_factor,
+        sample_count=len(cases),
+        accuracy_mean=source_summary.accuracy_summary_by_split.get(split, {}).get("mean", 0.0),
+        best_constant_baseline_mean=sum(
+            _best_constant_baseline_for_split(run, split) for run in source_summary.runs
+        )
+        / len(source_summary.runs),
+        seeds_beating_best_baseline=source_summary.seeds_beating_baseline_by_split.get(
+            split, 0
+        ),
+        query_collapse_rate=_query_collapse_rate(cases),
+        execute_retry_accuracy=_execute_retry_accuracy(cases),
+        action_distribution=_aigarth_action_distribution(cases),
+    )
+
 
 
 def run_ctypes_aigarth_action_target_contract_stress_objective_probe(
@@ -5743,6 +5886,136 @@ def run_ctypes_aigarth_action_target_contract_stress_objective_probe(
         notes=[
             "fresh cuNxon network/context per seed",
             "fitness callback weights scaled stress_train margin more strongly than the ladder",
+            "original stress_holdout and controls are never optimized",
+            "objective-shaping diagnostic only; not a long-sweep or intelligence claim",
+        ],
+    )
+
+
+def run_ctypes_aigarth_action_target_contract_supervised_low_margin_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (150, 151, 152),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_supervised_low_margin",
+    device_id: int = 0,
+) -> CunxonAigarthStressObjectiveResult:
+    """Run a supervised low-margin objective diagnostic after stress query-collapse."""
+    if fitness_variant != "target_contract_supervised_low_margin":
+        raise ValueError(
+            "supervised low-margin audit only supports "
+            "fitness_variant='target_contract_supervised_low_margin'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    specs = _aigarth_action_target_contract_supervised_low_margin_specs()
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    source_summary = _summarize_aigarth_action_runs(
+        probe_results=probe_results,
+        seed_offsets=seed_offsets,
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        status="aigarth target-contract supervised low-margin objective completed",
+        notes=[],
+    )
+    split_summaries = [
+        _aigarth_source_split_summary(source_summary, split)
+        for split in (
+            "train",
+            "augmented_train",
+            "supervised_low_margin_train",
+            "holdout",
+            "hard_holdout",
+            "stress_holdout",
+            "counterfactual_control",
+            "permuted_control",
+        )
+    ]
+    stress_summary = _split_summary_by_name(split_summaries, "stress_holdout")
+    supervised_train_summary = _split_summary_by_name(
+        split_summaries, "supervised_low_margin_train"
+    )
+    return CunxonAigarthStressObjectiveResult(
+        status="aigarth target-contract supervised low-margin objective completed",
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(Path(library_path)),
+        device_name=probe_results[0].device_name,
+        compute_capability=probe_results[0].compute_capability,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        seed_offsets=list(seed_offsets),
+        amplitude_factor=1.0,
+        fitness_variant=fitness_variant,
+        split_summaries=split_summaries,
+        original_stress_holdout_accuracy_mean=stress_summary.accuracy_mean
+        if stress_summary
+        else 0.0,
+        original_stress_holdout_query_collapse_rate=stress_summary.query_collapse_rate
+        if stress_summary
+        else 0.0,
+        original_stress_holdout_execute_retry_accuracy=stress_summary.execute_retry_accuracy
+        if stress_summary
+        else 0.0,
+        scaled_stress_holdout_accuracy_mean=supervised_train_summary.accuracy_mean
+        if supervised_train_summary
+        else 0.0,
+        scaled_stress_holdout_query_collapse_rate=supervised_train_summary.query_collapse_rate
+        if supervised_train_summary
+        else 0.0,
+        scaled_stress_holdout_execute_retry_accuracy=supervised_train_summary.execute_retry_accuracy
+        if supervised_train_summary
+        else 0.0,
+        counterfactual_control_accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "counterfactual_control", {}
+        ).get("mean", 0.0),
+        permuted_control_accuracy_mean=source_summary.accuracy_summary_by_split.get(
+            "permuted_control", {}
+        ).get("mean", 0.0),
+        aggregate_action_distribution=source_summary.aggregate_action_distribution,
+        evidence_boundary=(
+            "This is one supervised low-margin target-objective diagnostic. Normalized "
+            "supervised_low_margin_train examples are optimized, while original stress_holdout "
+            "and controls are reported separately. It is not intelligence evidence and not "
+            "generalization evidence unless original stress/control splits beat constant baselines."
+        ),
+        recommended_next_probe={
+            "id": "low_margin_target_objective_decision",
+            "condition": (
+                "if original stress_holdout remains baseline-level, inspect "
+                "decoder/readout geometry before another objective sweep"
+            ),
+        },
+        notes=[
+            "fresh cuNxon network/context per seed",
+            (
+                "fitness callback sees train, augmented_train and normalized "
+                "supervised_low_margin_train only"
+            ),
             "original stress_holdout and controls are never optimized",
             "objective-shaping diagnostic only; not a long-sweep or intelligence claim",
         ],
@@ -9155,6 +9428,37 @@ def _aigarth_action_target_contract_stress_injection_specs() -> list[
     return [
         *_aigarth_action_target_contract_augmented_train_specs(),
         *stress_train_specs,
+    ]
+
+
+def _supervised_low_margin_vector(
+    vector: tuple[float, float, float], expected_action: str
+) -> tuple[float, float, float]:
+    """Normalize stress-like vectors just past the target-contract query boundary."""
+    if expected_action == "execute":
+        return (max(abs(vector[0]), 0.30), vector[1], vector[2])
+    if expected_action == "retry":
+        return (-max(abs(vector[0]), 0.30), vector[1], vector[2])
+    return vector
+
+
+def _aigarth_action_target_contract_supervised_low_margin_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return specs with normalized supervised low-margin train-only examples."""
+    supervised_specs = [
+        (
+            f"{name}-supervised-low-margin-train",
+            "supervised_low_margin_train",
+            _supervised_low_margin_vector(vector, expected),
+            expected,
+        )
+        for name, split, vector, expected in _aigarth_action_target_contract_stress_specs()
+        if split == "stress_holdout"
+    ]
+    return [
+        *_aigarth_action_target_contract_augmented_train_specs(),
+        *supervised_specs,
     ]
 
 

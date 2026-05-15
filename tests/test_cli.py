@@ -1730,6 +1730,106 @@ def test_cli_cunxon_stress_objective_writes_artifacts(
     assert "stress objective" in markdown_path.read_text(encoding="utf-8")
 
 
+def test_cli_cunxon_supervised_low_margin_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAigarthStressObjectiveResult:
+        raw_seed_offsets = kwargs["seed_offsets"]
+        assert isinstance(raw_seed_offsets, list)
+        assert raw_seed_offsets == [150, 151]
+        assert kwargs["fitness_variant"] == "target_contract_supervised_low_margin"
+        return CunxonAigarthStressObjectiveResult(
+            status="aigarth target-contract supervised low-margin objective completed",
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            generations=int(str(kwargs["generations"])),
+            population_size=int(str(kwargs["population_size"])),
+            eval_steps=int(str(kwargs["eval_steps"])),
+            seed_offsets=raw_seed_offsets,
+            amplitude_factor=1.0,
+            fitness_variant=str(kwargs["fitness_variant"]),
+            split_summaries=[
+                CunxonAigarthStressAmplitudeSplitSummary(
+                    split="supervised_low_margin_train",
+                    amplitude_factor=1.0,
+                    sample_count=12,
+                    accuracy_mean=1.0,
+                    best_constant_baseline_mean=0.333333,
+                    seeds_beating_best_baseline=2,
+                    query_collapse_rate=0.0,
+                    execute_retry_accuracy=1.0,
+                    action_distribution={"execute": 4, "query": 4, "retry": 4},
+                ),
+                CunxonAigarthStressAmplitudeSplitSummary(
+                    split="stress_holdout",
+                    amplitude_factor=1.0,
+                    sample_count=12,
+                    accuracy_mean=0.333333,
+                    best_constant_baseline_mean=0.333333,
+                    seeds_beating_best_baseline=0,
+                    query_collapse_rate=1.0,
+                    execute_retry_accuracy=0.0,
+                    action_distribution={"query": 12},
+                ),
+            ],
+            original_stress_holdout_accuracy_mean=0.333333,
+            original_stress_holdout_query_collapse_rate=1.0,
+            original_stress_holdout_execute_retry_accuracy=0.0,
+            scaled_stress_holdout_accuracy_mean=1.0,
+            scaled_stress_holdout_query_collapse_rate=0.0,
+            scaled_stress_holdout_execute_retry_accuracy=1.0,
+            counterfactual_control_accuracy_mean=0.333333,
+            permuted_control_accuracy_mean=0.333333,
+            aggregate_action_distribution={"execute": 4, "query": 16, "retry": 4},
+            evidence_boundary=(
+                "This supervised low-margin diagnostic is not intelligence evidence."
+            ),
+            recommended_next_probe={"id": "low_margin_target_objective_decision"},
+            notes=["fake supervised low-margin objective"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_aigarth_action_target_contract_supervised_low_margin_probe",
+        fake_probe,
+    )
+    json_path = tmp_path / "supervised-low-margin.json"
+    markdown_path = tmp_path / "supervised-low-margin.md"
+
+    rc = main(
+        [
+            "cunxon-aigarth-action-target-contract-supervised-low-margin-probe",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "150,151",
+            "--generations",
+            "1",
+            "--population-size",
+            "2",
+            "--eval-steps",
+            "3",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["status"] == "aigarth target-contract supervised low-margin objective completed"
+    assert data["fitness_variant"] == "target_contract_supervised_low_margin"
+    assert "supervised low-margin objective" in markdown_path.read_text(encoding="utf-8")
+
+
 def test_cli_cunxon_branching_regime_scan_writes_artifacts(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

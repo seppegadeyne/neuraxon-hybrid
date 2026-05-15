@@ -66,6 +66,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_target_contract_stress_injection_markdown_report,
     render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_action_target_contract_stress_objective_markdown_report,
+    render_aigarth_action_target_contract_supervised_low_margin_markdown_report,
     render_aigarth_readout_markdown_report,
     render_avalanche_intervention_task_correlation_markdown_report,
     render_avalanche_window_markdown_report,
@@ -96,6 +97,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_action_target_contract_stress_injection_artifacts,
     write_aigarth_action_target_contract_stress_objective_artifacts,
+    write_aigarth_action_target_contract_supervised_low_margin_artifacts,
     write_aigarth_readout_artifacts,
     write_avalanche_intervention_task_correlation_artifacts,
     write_avalanche_window_artifacts,
@@ -1414,6 +1416,84 @@ def test_aigarth_action_target_contract_stress_objective_report_records_boundary
     data = json.loads(json_path.read_text(encoding="utf-8"))
     assert data["fitness_variant"] == "target_contract_stress_margin_weighted"
     assert "stress objective" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_aigarth_action_target_contract_supervised_low_margin_report_records_boundary(
+    tmp_path: Path,
+) -> None:
+    result = CunxonAigarthStressObjectiveResult(
+        status="aigarth target-contract supervised low-margin objective completed",
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        generations=3,
+        population_size=6,
+        eval_steps=5,
+        seed_offsets=[150, 151],
+        amplitude_factor=1.0,
+        fitness_variant="target_contract_supervised_low_margin",
+        split_summaries=[
+            CunxonAigarthStressAmplitudeSplitSummary(
+                split="stress_holdout",
+                amplitude_factor=1.0,
+                sample_count=12,
+                accuracy_mean=0.333333,
+                best_constant_baseline_mean=0.333333,
+                seeds_beating_best_baseline=0,
+                query_collapse_rate=1.0,
+                execute_retry_accuracy=0.0,
+                action_distribution={"query": 12},
+            ),
+            CunxonAigarthStressAmplitudeSplitSummary(
+                split="supervised_low_margin_train",
+                amplitude_factor=1.0,
+                sample_count=12,
+                accuracy_mean=0.666667,
+                best_constant_baseline_mean=0.333333,
+                seeds_beating_best_baseline=2,
+                query_collapse_rate=0.333333,
+                execute_retry_accuracy=0.5,
+                action_distribution={"execute": 4, "query": 4, "retry": 4},
+            ),
+        ],
+        original_stress_holdout_accuracy_mean=0.333333,
+        original_stress_holdout_query_collapse_rate=1.0,
+        original_stress_holdout_execute_retry_accuracy=0.0,
+        scaled_stress_holdout_accuracy_mean=0.333333,
+        scaled_stress_holdout_query_collapse_rate=1.0,
+        scaled_stress_holdout_execute_retry_accuracy=0.0,
+        counterfactual_control_accuracy_mean=0.0,
+        permuted_control_accuracy_mean=0.0,
+        aggregate_action_distribution={"execute": 4, "query": 16, "retry": 4},
+        evidence_boundary=(
+            "This supervised low-margin objective is a diagnostic, not intelligence evidence."
+        ),
+        recommended_next_probe={"id": "low_margin_stress_result_review"},
+        notes=["original stress_holdout and controls stay outside the fitness callback"],
+    )
+
+    markdown = render_aigarth_action_target_contract_supervised_low_margin_markdown_report(
+        result
+    )
+    assert "supervised low-margin objective" in markdown
+    assert "target_contract_supervised_low_margin" in markdown
+    assert "Original stress_holdout accuracy: `0.333333`" in markdown
+    assert "original stress_holdout and controls stay outside" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "aigarth-action-target-contract-supervised-low-margin.json"
+    markdown_path = tmp_path / "aigarth-action-target-contract-supervised-low-margin.md"
+    write_aigarth_action_target_contract_supervised_low_margin_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["fitness_variant"] == "target_contract_supervised_low_margin"
+    assert "supervised low-margin objective" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_branching_regime_scan_report_couples_regime_metrics_to_action_quality(
