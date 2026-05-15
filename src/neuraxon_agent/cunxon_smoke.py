@@ -2227,6 +2227,44 @@ def render_aigarth_action_target_contract_augmented_train_markdown_report(
     )
 
 
+def render_aigarth_action_target_contract_stress_injection_markdown_report(
+    result: CunxonAigarthActionHardHoldoutResult,
+) -> str:
+    """Render a target-contract stress-injection upper-bound audit report."""
+    return (
+        render_aigarth_action_target_contract_augmented_train_markdown_report(result)
+        .replace(
+            "# cuNxon Aigarth target-contract augmented-train audit",
+            "# cuNxon Aigarth target-contract stress-injection audit",
+            1,
+        )
+        .replace(
+            "The target-contract stress audit exposed baseline-level low-margin stress "
+            "holdout behavior. This follow-up keeps the signed-first-lane contract but "
+            "tests a train-only objective with additional low-margin training cases: "
+            "`target_contract_augmented_train` optimizes `train` plus `augmented_train` "
+            "cases, while `stress_holdout`, hard holdout, and control labels stay outside "
+            "the fitness callback.",
+            "The criticality/decoder separation result points to low-margin execute/retry "
+            "stress query-collapse. This diagnostic changes the question from "
+            "generalization to an upper-bound: `target_contract_stress_injection` "
+            "deliberately includes duplicated low-margin `stress_train` cases in the "
+            "Aigarth fitness callback, while reporting the original `stress_holdout` and "
+            "controls separately. This leaks stress-like labels into optimization and is "
+            "therefore adapter-capability/debugging evidence only, not generalization "
+            "evidence.",
+            1,
+        )
+        .replace(
+            "This is an augmented-train target-contract stress audit of a tiny "
+            "Aigarth/evolutionary adapter route, not ",
+            "This is a stress-injection upper-bound diagnostic for a tiny "
+            "Aigarth/evolutionary adapter route, not ",
+            1,
+        )
+    )
+
+
 def write_aigarth_action_hard_holdout_artifacts(
     result: CunxonAigarthActionHardHoldoutResult,
     *,
@@ -2331,6 +2369,25 @@ def write_aigarth_action_target_contract_augmented_train_artifacts(
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(
         render_aigarth_action_target_contract_augmented_train_markdown_report(result),
+        encoding="utf-8",
+    )
+    return json_output, markdown_output
+
+
+def write_aigarth_action_target_contract_stress_injection_artifacts(
+    result: CunxonAigarthActionHardHoldoutResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON/Markdown Aigarth target-contract stress-injection artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_aigarth_action_target_contract_stress_injection_markdown_report(result),
         encoding="utf-8",
     )
     return json_output, markdown_output
@@ -4265,11 +4322,12 @@ def run_ctypes_aigarth_action_probe(
             if evaluation_specs is not None
             else _default_supervised_motor_specs()
         )
-        train_splits = (
-            {"train", "augmented_train"}
-            if fitness_variant == "target_contract_augmented_train"
-            else {"train"}
-        )
+        if fitness_variant == "target_contract_augmented_train":
+            train_splits = {"train", "augmented_train"}
+        elif fitness_variant == "target_contract_stress_injection":
+            train_splits = {"train", "augmented_train", "stress_train"}
+        else:
+            train_splits = {"train"}
         train_specs = [spec for spec in specs if spec[1] in train_splits]
         if not train_specs:
             raise ValueError("evaluation_specs must include at least one train case")
@@ -4277,7 +4335,12 @@ def run_ctypes_aigarth_action_probe(
         def train_score(candidate_net: C.c_void_p) -> float:
             decoder_strategy = (
                 "target_contract"
-                if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}
+                if fitness_variant
+                in {
+                    "target_contract_margin",
+                    "target_contract_augmented_train",
+                    "target_contract_stress_injection",
+                }
                 else "action_decoder"
             )
             cases = _evaluate_aigarth_action_cases(
@@ -4295,7 +4358,11 @@ def run_ctypes_aigarth_action_probe(
             alignment_score = sum(case.target_alignment for case in cases) / len(cases)
             if fitness_variant == "success_plus_alignment":
                 return float(success_score + 0.25 * alignment_score)
-            if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}:
+            if fitness_variant in {
+                "target_contract_margin",
+                "target_contract_augmented_train",
+                "target_contract_stress_injection",
+            }:
                 margin_score = sum(_target_contract_margin(case) for case in cases) / len(cases)
                 return float(success_score + 0.25 * alignment_score + 0.25 * margin_score)
             if fitness_variant in {"strict_label_margin", "strict_label_heavy_penalty"}:
@@ -4349,7 +4416,12 @@ def run_ctypes_aigarth_action_probe(
             decoder=decoder,
             decoder_strategy=(
                 "target_contract"
-                if fitness_variant in {"target_contract_margin", "target_contract_augmented_train"}
+                if fitness_variant
+                in {
+                    "target_contract_margin",
+                    "target_contract_augmented_train",
+                    "target_contract_stress_injection",
+                }
                 else "action_decoder"
             ),
         )
@@ -4942,6 +5014,63 @@ def run_ctypes_aigarth_action_target_contract_augmented_train_probe(
             "fitness callback uses train plus augmented_train low-margin cases only",
             "stress_holdout, hard holdout, and control labels are never optimized",
             "target-contract augmented-train stress audit, not intelligence evidence",
+        ],
+    )
+
+
+def run_ctypes_aigarth_action_target_contract_stress_injection_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    seed_offsets: Sequence[int] = (137, 138, 139, 140, 141),
+    generations: int = 16,
+    population_size: int = 32,
+    eval_steps: int = 24,
+    fitness_variant: str = "target_contract_stress_injection",
+    device_id: int = 0,
+) -> CunxonAigarthActionHardHoldoutResult:
+    """Run a stress-label-injection upper-bound audit for low-margin stress cases."""
+    if fitness_variant != "target_contract_stress_injection":
+        raise ValueError(
+            "target-contract stress-injection audit only supports "
+            "fitness_variant='target_contract_stress_injection'"
+        )
+    if not seed_offsets:
+        raise ValueError("seed_offsets must contain at least one value")
+    specs = _aigarth_action_target_contract_stress_injection_specs()
+    probe_results = [
+        run_ctypes_aigarth_action_probe(
+            library_path=library_path,
+            upstream_commit=upstream_commit,
+            cunxon_commit=cunxon_commit,
+            generations=generations,
+            population_size=population_size,
+            eval_steps=eval_steps,
+            seed_offset=seed_offset,
+            evaluation_specs=specs,
+            fitness_variant=fitness_variant,
+            device_id=device_id,
+        )
+        for seed_offset in seed_offsets
+    ]
+    return _summarize_aigarth_action_runs(
+        probe_results=probe_results,
+        seed_offsets=seed_offsets,
+        library_path=library_path,
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        generations=generations,
+        population_size=population_size,
+        eval_steps=eval_steps,
+        fitness_variant=fitness_variant,
+        status="aigarth target-contract stress-injection audit completed",
+        notes=[
+            "fresh cuNxon network/context per seed",
+            "target-contract fitness decodes with the signed-first-lane project contract",
+            "fitness callback deliberately includes duplicated stress_train low-margin cases",
+            "stress_holdout is the original stress split, but stress-like labels are optimized",
+            "upper-bound/debugging diagnostic only; not generalization or intelligence evidence",
         ],
     )
 
@@ -8360,6 +8489,21 @@ def _aigarth_action_target_contract_augmented_train_specs() -> list[
             (-0.08, 0.08, -0.02),
             "query",
         ),
+    ]
+
+
+def _aigarth_action_target_contract_stress_injection_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return stress audit specs plus duplicated stress_train upper-bound cases."""
+    stress_train_specs = [
+        (f"{name}-train-injected", "stress_train", vector, expected)
+        for name, split, vector, expected in _aigarth_action_target_contract_stress_specs()
+        if split == "stress_holdout"
+    ]
+    return [
+        *_aigarth_action_target_contract_augmented_train_specs(),
+        *stress_train_specs,
     ]
 
 

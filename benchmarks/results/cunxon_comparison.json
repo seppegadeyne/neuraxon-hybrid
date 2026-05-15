@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration now shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality metrics are useful diagnostics, not intelligence evidence; the decoder-separation follow-up shows the current stress bottleneck is mostly query/action collapse on low-margin execute/retry cases despite observable estimator movement.",
+  "claim_boundary": "cuNxon GPU execution has runtime/dynamics viability and exposes snapshot/pattern/multi-sphere/interface APIs from Python, but most task-coupled probes remain diagnostic/negative. The Aigarth action route remains the only constructive action-quality lead so far, and even its target-contract/augmented-train variants stay baseline-level on low-margin stress_holdout. Qubic NIA Vol. 8 adds branching ratio/criticality as an explicit regime-diagnostic hypothesis. The branching-regime scan observed near-critical-looking proxy ratios beside baseline-level stress_holdout; direct avalanche-window probes made activation-transition estimates observable but did not by themselves produce robust task evidence. The task-coupled avalanche lane showed repeatable normal/hard holdout bumps, but stress_holdout remained at the best constant baseline. The controlled-regime calibration shows that low/medium/high drive scales move estimator/occupancy/entropy and action distributions, while stress_holdout still stays at 0.333333 and no drive regime beats the stress baseline. Criticality/decoder separation showed query/action collapse on low-margin execute/retry stress cases despite observable estimator movement. A new stress-injection upper-bound diagnostic deliberately put duplicated stress-like labels into Aigarth fitness, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Criticality metrics and stress-label injection are useful diagnostics, not intelligence or generalization evidence.",
   "comparison_lanes": [
     {
       "evidence": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
@@ -126,6 +126,12 @@
       "lane": "cuNxon Aigarth target-contract augmented-train audit",
       "metric": "5-seed augmented-train target-contract stress/control accuracy vs trivial baselines",
       "value": "augmented_train mean=1.000000; holdout mean=1.000000; hard-holdout mean=0.866667; stress-holdout mean=0.333333; counterfactual-control mean=0.066667; permuted-control mean=0.000000; unexpected labels=0"
+    },
+    {
+      "evidence": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+      "lane": "cuNxon Aigarth target-contract stress-injection upper-bound audit",
+      "metric": "5-seed injected-stress action accuracy vs trivial baselines",
+      "value": "stress_train mean=0.333333 and stress_holdout mean=0.333333 with 0/5 seeds beating constants, despite holdout=1.000000 and hard_holdout=0.866667; unexpected labels=0; this is negative upper-bound/debugging evidence, not generalization evidence"
     },
     {
       "evidence": "benchmarks/results/cunxon_source_semantics_audit.json",
@@ -636,6 +642,30 @@
     "unexpected_action_count": 0,
     "unexpected_action_rate": 0.0,
     "verdict": "target-contract fitness removes out-of-contract labels and improves holdout versus the post-hoc remap/heavy-penalty lanes, but remains brittle tiny Aigarth toy evidence with one hard-holdout baseline-level seed"
+  },
+  "cunxon_aigarth_action_target_contract_stress_injection_probe": {
+    "artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "counterfactual_control_mean": 0.0,
+    "evidence_boundary": "Deliberately optimizes stress-like labels as stress_train; negative upper-bound/debugging evidence because even injected low-margin stress cases stay at constant baseline. Not generalization, useful-computation, or intelligence evidence.",
+    "fitness_variant": "target_contract_stress_injection",
+    "hard_holdout_mean": 0.866667,
+    "holdout_mean": 1.0,
+    "hypothesis": "stress_label_injection_upper_bound",
+    "permuted_control_mean": 0.0,
+    "seed_count": 5,
+    "seed_offsets": [
+      137,
+      138,
+      139,
+      140,
+      141
+    ],
+    "stress_holdout_mean": 0.333333,
+    "stress_holdout_seeds_beating_baseline": 0,
+    "stress_train_mean": 0.333333,
+    "stress_train_seeds_beating_baseline": 0,
+    "unexpected_action_count": 0,
+    "unexpected_action_rate": 0.0
   },
   "cunxon_aigarth_action_target_contract_stress_probe": {
     "aggregate_action_distribution": {
@@ -1548,20 +1578,22 @@
     "verdict": "four-hour resident process completed without observed GPU resource failure, but readout stayed flat zero and no decision-quality score was measured"
   },
   "observed_files": [
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md",
     "benchmarks/results/cunxon_aigarth_action_probe.json",
     "benchmarks/results/cunxon_aigarth_action_probe.md",
-    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.json",
-    "benchmarks/results/cunxon_aigarth_action_hard_holdout_probe.md"
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.md"
   ],
   "qubic_nia_vol8_criticality_claim_map": {
     "artifact": "benchmarks/results/qubic_nia_vol8_criticality_claim_map.json",
     "evidence_boundary": "hypothesis source only; branching/regime and avalanche-window metrics are diagnostics until robust held-out/stress task quality beats baselines",
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
     "hypothesis": "branching_ratio_as_measured_regime_gate",
-    "latest_evidence": "cunxon_avalanche_intervention_seed_replication",
-    "recommended_next_probe": "criticality_decoder_separation_completed",
+    "latest_evidence": "cunxon_aigarth_action_target_contract_stress_injection_probe",
+    "recommended_next_probe": "stress_injection_upper_bound_completed",
     "source_url": "https://qubic.org/blog-detail/brain-criticality-branching-ratio-neural-artificial-networks-neuraxon-nia-vol-8",
-    "summary": "branching-ratio/criticality claims mapped to current artifacts; controlled-regime calibration completed; next separates estimator movement from decoder/action bottlenecks; no intelligence claim"
+    "summary": "branching-ratio/criticality claims mapped to current artifacts; decoder separation found stress query collapse; stress-label injection upper-bound still left stress at baseline; no intelligence claim"
   },
   "sources": [
     "benchmarks/results/cunxon_smoke.json",
@@ -1581,5 +1613,5 @@
     "benchmarks/results/holdout_noisy_generalization.json",
     "benchmarks/results/analysis/benchmark_summary.csv"
   ],
-  "verdict": "Fresh-seed avalanche intervention replication repeats holdout/hard_holdout bumps but leaves stress_holdout at constant-baseline level; criticality metrics remain diagnostics, not intelligence evidence"
+  "verdict": "Stress-label injection did not solve low-margin stress query collapse: even optimized stress_train and original stress_holdout stayed at constant-baseline level; criticality/Aigarth signals remain diagnostics, not intelligence evidence"
 }

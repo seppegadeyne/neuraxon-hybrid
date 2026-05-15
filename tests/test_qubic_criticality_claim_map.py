@@ -73,8 +73,8 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "estimator_decoder_separation_followup"
-    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/86")
+    assert data["recommended_next_probe"]["id"] == "stress_injection_upper_bound_followup"
+    assert data["recommended_next_probe"]["github_issue"].endswith("/issues/79")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
 
@@ -93,7 +93,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "criticality_decoder_separation_completed"
+        "stress_injection_upper_bound_completed"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -190,7 +190,7 @@ def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() 
     assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
     assert "stress_holdout" in comparison_markdown
 
-    assert claim_data["recommended_next_probe"]["id"] == "estimator_decoder_separation_followup"
+    assert claim_data["recommended_next_probe"]["id"] == "stress_injection_upper_bound_followup"
     assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown
 
 
@@ -332,3 +332,48 @@ def test_cunxon_criticality_decoder_separation_explains_stress_bottleneck() -> N
     )
     assert claim_data["recommended_next_probe"]["status"] == "completed"
     assert "cunxon_criticality_decoder_separation" in claim_markdown
+
+
+def test_cunxon_stress_injection_upper_bound_keeps_stress_baseline_boundary() -> None:
+    artifact_path = ROOT / (
+        "benchmarks/results/"
+        "cunxon_aigarth_action_target_contract_stress_injection_probe.json"
+    )
+    markdown_path = ROOT / (
+        "benchmarks/results/"
+        "cunxon_aigarth_action_target_contract_stress_injection_probe.md"
+    )
+    data = json.loads(artifact_path.read_text(encoding="utf-8"))
+    markdown = markdown_path.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["fitness_variant"] == "target_contract_stress_injection"
+    assert data["seed_count"] == 5
+    assert data["accuracy_summary_by_split"]["stress_train"]["mean"] == 0.3333333333333333
+    assert data["accuracy_summary_by_split"]["stress_holdout"]["mean"] == 0.3333333333333333
+    assert data["seeds_beating_baseline_by_split"]["stress_train"] == 0
+    assert data["seeds_beating_baseline_by_split"]["stress_holdout"] == 0
+    assert data["unexpected_action_count"] == 0
+
+    assert "stress-injection audit" in markdown
+    assert "leaks stress-like labels" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_aigarth_action_target_contract_stress_injection_probe"]
+    assert summary["hypothesis"] == "stress_label_injection_upper_bound"
+    assert summary["stress_train_mean"] == 0.333333
+    assert summary["stress_holdout_mean"] == 0.333333
+    assert "stress-injection upper-bound audit" in comparison_markdown
+    assert "negative upper-bound/debugging evidence" in comparison_markdown
+
+    assert any(
+        item["id"] == "cunxon-stress-injection-upper-bound"
+        for item in claim_data["evidence_map"]
+    )
+    assert claim_data["recommended_next_probe"]["id"] == "stress_injection_upper_bound_followup"
+    assert claim_data["recommended_next_probe"]["status"] == "completed"
+    assert "stress-injection upper-bound diagnostic" in claim_markdown

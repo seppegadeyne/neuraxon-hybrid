@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. The decoder-separation follow-up explains the latest stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases despite estimator movement. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct project evidence. Current cuNxon evidence keeps branching/criticality as instrumentation: direct snapshot estimators and controlled drive regimes are observable, but stress_holdout remains at the best constant baseline. Decoder separation explained the stress bottleneck as mostly query/action collapse on low-margin execute/retry stress cases. The stress-injection upper-bound follow-up then deliberately optimized duplicated stress_train cases, yet stress_train and stress_holdout still stayed at 0.333333 with 0/5 seeds beating constants. Useful-computation claims still require robust held-out/stress/control task quality above trivial baselines across seeds/settings.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -114,6 +114,13 @@
       "interpretation": "The repeated stress bottleneck is better explained as decoder/action collapse on low-margin execute/retry cases than as complete estimator collapse; this remains negative/diagnostic evidence, not intelligence evidence.",
       "observed": "Post-hoc analysis of the 288-sample controlled-regime calibration found stress_holdout accuracy=0.333333, query_collapse_rate=0.902778, execute/retry stress accuracy=0.041667, query stress accuracy=0.916667, and estimator movement present but not task-sufficient.",
       "status": "completed estimator/decoder separation follow-up for the NIA Vol. 8 regime lane"
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+      "id": "cunxon-stress-injection-upper-bound",
+      "interpretation": "This intentionally leaks stress-like labels into the Aigarth objective to test an upper bound. The failure of stress_train itself to beat constants means the low-margin stress bottleneck is not merely a missing generalization example; it points to objective/readout expressivity or task-signal limitations in this tiny route.",
+      "observed": "Five fresh seeds 137..141 with target_contract_stress_injection reached holdout mean=1.000000 and hard_holdout mean=0.866667, but stress_train mean=0.333333, stress_holdout mean=0.333333, and 0/5 seeds beat the stress baseline; unexpected labels stayed at 0.",
+      "status": "negative upper-bound/debugging evidence for the NIA Vol. 8 stress/action bottleneck"
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
@@ -125,21 +132,22 @@
     "Do Aigarth-evolved networks land in a measurably different activity regime than flat StepTrain/StepInfer resident networks?",
     "Can a source-level or CUDA-level branching estimator be added without conflating readout ports, input-class drive, and hidden-state snapshots?",
     "Does controlled_regime_calibration show estimator movement without stress_holdout improvement because of decoder collapse, lack of task signal, or both?",
-    "What target-contract or objective-level change can reduce low-margin execute/retry stress query collapse without using stress/control labels for optimization?"
+    "What target-contract or objective-level change can reduce low-margin execute/retry stress query collapse without using stress/control labels for optimization?",
+    "If even injected stress_train labels remain baseline-level, is the next bottleneck Aigarth objective/readout expressivity, low-margin case separability, or the signed-first-lane action contract itself?"
   ],
   "recommended_next_probe": {
     "acceptance_criteria": [
-      "Preserve controlled-regime calibration as a baseline artifact.",
-      "Explain whether stress_holdout failure is estimator collapse, decoder collapse, or task-signal absence.",
-      "Keep stress/control labels outside optimization.",
-      "Do not claim useful computation unless stress/control task quality beats constant baselines robustly."
+      "Preserve the stress-injection artifact as negative upper-bound evidence.",
+      "Do not treat stress-label injection as generalization evidence because it optimizes stress-like labels directly.",
+      "Before adding more task complexity, inspect whether low-margin execute/retry cases are separable under the signed-first-lane readout contract or need a different objective/readout surface.",
+      "Continue requiring stress/control quality above constant baselines before any useful-computation claim."
     ],
-    "completed_artifact": "benchmarks/results/cunxon_criticality_decoder_separation.json",
-    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/86",
-    "id": "estimator_decoder_separation_followup",
-    "purpose": "Use the controlled-regime calibration result to separate estimator movement from decoder/action-contract bottlenecks before adding task complexity.",
-    "result": "stress bottleneck classified as decoder/action collapse despite observable estimator movement",
-    "shape": "Analyze per-regime readout/action distributions and stress cases, then test a smaller decoder/objective diagnostic only if it targets the stress_holdout bottleneck without using stress/control labels in optimization.",
+    "completed_artifact": "benchmarks/results/cunxon_aigarth_action_target_contract_stress_injection_probe.json",
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/79",
+    "id": "stress_injection_upper_bound_followup",
+    "purpose": "Test whether the low-margin stress bottleneck is only missing training exposure or persists even when stress-like labels are deliberately injected into the Aigarth objective.",
+    "result": "stress_train and stress_holdout both stayed at constant-baseline level despite stress-like label injection",
+    "shape": "Run a bounded five-seed target-contract Aigarth probe with duplicated stress_train cases in the fitness callback and report original stress_holdout/control splits separately.",
     "status": "completed"
   },
   "source": {
