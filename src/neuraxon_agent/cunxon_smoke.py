@@ -466,6 +466,7 @@ class CunxonAvalancheWindowSample:
     outcome: str
     energy_delta: float
     elapsed_ms: float
+    split: str = "direct"
     gpu_memory_used_mb: int | None = None
     gpu_utilization_percent: int | None = None
     gpu_temperature_c: int | None = None
@@ -501,6 +502,68 @@ class CunxonAvalancheWindowProbeResult:
         """Return a JSON-serializable result dictionary."""
         data = asdict(self)
         data["sample_count"] = self.sample_count
+        return data
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        """Return this result as stable JSON."""
+        return json.dumps(self.to_dict(), indent=indent, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class CunxonAvalancheInterventionTaskConfigSummary:
+    """Per-intervention summary coupling avalanche metrics to split task quality."""
+
+    id: str
+    steps: int
+    sample_interval: int
+    sample_count: int
+    mean_branching_ratio_estimate: float
+    branching_ratio_estimate_range: list[float]
+    mean_neutral_occupancy: float
+    accuracy_by_split: dict[str, float]
+    best_constant_baseline_by_split: dict[str, float]
+    beats_best_constant_baseline_by_split: dict[str, bool]
+
+
+@dataclass(frozen=True)
+class CunxonAvalancheInterventionTaskCorrelationResult:
+    """Task-coupled avalanche intervention/correlation matrix."""
+
+    status: str
+    hypothesis_for_this_slice: str
+    source_claim_ids: list[str]
+    upstream_commit: str
+    cunxon_commit: str
+    library_path: str
+    device_name: str
+    compute_capability: str
+    seed_offsets: list[int]
+    modes: list[str]
+    configurations: list[CunxonAvalancheInterventionTaskConfigSummary]
+    samples: list[CunxonAvalancheWindowSample]
+    split_accuracy: dict[str, float]
+    best_constant_baseline_by_split: dict[str, float]
+    configurations_beating_stress_baseline: list[str]
+    correlation_summary: dict[str, float]
+    verdict: str
+    evidence_boundary: str
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def sample_count(self) -> int:
+        """Return the total number of live windows sampled."""
+        return len(self.samples)
+
+    @property
+    def config_count(self) -> int:
+        """Return the number of intervention configurations."""
+        return len(self.configurations)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable result dictionary."""
+        data = asdict(self)
+        data["sample_count"] = self.sample_count
+        data["config_count"] = self.config_count
         return data
 
     def to_json(self, *, indent: int | None = 2) -> str:
@@ -2306,6 +2369,141 @@ def write_avalanche_window_artifacts(
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     json_output.write_text(result.to_json() + "\n", encoding="utf-8")
     markdown_output.write_text(render_avalanche_window_markdown_report(result), encoding="utf-8")
+    return json_output, markdown_output
+
+
+def render_avalanche_intervention_task_correlation_markdown_report(
+    result: CunxonAvalancheInterventionTaskCorrelationResult,
+) -> str:
+    """Render the task-coupled avalanche intervention/correlation report."""
+    notes = "\n".join(f"- {note}" for note in result.notes) or "- None"
+    config_rows = [
+        (
+            "| Config | Steps | Interval | Samples | Mean branching | Branching range | "
+            "Mean neutral | Splits beating constants |"
+        ),
+        "| --- | ---: | ---: | ---: | ---: | --- | ---: | --- |",
+    ]
+    for config in result.configurations:
+        beating = [
+            split
+            for split, did_beat in sorted(config.beats_best_constant_baseline_by_split.items())
+            if did_beat
+        ]
+        config_rows.append(
+            f"| {config.id} | {config.steps} | {config.sample_interval} | "
+            f"{config.sample_count} | {config.mean_branching_ratio_estimate:.6f} | "
+            f"{config.branching_ratio_estimate_range[0]:.6f}.."
+            f"{config.branching_ratio_estimate_range[1]:.6f} | "
+            f"{config.mean_neutral_occupancy:.6f} | {', '.join(beating) or 'none'} |"
+        )
+    split_rows = [
+        "| Split | Accuracy | Best constant baseline | Beats baseline? |",
+        "| --- | ---: | ---: | --- |",
+    ]
+    for split, accuracy in sorted(result.split_accuracy.items()):
+        baseline = result.best_constant_baseline_by_split.get(split, 0.0)
+        split_rows.append(
+            f"| {split} | {accuracy:.6f} | {baseline:.6f} | {accuracy > baseline} |"
+        )
+    sample_rows = [
+        (
+            "| Elapsed | Mode | Seed | Split | Stimulus | Branching | Neutral | "
+            "Action | Expected | Outcome |"
+        ),
+        "| --- | --- | ---: | --- | --- | ---: | ---: | --- | --- | --- |",
+    ]
+    for sample in result.samples[:60]:
+        sample_rows.append(
+            f"| {sample.elapsed_ms:.0f}ms | {sample.mode} | {sample.seed_offset} | "
+            f"{sample.split} | {sample.stimulus} | {sample.branching_ratio_estimate:.6f} | "
+            f"{sample.neutral_occupancy:.6f} | {sample.normalized_action} | "
+            f"{sample.expected_action} | {sample.outcome} |"
+        )
+    if len(result.samples) > 60:
+        remaining = len(result.samples) - 60
+        sample_rows.append(
+            f"| ... | ... | ... | ... | ... | ... | ... | ... | ... | {remaining} more samples |"
+        )
+    correlation_lines = [
+        f"- {name}: {value:.6f}" for name, value in sorted(result.correlation_summary.items())
+    ] or ["- none"]
+    return "\n".join(
+        [
+            "# cuNxon avalanche intervention/task correlation",
+            "",
+            f"Status: `{result.status}`",
+            f"Hypothesis: `{result.hypothesis_for_this_slice}`",
+            "",
+            "## Source",
+            "",
+            f"- Upstream repo commit: `{result.upstream_commit}`",
+            f"- cuNxon commit: `{result.cunxon_commit}`",
+            f"- Library: `{result.library_path}`",
+            "",
+            "## GPU/runtime",
+            "",
+            f"- Device: {result.device_name}",
+            f"- Compute capability: {result.compute_capability}",
+            f"- Modes: {', '.join(result.modes)}",
+            f"- Seed offsets: {', '.join(str(seed) for seed in result.seed_offsets)}",
+            f"- Samples: {result.sample_count}",
+            "",
+            "## Why this probe exists",
+            "",
+            "This report follows Qubic NIA Vol. 8's branching-ratio/criticality claims by "
+            "checking whether bounded avalanche/regime movements are coupled to held-out, "
+            "stress and control action quality. The relevant comparator is constant baselines; "
+            "criticality metrics alone are not intelligence evidence.",
+            "",
+            "## Intervention configurations",
+            "",
+            *config_rows,
+            "",
+            "## Split accuracy versus constant baselines",
+            "",
+            *split_rows,
+            "",
+            "## Correlation summary",
+            "",
+            *correlation_lines,
+            "",
+            "## Sample excerpt",
+            "",
+            *sample_rows,
+            "",
+            "## Verdict",
+            "",
+            result.verdict,
+            "",
+            "## Evidence boundary",
+            "",
+            result.evidence_boundary,
+            "",
+            "## Notes",
+            "",
+            notes,
+            "",
+        ]
+    )
+
+
+def write_avalanche_intervention_task_correlation_artifacts(
+    result: CunxonAvalancheInterventionTaskCorrelationResult,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> tuple[Path, Path]:
+    """Write JSON and Markdown task-coupled avalanche intervention artifacts."""
+    json_output = Path(json_path)
+    markdown_output = Path(markdown_path)
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(result.to_json() + "\n", encoding="utf-8")
+    markdown_output.write_text(
+        render_avalanche_intervention_task_correlation_markdown_report(result),
+        encoding="utf-8",
+    )
     return json_output, markdown_output
 
 
@@ -4615,6 +4813,7 @@ def run_ctypes_avalanche_window_probe(
     steps: int = 256,
     sample_interval: int = 16,
     device_id: int = 0,
+    action_specs: Sequence[tuple[str, str, tuple[float, float, float], str]] | None = None,
 ) -> CunxonAvalancheWindowProbeResult:
     """Run full-sphere snapshot windows to estimate avalanche/branching dynamics."""
     if not modes:
@@ -4640,6 +4839,10 @@ def run_ctypes_avalanche_window_probe(
         device_name = _query_device_name(lib, ctx)
         compute_capability = _query_compute_capability(lib, ctx)
         gpu_sample = _query_nvidia_smi_sample(device_id)
+        specs = action_specs or [
+            (stimulus, "direct", input_vector, expected_action)
+            for stimulus, input_vector, expected_action in _default_action_probe_specs()
+        ]
         samples = [
             _run_avalanche_window_sample(
                 lib=lib,
@@ -4647,6 +4850,7 @@ def run_ctypes_avalanche_window_probe(
                 mode=mode,
                 seed_offset=seed_offset,
                 stimulus=stimulus,
+                split=split,
                 input_vector=input_vector,
                 expected_action=expected_action,
                 steps=steps,
@@ -4658,7 +4862,7 @@ def run_ctypes_avalanche_window_probe(
             )
             for mode in modes
             for seed_offset in seed_offsets
-            for stimulus, input_vector, expected_action in _default_action_probe_specs()
+            for stimulus, split, input_vector, expected_action in specs
         ]
         return CunxonAvalancheWindowProbeResult(
             status="avalanche-window probe completed",
@@ -4688,6 +4892,91 @@ def run_ctypes_avalanche_window_probe(
             lib.cunxonDestroyContext(ctx)
 
 
+def run_ctypes_avalanche_intervention_task_correlation_probe(
+    *,
+    library_path: str | Path,
+    upstream_commit: str,
+    cunxon_commit: str,
+    modes: Sequence[str] = ("infer", "train"),
+    seed_offsets: Sequence[int] = (127, 128),
+    device_id: int = 0,
+) -> CunxonAvalancheInterventionTaskCorrelationResult:
+    """Run bounded avalanche interventions over held-out/stress/control cases."""
+    configs = [
+        ("short-dense-heldout-stress", 128, 8),
+        ("baseline-equivalent-heldout-stress", 256, 16),
+    ]
+    specs = _avalanche_intervention_task_specs()
+    probe_results = [
+        (
+            config_id,
+            run_ctypes_avalanche_window_probe(
+                library_path=library_path,
+                upstream_commit=upstream_commit,
+                cunxon_commit=cunxon_commit,
+                modes=modes,
+                seed_offsets=seed_offsets,
+                steps=steps,
+                sample_interval=sample_interval,
+                device_id=device_id,
+                action_specs=specs,
+            ),
+        )
+        for config_id, steps, sample_interval in configs
+    ]
+    samples = [sample for _, probe in probe_results for sample in probe.samples]
+    config_summaries = [
+        _avalanche_intervention_config_summary(
+            config_id,
+            probe.samples,
+            probe.steps,
+            probe.sample_interval,
+        )
+        for config_id, probe in probe_results
+    ]
+    split_accuracy = _avalanche_accuracy_by_split(samples)
+    best_constant_baseline_by_split = _avalanche_best_constant_baseline_by_split(samples)
+    stress_beaters = [
+        config.id
+        for config in config_summaries
+        if config.beats_best_constant_baseline_by_split.get("stress_holdout", False)
+    ]
+    return CunxonAvalancheInterventionTaskCorrelationResult(
+        status="avalanche intervention/task correlation completed",
+        hypothesis_for_this_slice="avalanche_intervention_task_correlation",
+        source_claim_ids=[
+            "branching-ratio-regimes",
+            "self-organized-criticality",
+            "functional-generalization-claim",
+        ],
+        upstream_commit=upstream_commit,
+        cunxon_commit=cunxon_commit,
+        library_path=str(library_path),
+        device_name=probe_results[0][1].device_name,
+        compute_capability=probe_results[0][1].compute_capability,
+        seed_offsets=list(seed_offsets),
+        modes=list(modes),
+        configurations=config_summaries,
+        samples=samples,
+        split_accuracy=split_accuracy,
+        best_constant_baseline_by_split=best_constant_baseline_by_split,
+        configurations_beating_stress_baseline=stress_beaters,
+        correlation_summary=_avalanche_correlation_summary(samples),
+        verdict=_avalanche_intervention_task_correlation_verdict(config_summaries, samples),
+        evidence_boundary=(
+            "This is task-coupled regime instrumentation from bounded cuNxon snapshot windows; "
+            "avalanche movement or branching-ratio estimates are not intelligence evidence unless "
+            "held-out/stress task quality beats constant baselines under controls."
+        ),
+        notes=[
+            "uses fresh seeds after the estimator-sensitivity matrix",
+            "scores train, holdout, stress_holdout, counterfactual_control and "
+            "permuted_control splits",
+            "constant-action baselines are computed per split before interpreting regime movement",
+        ],
+    )
+
+
 def _run_avalanche_window_sample(
     *,
     lib: C.CDLL,
@@ -4695,6 +4984,7 @@ def _run_avalanche_window_sample(
     mode: str,
     seed_offset: int,
     stimulus: str,
+    split: str,
     input_vector: tuple[float, float, float],
     expected_action: str,
     steps: int,
@@ -4816,6 +5106,7 @@ def _run_avalanche_window_sample(
             outcome="success" if normalized_action == expected_action else "failure",
             energy_delta=energy_delta,
             elapsed_ms=(time.perf_counter() - start) * 1000.0,
+            split=split,
             gpu_memory_used_mb=gpu_memory_used_mb,
             gpu_utilization_percent=gpu_utilization_percent,
             gpu_temperature_c=gpu_temperature_c,
@@ -7441,6 +7732,96 @@ def _avalanche_window_verdict(samples: Sequence[CunxonAvalancheWindowSample]) ->
     )
 
 
+def _avalanche_accuracy_by_split(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, float]:
+    by_split: dict[str, list[CunxonAvalancheWindowSample]] = {}
+    for sample in samples:
+        by_split.setdefault(sample.split, []).append(sample)
+    return {
+        split: sum(1 for sample in split_samples if sample.outcome == "success")
+        / len(split_samples)
+        for split, split_samples in sorted(by_split.items())
+        if split_samples
+    }
+
+
+def _avalanche_best_constant_baseline_by_split(
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> dict[str, float]:
+    baselines = {
+        "always_execute": "execute",
+        "always_query": "query",
+        "always_retry": "retry",
+    }
+    by_split: dict[str, list[CunxonAvalancheWindowSample]] = {}
+    for sample in samples:
+        by_split.setdefault(sample.split, []).append(sample)
+    best_by_split: dict[str, float] = {}
+    for split, split_samples in sorted(by_split.items()):
+        best_by_split[split] = max(
+            sum(1 for sample in split_samples if action == sample.expected_action)
+            / len(split_samples)
+            for action in baselines.values()
+        )
+    return best_by_split
+
+
+def _avalanche_intervention_config_summary(
+    config_id: str,
+    samples: Sequence[CunxonAvalancheWindowSample],
+    steps: int,
+    sample_interval: int,
+) -> CunxonAvalancheInterventionTaskConfigSummary:
+    ratios = [sample.branching_ratio_estimate for sample in samples]
+    split_accuracy = _avalanche_accuracy_by_split(samples)
+    baselines = _avalanche_best_constant_baseline_by_split(samples)
+    return CunxonAvalancheInterventionTaskConfigSummary(
+        id=config_id,
+        steps=steps,
+        sample_interval=sample_interval,
+        sample_count=len(samples),
+        mean_branching_ratio_estimate=_mean_sequence(ratios),
+        branching_ratio_estimate_range=[
+            min(ratios) if ratios else 0.0,
+            max(ratios) if ratios else 0.0,
+        ],
+        mean_neutral_occupancy=_mean_sequence(sample.neutral_occupancy for sample in samples),
+        accuracy_by_split=split_accuracy,
+        best_constant_baseline_by_split=baselines,
+        beats_best_constant_baseline_by_split={
+            split: accuracy > baselines.get(split, 0.0)
+            for split, accuracy in sorted(split_accuracy.items())
+        },
+    )
+
+
+def _avalanche_intervention_task_correlation_verdict(
+    configs: Sequence[CunxonAvalancheInterventionTaskConfigSummary],
+    samples: Sequence[CunxonAvalancheWindowSample],
+) -> str:
+    if not samples:
+        return "No task-coupled avalanche windows were captured; no claim is supported."
+    stress_beaters = [
+        config.id
+        for config in configs
+        if config.beats_best_constant_baseline_by_split.get("stress_holdout", False)
+    ]
+    mean_branching = _mean_sequence(sample.branching_ratio_estimate for sample in samples)
+    if stress_beaters:
+        return (
+            "Some configurations beat constant baselines on stress_holdout "
+            f"({', '.join(stress_beaters)}), but this remains bounded toy evidence and needs "
+            "independent controls before any broader claim."
+        )
+    return (
+        "Bounded task-coupled avalanche interventions moved/recorded regime metrics "
+        "(mean branching "
+        f"estimate {mean_branching:.6f}), but no configuration beat the best constant baseline on "
+        "stress_holdout; criticality remains diagnostic instrumentation, not intelligence evidence."
+    )
+
+
 def _mean_sequence(values: Sequence[float] | Any) -> float:
     values_list = list(values)
     return sum(values_list) / len(values_list) if values_list else 0.0
@@ -7465,6 +7846,13 @@ def _default_action_probe_specs() -> list[tuple[str, tuple[float, float, float],
         ("retry-negative-drive", (-1.0, -0.25, 0.0), "retry"),
         ("query-neutral-drive", (0.0, 0.0, 0.0), "query"),
     ]
+
+
+def _avalanche_intervention_task_specs() -> list[
+    tuple[str, str, tuple[float, float, float], str]
+]:
+    """Return held-out/stress/control cases for task-coupled avalanche probes."""
+    return _aigarth_action_target_contract_stress_specs()
 
 
 def _default_supervised_motor_specs() -> list[

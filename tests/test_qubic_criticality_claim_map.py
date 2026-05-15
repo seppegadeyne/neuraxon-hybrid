@@ -14,6 +14,12 @@ AVALANCHE_MATRIX_JSON_PATH = (
 AVALANCHE_MATRIX_MD_PATH = (
     ROOT / "benchmarks/results/cunxon_avalanche_window_intervention_matrix.md"
 )
+AVALANCHE_TASK_CORRELATION_JSON_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_task_correlation.json"
+)
+AVALANCHE_TASK_CORRELATION_MD_PATH = (
+    ROOT / "benchmarks/results/cunxon_avalanche_intervention_task_correlation.md"
+)
 
 
 def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> None:
@@ -49,7 +55,7 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     }.issubset(evidence_ids)
 
     assert data["current_evidence_boundary"].startswith("The article is a hypothesis source")
-    assert data["recommended_next_probe"]["id"] == "cunxon-avalanche-intervention-task-correlation"
+    assert data["recommended_next_probe"]["id"] == "higher_resolution_task_coupled_regime_probe"
     assert data["recommended_next_probe"]["github_issue"].endswith("/issues/85")
     assert data["recommended_next_probe"]["acceptance_criteria"]
     assert any("stress_holdout" in question for question in data["open_questions"])
@@ -63,12 +69,12 @@ def test_qubic_nia_vol8_claim_map_records_claims_evidence_and_next_probe() -> No
     assert "0/5 seeds beat the best constant stress baseline" in markdown
     assert "not intelligence evidence" in markdown
     assert "cunxon_branching_regime_scan" in markdown
-    assert "cunxon-avalanche-intervention-task-correlation" in markdown
+    assert "cunxon_avalanche_intervention_task_correlation" in markdown
     assert "cunxon_avalanche_window_intervention_matrix" in comparison_markdown
     assert "\\n" not in markdown
 
     assert comparison_data["qubic_nia_vol8_criticality_claim_map"]["recommended_next_probe"] == (
-        "cunxon-avalanche-intervention-task-correlation"
+        "higher_resolution_task_coupled_regime_probe"
     )
     scan_summary = comparison_data["cunxon_branching_regime_scan"]
     assert scan_summary["mean_branching_activity_ratio_proxy"] == 0.997701
@@ -123,3 +129,49 @@ def test_cunxon_avalanche_window_intervention_matrix_records_estimator_sensitivi
     assert matrix_summary["configurations_with_all_modes_beating_baseline"] == []
     assert "cuNxon avalanche-window intervention matrix" in comparison_markdown
     assert "estimator sensitivity" in comparison_markdown
+
+
+def test_cunxon_avalanche_intervention_task_correlation_records_split_quality() -> None:
+    data = json.loads(AVALANCHE_TASK_CORRELATION_JSON_PATH.read_text(encoding="utf-8"))
+    markdown = AVALANCHE_TASK_CORRELATION_MD_PATH.read_text(encoding="utf-8")
+    comparison_data = json.loads(COMPARISON_JSON_PATH.read_text(encoding="utf-8"))
+    comparison_markdown = COMPARISON_MD_PATH.read_text(encoding="utf-8")
+    claim_data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    claim_markdown = MD_PATH.read_text(encoding="utf-8")
+
+    assert data["hypothesis_for_this_slice"] == "avalanche_intervention_task_correlation"
+    assert data["source_claim_ids"] == [
+        "branching-ratio-regimes",
+        "self-organized-criticality",
+        "functional-generalization-claim",
+    ]
+    assert data["sample_count"] >= 60
+    assert data["config_count"] >= 2
+    assert "holdout" in data["split_accuracy"]
+    assert "stress_holdout" in data["split_accuracy"]
+    assert "counterfactual_control" in data["split_accuracy"]
+    assert data["configurations_beating_stress_baseline"] == []
+    assert "not intelligence evidence" in data["evidence_boundary"]
+
+    for config in data["configurations"]:
+        assert "stress_holdout" in config["accuracy_by_split"]
+        assert "stress_holdout" in config["best_constant_baseline_by_split"]
+        assert config["beats_best_constant_baseline_by_split"]["stress_holdout"] is False
+
+    assert "# cuNxon avalanche intervention/task correlation" in markdown
+    assert "stress_holdout" in markdown
+    assert "counterfactual_control" in markdown
+    assert "constant baselines" in markdown
+    assert "not intelligence evidence" in markdown
+    assert "\\n" not in markdown
+
+    summary = comparison_data["cunxon_avalanche_intervention_task_correlation"]
+    assert summary["hypothesis"] == "avalanche_intervention_task_correlation"
+    assert summary["configurations_beating_stress_baseline"] == []
+    assert "cuNxon avalanche intervention/task correlation" in comparison_markdown
+    assert "stress_holdout" in comparison_markdown
+
+    assert claim_data["recommended_next_probe"]["id"] == (
+        "higher_resolution_task_coupled_regime_probe"
+    )
+    assert "cunxon_avalanche_intervention_task_correlation" in claim_markdown

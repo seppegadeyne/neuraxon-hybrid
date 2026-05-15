@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAvalancheInterventionTaskConfigSummary,
+    CunxonAvalancheInterventionTaskCorrelationResult,
     CunxonAvalancheWindowProbeResult,
     CunxonAvalancheWindowSample,
     CunxonBranchingRegimeRun,
@@ -59,6 +61,7 @@ from neuraxon_agent.cunxon_smoke import (
     render_aigarth_action_target_contract_markdown_report,
     render_aigarth_action_target_contract_stress_markdown_report,
     render_aigarth_readout_markdown_report,
+    render_avalanche_intervention_task_correlation_markdown_report,
     render_avalanche_window_markdown_report,
     render_branching_regime_scan_markdown_report,
     render_external_drive_window_markdown_report,
@@ -85,6 +88,7 @@ from neuraxon_agent.cunxon_smoke import (
     write_aigarth_action_target_contract_augmented_train_artifacts,
     write_aigarth_action_target_contract_stress_artifacts,
     write_aigarth_readout_artifacts,
+    write_avalanche_intervention_task_correlation_artifacts,
     write_avalanche_window_artifacts,
     write_branching_regime_scan_artifacts,
     write_external_drive_window_artifacts,
@@ -2259,6 +2263,118 @@ def test_avalanche_window_report_records_snapshot_estimator_and_baselines(
     assert '\"sample_count\": 1' in data
     assert '\"branching_ratio_estimate\": 1.0' in data
     assert "full-sphere snapshot" in markdown_path.read_text(encoding="utf-8")
+
+
+def test_avalanche_intervention_task_correlation_report_couples_splits_and_baselines(
+    tmp_path: Path,
+) -> None:
+    samples = [
+        CunxonAvalancheWindowSample(
+            mode="infer",
+            seed_offset=127,
+            stimulus="execute-holdout-noisy",
+            split="holdout",
+            input_vector=[0.8, 0.2, 0.1],
+            expected_action="execute",
+            active_state_sequence=[2, 3, 3, 4],
+            activation_event_sequence=[2, 1, 1, 2],
+            deactivation_event_sequence=[0, 0, 1, 1],
+            branching_ratio_estimate=0.75,
+            active_count_ratio_mean=1.25,
+            neutral_occupancy=0.75,
+            transition_entropy_bits=1.0,
+            avalanche_event_count=4,
+            mean_avalanche_size=1.5,
+            max_avalanche_size=2,
+            final_readout=[1, 0, 0],
+            normalized_action="execute",
+            outcome="success",
+            energy_delta=12.0,
+            elapsed_ms=2.0,
+        ),
+        CunxonAvalancheWindowSample(
+            mode="train",
+            seed_offset=127,
+            stimulus="retry-stress-low-margin",
+            split="stress_holdout",
+            input_vector=[-0.18, 0.12, -0.08],
+            expected_action="retry",
+            active_state_sequence=[1, 1, 1, 1],
+            activation_event_sequence=[0, 0, 0, 0],
+            deactivation_event_sequence=[0, 0, 0, 0],
+            branching_ratio_estimate=0.0,
+            active_count_ratio_mean=1.0,
+            neutral_occupancy=0.9,
+            transition_entropy_bits=0.0,
+            avalanche_event_count=0,
+            mean_avalanche_size=0.0,
+            max_avalanche_size=0,
+            final_readout=[0, 0, 0],
+            normalized_action="query",
+            outcome="failure",
+            energy_delta=8.0,
+            elapsed_ms=2.5,
+        ),
+    ]
+    result = CunxonAvalancheInterventionTaskCorrelationResult(
+        status="avalanche intervention/task correlation completed",
+        hypothesis_for_this_slice="avalanche_intervention_task_correlation",
+        source_claim_ids=["branching-ratio-regimes", "functional-generalization-claim"],
+        upstream_commit="bd2242fabad08cb73dab2c4170d11fa941030e8c",
+        cunxon_commit="b4f6db85f7aff04ddb4e1078d523d514a278521b",
+        library_path="/tmp/libcunxon.so",
+        device_name="NVIDIA GeForce RTX 5090",
+        compute_capability="12.0",
+        seed_offsets=[127],
+        modes=["infer", "train"],
+        configurations=[
+            CunxonAvalancheInterventionTaskConfigSummary(
+                id="short-dense-heldout-stress",
+                steps=128,
+                sample_interval=8,
+                sample_count=2,
+                mean_branching_ratio_estimate=0.375,
+                branching_ratio_estimate_range=[0.0, 0.75],
+                mean_neutral_occupancy=0.825,
+                accuracy_by_split={"holdout": 1.0, "stress_holdout": 0.0},
+                best_constant_baseline_by_split={"holdout": 1.0, "stress_holdout": 1.0},
+                beats_best_constant_baseline_by_split={
+                    "holdout": False,
+                    "stress_holdout": False,
+                },
+            )
+        ],
+        samples=samples,
+        split_accuracy={"holdout": 1.0, "stress_holdout": 0.0},
+        best_constant_baseline_by_split={"holdout": 1.0, "stress_holdout": 1.0},
+        configurations_beating_stress_baseline=[],
+        correlation_summary={"accuracy_vs_branching_ratio_estimate": 1.0},
+        verdict="No intervention beat constant baselines on the stress_holdout split.",
+        evidence_boundary=(
+            "Avalanche movement is task-coupled instrumentation, not intelligence evidence."
+        ),
+        notes=["held-out and stress splits are scored beside constants"],
+    )
+
+    markdown = render_avalanche_intervention_task_correlation_markdown_report(result)
+    assert "cuNxon avalanche intervention/task correlation" in markdown
+    assert "stress_holdout" in markdown
+    assert "constant baselines" in markdown
+    assert "not intelligence evidence" in markdown
+
+    json_path = tmp_path / "avalanche-task-correlation.json"
+    markdown_path = tmp_path / "avalanche-task-correlation.md"
+    write_avalanche_intervention_task_correlation_artifacts(
+        result,
+        json_path=json_path,
+        markdown_path=markdown_path,
+    )
+
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    assert data["hypothesis_for_this_slice"] == "avalanche_intervention_task_correlation"
+    assert data["sample_count"] == 2
+    assert data["configurations_beating_stress_baseline"] == []
+    assert "stress_holdout" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_tracked_cunxon_resident_action_probe_records_baseline_level_loop() -> None:

@@ -37,7 +37,7 @@
       "testable_hypothesis": "For this repo, such a claim requires holdout/stress/control benchmarks, trivial baselines, leakage checks, and separate reporting of runtime dynamics versus decision quality."
     }
   ],
-  "current_evidence_boundary": "The article is a hypothesis source, not direct evidence for Neuraxon-Hybrid. Existing repo evidence supports measuring branching/activity regimes. The first bounded branching-regime scan observed near-critical-looking proxy activity (mean branching proxy=0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline. Snapshot avalanche windows made activation-transition estimates observable, and the intervention matrix shows those estimates are sensitive to window/sample settings; neither result yet provides robust task quality above baselines across modes.",
+  "current_evidence_boundary": "The article is a hypothesis source, not direct evidence for Neuraxon-Hybrid. Existing repo evidence supports measuring branching/activity regimes. The first bounded branching-regime scan observed near-critical-looking proxy activity (mean branching proxy=0.997701) alongside perfect standard holdout, but stress_holdout stayed at the best constant baseline. Snapshot avalanche windows made activation-transition estimates observable, and the intervention matrix shows those estimates are sensitive to window/sample settings. The task-coupled avalanche intervention/correlation probe adds held-out, stress and control splits over fresh seeds: holdout/hard_holdout beat constants, but stress_holdout remained at 0.333333 and no configuration beat the stress baseline, so criticality remains instrumentation rather than functional evidence.",
   "evidence_map": [
     {
       "artifact": "benchmarks/results/analysis/criticality_summary.csv",
@@ -87,10 +87,18 @@
       "interpretation": "The metric moves with bounded measurement settings, so future criticality claims must report estimator parameters and require robust task-coupled improvement.",
       "observed": "short-dense/baseline-equivalent/long-sparse windows over seeds 125..126 produced branching-estimator range 0.000000..0.483938; only short-dense infer beat constants and no configuration beat constants in both modes",
       "status": "estimator-sensitivity evidence, not robust task evidence"
+    },
+    {
+      "artifact": "benchmarks/results/cunxon_avalanche_intervention_task_correlation.json",
+      "id": "cunxon-avalanche-intervention-task-correlation",
+      "interpretation": "Task-coupled snapshot windows can show split-specific action bumps, but the low-margin stress split still does not beat constants; avalanche/branching movement is not sufficient functional evidence.",
+      "observed": "two bounded configurations over fresh seeds 127..128 produced 192 samples, mean branching estimate=0.110748, holdout=0.458333, hard_holdout=0.458333, stress_holdout=0.333333, counterfactual_control=0.250000, permuted_control=0.208333, and 0 configurations beating the stress baseline",
+      "status": "task-coupled negative/diagnostic evidence for the NIA Vol. 8 regime lane"
     }
   ],
   "hypothesis_for_this_slice": "branching_ratio_as_measured_regime_gate",
   "open_questions": [
+    "Does higher-resolution snapshot or source-level activity explain why stress_holdout remains baseline-level while holdout/hard_holdout can beat constants?",
     "Why do all five near-critical proxy seeds keep stress_holdout at the best constant baseline despite perfect standard holdout?",
     "Does a near-1 branching/activity ratio in cuNxon predict anything about action quality, or is it only an occupancy statistic in the current tiny networks?",
     "Can the stress_holdout baseline failure be explained by regime metrics such as subcritical collapse, supercritical saturation, or insufficient readout diversity?",
@@ -99,15 +107,15 @@
   ],
   "recommended_next_probe": {
     "acceptance_criteria": [
-      "Use fresh seeds and at least one held-out or stress action split, not only train/infer action stimuli.",
-      "Report branching/avalanche movement beside action quality, constant baselines, and leakage/control checks.",
-      "Treat mode-specific or seed-specific bumps as hypotheses until they repeat across modes/seeds."
+      "Preserve the completed cunxon_avalanche_intervention_task_correlation artifact as the baseline for comparison.",
+      "Report per-split readout/action distributions and regime metrics for stress_holdout and controls.",
+      "Do not claim useful computation unless stress/control task quality beats constant baselines robustly across seeds/configurations."
     ],
     "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/85",
-    "id": "cunxon-avalanche-intervention-task-correlation",
-    "purpose": "Test whether runtime/intervention-driven regime movement predicts or improves held-out/stress action quality, instead of only changing estimator values.",
-    "shape": "Run fresh seeds with explicit intervention/config knobs, record branching/avalanche metrics, action quality, constant baselines, and controls for the same cases.",
-    "status": "recommended after estimator-sensitivity matrix; not yet run"
+    "id": "higher_resolution_task_coupled_regime_probe",
+    "purpose": "If continuing #85, separate whether stress_holdout failures are caused by subcritical low-drive collapse, decoder contract limits, or insufficient sample resolution by logging per-split readout/action distributions and target-free low-margin controls.",
+    "shape": "Use fresh seeds, preserve stress/control labels outside optimization, and compare higher-resolution snapshot windows or source-level activity surfaces against constant baselines and prior task-coupled avalanche results.",
+    "status": "recommended after task-coupled avalanche correlation; not yet run"
   },
   "source": {
     "captured_with": "dokobot local read",

@@ -18,6 +18,8 @@ from neuraxon_agent.cunxon_smoke import (
     CunxonAigarthActionSeedSweepResult,
     CunxonAigarthReadoutProbeResult,
     CunxonAigarthReadoutRun,
+    CunxonAvalancheInterventionTaskConfigSummary,
+    CunxonAvalancheInterventionTaskCorrelationResult,
     CunxonAvalancheWindowProbeResult,
     CunxonAvalancheWindowSample,
     CunxonBranchingRegimeRun,
@@ -1739,6 +1741,84 @@ def test_cli_cunxon_avalanche_window_probe_writes_artifacts(
     assert "cuNxon avalanche-window snapshot probe" in markdown_path.read_text(
         encoding="utf-8"
     )
+
+
+def test_cli_cunxon_avalanche_intervention_task_correlation_writes_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def fake_probe(**kwargs: object) -> CunxonAvalancheInterventionTaskCorrelationResult:
+        assert kwargs["seed_offsets"] == [127, 128]
+        assert kwargs["modes"] == ["infer", "train"]
+        return CunxonAvalancheInterventionTaskCorrelationResult(
+            status="avalanche intervention/task correlation completed",
+            hypothesis_for_this_slice="avalanche_intervention_task_correlation",
+            source_claim_ids=["branching-ratio-regimes", "functional-generalization-claim"],
+            upstream_commit=str(kwargs["upstream_commit"]),
+            cunxon_commit=str(kwargs["cunxon_commit"]),
+            library_path=str(kwargs["library_path"]),
+            device_name="NVIDIA GeForce RTX 5090",
+            compute_capability="12.0",
+            seed_offsets=list(kwargs["seed_offsets"]),
+            modes=list(kwargs["modes"]),
+            configurations=[
+                CunxonAvalancheInterventionTaskConfigSummary(
+                    id="short-dense-heldout-stress",
+                    steps=128,
+                    sample_interval=8,
+                    sample_count=1,
+                    mean_branching_ratio_estimate=0.5,
+                    branching_ratio_estimate_range=[0.5, 0.5],
+                    mean_neutral_occupancy=0.8,
+                    accuracy_by_split={"stress_holdout": 0.0},
+                    best_constant_baseline_by_split={"stress_holdout": 1.0},
+                    beats_best_constant_baseline_by_split={"stress_holdout": False},
+                )
+            ],
+            samples=[],
+            split_accuracy={"stress_holdout": 0.0},
+            best_constant_baseline_by_split={"stress_holdout": 1.0},
+            configurations_beating_stress_baseline=[],
+            correlation_summary={"accuracy_vs_branching_ratio_estimate": 0.0},
+            verdict="No config beat stress baselines.",
+            evidence_boundary=(
+                "Task-coupled criticality instrumentation is not intelligence evidence."
+            ),
+            notes=["fake task-correlation probe"],
+        )
+
+    monkeypatch.setattr(
+        "neuraxon_agent.cli.run_ctypes_avalanche_intervention_task_correlation_probe",
+        fake_probe,
+    )
+    json_path = tmp_path / "avalanche-task-correlation.json"
+    markdown_path = tmp_path / "avalanche-task-correlation.md"
+
+    rc = main(
+        [
+            "cunxon-avalanche-intervention-task-correlation",
+            "--library",
+            "/tmp/libcunxon.so",
+            "--upstream-commit",
+            "upstream",
+            "--cunxon-commit",
+            "cunxon",
+            "--seed-offsets",
+            "127,128",
+            "--modes",
+            "infer,train",
+            "--json-output",
+            str(json_path),
+            "--markdown-output",
+            str(markdown_path),
+        ]
+    )
+
+    assert rc == 0
+    data = json_path.read_text(encoding="utf-8")
+    assert '\"status\": \"avalanche intervention/task correlation completed\"' in data
+    assert '\"hypothesis_for_this_slice\": \"avalanche_intervention_task_correlation\"' in data
+    assert "stress_holdout" in markdown_path.read_text(encoding="utf-8")
 
 
 def test_cli_cunxon_aigarth_action_remap_audit_writes_artifacts(tmp_path: Path) -> None:
