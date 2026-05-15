@@ -1,0 +1,77 @@
+{
+  "controls": {
+    "counterfactual_control_accuracy_mean": 0.0,
+    "permuted_control_accuracy_mean": 0.0
+  },
+  "created_at": "2026-05-15",
+  "diagnosis": "normalized_surrogate_learned_original_low_margin_boundary_unchanged",
+  "evidence_boundary": "This is a post-hoc source-and-artifact audit, not intelligence evidence. It narrows the next question to lower-level readout margin/objective expressivity or CTSN/readout semantics; it does not improve original stress/control task quality above constant baselines.",
+  "hypothesis_for_this_slice": "low_margin_objective_expressivity_boundary",
+  "interpretation": "The successful supervised_low_margin_train result means a normalized surrogate is separable inside the scalar Aigarth fitness route. It does not show that the public cuNxon API can supply per-output low-margin desired labels or move the original stress/control split, because Aigarth is black-box scalar selection over mutated weights and StepTrain has no desired-output/error-vector surface.",
+  "issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80",
+  "original_stress_holdout": {
+    "accuracy_mean": 0.3333333333333333,
+    "best_constant_baseline_mean": 0.3333333333333333,
+    "execute_retry_accuracy": 0.0,
+    "query_collapse_rate": 1.0,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 0
+  },
+  "recommended_next_probe": {
+    "acceptance_criteria": [
+      "Treat original stress_holdout/counterfactual/permuted labels as evaluation-only unless a deliberately labeled diagnostic is clearly marked as such.",
+      "Report readout margin distributions and query-collapse before/after any threshold or objective change.",
+      "Keep source semantics explicit: scalar Aigarth selection is not a desired-output API, and StepTrain still lacks label/loss/error-vector arguments.",
+      "Do not claim useful computation unless original stress/control splits beat constant baselines across fresh seeds."
+    ],
+    "github_issue": "https://github.com/sisutuulenisa/neuraxon-hybrid/issues/80",
+    "id": "readout_margin_objective_or_ctsn_semantics_audit",
+    "purpose": "Inspect whether readout thresholds/CTSN target-firing-rate parameters or an explicitly engineered readout-margin objective can represent original low-margin execute/retry stress without using stress/control labels for optimization.",
+    "status": "proposed"
+  },
+  "source_artifacts": [
+    "benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json",
+    "benchmarks/results/cunxon_source_semantics_audit.json",
+    "benchmarks/results/cunxon_external_drive_window_probe.json"
+  ],
+  "source_files_inspected": [
+    {
+      "finding": "StepTrain exposes plasticity/reward style execution and readout copying, while Aigarth exposes a scalar fitness callback; neither surface accepts desired-output vectors.",
+      "lines": "173-220, 256-269",
+      "path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/include/cuNxon.h"
+    },
+    {
+      "finding": "cunxonFitnessFn_t returns one float score for a candidate network.",
+      "lines": "256-257",
+      "path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/include/cuNxon_types.h"
+    },
+    {
+      "finding": "Aigarth snapshots weights, resets dynamic state, mutates weights, calls the scalar fitness function, keeps the best score, restores the best weights, then resets dynamic state again.",
+      "lines": "1548-1765",
+      "path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/src/cuNxon.cu"
+    },
+    {
+      "finding": "The upstream Aigarth smoke test optimizes a trivial mean-readout scalar target, not a per-output supervised label/error vector.",
+      "lines": "396-447",
+      "path": "/home/seppe/Projects/research/DavidVivancos-Neuraxon/cuNxon/tests/test_cunxon.cu"
+    }
+  ],
+  "source_semantics": {
+    "aigarth_dynamic_state_reset_between_candidates": true,
+    "aigarth_fitness_surface": "scalar_black_box_selection",
+    "ctsn_learning_target": "homeostatic_target_firing_rate_not_motor_label",
+    "desired_output_api": "absent",
+    "external_drive_scope": "input_class_neurons_only",
+    "output_port_teacher_forcing": "unsupported",
+    "step_train_surface": "plasticity_enabled_runtime_step_without_label_loss_argument",
+    "upstream_aigarth_test_shape": "mean_readout_scalar_target"
+  },
+  "status": "low-margin objective expressivity audit completed",
+  "supervised_low_margin_train": {
+    "accuracy_mean": 1.0,
+    "execute_retry_accuracy": 1.0,
+    "query_collapse_rate": 0.3333333333333333,
+    "sample_count": 18,
+    "seeds_beating_best_baseline": 3
+  }
+}

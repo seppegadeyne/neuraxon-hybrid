@@ -1,6 +1,6 @@
 # cuNxon comparison against existing Neuraxon-Hybrid evidence
 
-Verdict: `Supervised low-margin target objective trains normalized low-margin cases but original stress/control remain baseline-or-below; not intelligence evidence`
+Verdict: `Low-margin objective expressivity boundary: normalized surrogate learned, original stress/control unchanged; not intelligence evidence`
 
 ## What changed
 
@@ -67,6 +67,7 @@ The stress objective decoder/readout geometry follow-up (`benchmarks/results/cun
 
 The supervised low-margin objective follows issue #90 with a bounded live RTX 5090 run over fresh seeds `150..152`. It optimizes normalized low-margin train-only examples and reaches `1.000000` on `supervised_low_margin_train`, standard `holdout`, and `hard_holdout`, but original `stress_holdout` remains `0.333333` with query-collapse `1.000000` and execute/retry accuracy `0.000000`; counterfactual/permuted controls remain `0.000000`. This is objective-shaping/readout diagnostics only and does not improve the original stress/control evidence boundary.
 
+The low-margin objective expressivity audit follows the supervised objective without launching another GPU sweep. It combines the completed supervised artifact with source/API evidence: `supervised_low_margin_train` is learnable at `1.000000`, but original `stress_holdout` remains `0.333333` with complete query-collapse. Source inspection shows Aigarth is scalar black-box selection over candidate weights and the desired-output API is absent; `StepTrain` remains plasticity-enabled runtime execution without label/loss/error-vector arguments. This makes the next useful hypothesis readout-margin/objective expressivity or CTSN semantics, not another longer identical objective.
 
 ## Comparison lanes
 
@@ -100,6 +101,7 @@ The supervised low-margin objective follows issue #90 with a bounded live RTX 50
 | cuNxon stress objective decoder/readout geometry | original vs scaled stress action-lane geometry | post-hoc issue #89 artifact; original stress_holdout=0.333333/query-collapse=1.000000, scaled stress_holdout 3.0x=0.888889/query-collapse=0.222222, first-lane gain=3.0; geometry evidence only | `benchmarks/results/cunxon_stress_objective_decoder_geometry_followup.json` |
 | cuNxon low-margin readout geometry | original vs scaled stress query-boundary margin | post-hoc issue #89 artifact; original stress_holdout=0.333333/query-collapse=1.000000 with first-lane margin -0.150000, scaled stress_holdout 3.0x=0.888889 with first-lane margin 0.150000; geometry evidence only | `benchmarks/results/cunxon_low_margin_readout_geometry_probe.json` |
 | cuNxon Aigarth target-contract supervised low-margin objective | normalized low-margin objective vs original stress/control boundary | fresh seeds 150..152; supervised_low_margin_train=1.000000 and holdout/hard_holdout=1.000000, but original stress_holdout=0.333333/query-collapse=1.000000/execute-retry=0.000000; counterfactual/permuted controls=0.000000; objective-shaping evidence only | `benchmarks/results/cunxon_aigarth_action_target_contract_supervised_low_margin_probe.json` |
+| cuNxon low-margin objective expressivity audit | source semantics plus normalized surrogate vs original stress boundary | supervised_low_margin_train=1.000000, but original stress_holdout=0.333333/query-collapse=1.000000; Aigarth is scalar black-box selection and desired-output API is absent; not intelligence evidence | `benchmarks/results/cunxon_low_margin_objective_expressivity_audit.json` |
 | cuNxon source semantics audit | desired-output API surface | no desired-output API surface; output-port teacher forcing through sensory inputs unsupported | `benchmarks/results/cunxon_source_semantics_audit.json` |
 | cuNxon input-proxy target route | target-proxy alignment and holdout success_rate vs trivial baselines | target proxy train alignment=1.000000; holdout=0.333333; overall=0.333333; motor readouts flat query | `benchmarks/results/cunxon_input_proxy_target_probe.json` |
 | cuNxon external-drive port-window probe | input/hidden/output sensory-id drive response | input-class windows active in infer/train; hidden/output windows stayed zero; output-window drive remains non-teacher-forcing | `benchmarks/results/cunxon_external_drive_window_probe.json` |
